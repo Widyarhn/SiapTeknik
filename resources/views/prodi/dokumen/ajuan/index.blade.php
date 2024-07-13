@@ -138,7 +138,7 @@
                                                                             <input type="file" name="file"
                                                                                 accept=".pdf">
                                                                             <button type="submit"
-                                                                                class="btn btn-outline-warning">Update dulu</button>
+                                                                                class="btn btn-outline-warning">Update</button>
                                                                         </div>
                                                                     </form>
                                                                 @endif
