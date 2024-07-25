@@ -7,6 +7,7 @@
     <title>UPPS | Matriks Penilaian</title>
     @include('body')
 </head>
+
 <body>
     <div id="app">
         <div class="main-wrapper main-wrapper-1">
@@ -23,31 +24,32 @@
                     <div class="section-header">
                         <h1>Edit Matriks Penilaian</h1>
                         <div class="section-header-breadcrumb">
-                            <div class="breadcrumb-item active"><a href="{{ url('dashboard-UPPS') }}">Dashboard</a></div>
+                            <div class="breadcrumb-item active"><a href="{{ url('dashboard-UPPS') }}">Dashboard</a>
+                            </div>
                             <div class="breadcrumb-item">Matriks Penilaian</div>
                         </div>
                     </div>
                     @if ($errors->any())
-                    <div class="alert alert-danger">
-                        <ul>
-                            @foreach ($errors->all() as $error)
-                                <li>{{ $error }}</li>
-                            @endforeach
-                        </ul>
-                    </div>
-                @endif
-                @if(session('success'))
-                    <script>
-                        const success = swal({
-                            icon: 'success',
-                            title: 'Berhasil!',
-                            text: '{{ session('success') }}'
-                        })
-                    </script>
-                @endif
+                        <div class="alert alert-danger">
+                            <ul>
+                                @foreach ($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
+                    @if (session('success'))
+                        <script>
+                            const success = swal({
+                                icon: 'success',
+                                title: 'Berhasil!',
+                                text: '{{ session('success') }}'
+                            })
+                        </script>
+                    @endif
                     <div class="section-body">
                         <h2 class="section-title">Matriks Penilaian</h2>
-                        <p class="section-lead">Matriks Penilaian Instrumen Akreditasi Lingkup INFOKOM</p>
+                        <p class="section-lead">Matriks Penilaian Instrumen Akreditasi Lingkup Teknik</p>
                         <!--Basic table-->
                         <div class="row">
                             <div class="col-12">
@@ -56,111 +58,125 @@
                                         <h4>Edit Data Matriks Penilaian</h4>
                                     </div>
                                     <div class="card-body">
-                                        <form action="{{route('UPPS.matriks-penilaian.update', ['id' => $matriks_penilaian->id, 'id_jenjang'=> $jenjang->id])}}" method="post"
-                                        enctype="multipart/form-data" id="formActionEdit">
-                                        @csrf
-                                        @method('POST')
-                                        <div class="modal-body" id="formEdit">
-                                            <div class="card">
-                                                <form class="needs-validation" novalidate="">
+                                        <form
+                                            action="{{ route('UPPS.matriks-penilaian.update', ['id' => $matriks_penilaian->id, 'id_jenjang' => $jenjang->id]) }}"
+                                            method="post" enctype="multipart/form-data" id="formActionEdit">
+                                            @csrf
+                                            @method('POST')
+                                            <div class="modal-body" id="formEdit">
+                                                <div class="card">
                                                     <div class="card-body">
-                                                        <input type="hidden" class="form-control" value="{{$jenjang->id}}" name="jenjang_id">
+                                                        <input type="hidden" class="form-control"
+                                                            value="{{ $jenjang->id }}" name="jenjang_id">
                                                         <div class="row">
-                                                            <div class="col-md-6"> 
-                                                                <div class="form-group">
-                                                                    <label>Bobot</label>
-                                                                    <input type="text" class="form-control"name="bobot"
-                                                                        value="{{$matriks_penilaian->bobot}}">
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <div class="row">
-                                                            <div class="col-md-6">
+                                                            <div class="col-md-12">
                                                                 <div class="form-group">
                                                                     <label>Elemen Penilaian</label>
-                                                                    <select id="kriteria_id" class="form-control selectric" name="kriteria_id">
+                                                                    <select id="kriteria_id"
+                                                                        class="form-control selectric"
+                                                                        name="kriteria_id">
                                                                         <option value="">-- Pilih --</option>
                                                                         @foreach ($kriteria as $k)
-                                                                            <option @if ($k->id == $matriks_penilaian->kriteria_id) selected  @endif value="{{ $k->id }}">
-                                                                                {{ $k->butir . '  ' . $k->kriteria }}</option>
+                                                                            <option
+                                                                                @if ($k->id == $matriks_penilaian->kriteria_id) selected @endif
+                                                                                value="{{ $k->id }}">
+                                                                                {{ $k->butir . '  ' . $k->kriteria }}
+                                                                            </option>
                                                                         @endforeach
                                                                     </select>
                                                                 </div>
                                                             </div>
-                                                            
                                                         </div>
                                                         <div class="row">
-                                                            <div class="col-md-6">
-                                                            <div class="form-group">
-                                                                <label>Sub Elemen</label>
-                                                                <input type="text" class="form-control" name="sub_kriteria" value="{{$matriks_penilaian->sub_kriteria}}"
-                                                                    placeholder="">
-                                                            </div>
-                                                            </div>
-                                                            <div class="col-md-6">
-                                                            <div class="form-group">
-                                                                <label>No Butir</label>
-                                                                <input type="text" class="form-control" name="no_butir" placeholder="contoh: 1.1"
-                                                                value="{{$matriks_penilaian->no_butir}}">
-                                                            </div>
+                                                            <div class="col-md-12">
+                                                                <div class="form-group">
+                                                                    <label>Sub Elemen</label>
+                                                                    <textarea class="form-control" name="sub_kriteria" placeholder="contoh: C.1.4. Indikator Kinerja Utama"
+                                                                        >{{ $matriks_penilaian->sub_kriteria->sub_kriteria }}</textarea>
+                                                                </div>
                                                             </div>
                                                         </div>
-                                                        <div class="form-group">
-                                                            <label>Deskripsi</label>
-                                                            <input type="text" class="form-control" name="deskriptor" value="{{$matriks_penilaian->deskriptor}}"
-                                                                placeholder="">
-                                                                
+                                                        <div id="indikator-wrapper">
+                                                            <div class="indikator-item">
+                                                                <hr>
+                                                                <div class="form-row">
+                                                                    <div class="form-group col-lg-9">
+                                                                        <label>Deskripsi</label>
+                                                                        <input type="text" class="form-control"
+                                                                            name="deskriptor"
+                                                                            placeholder="isi deskripsi"
+                                                                            value="{{ $matriks_penilaian->indikator->deskriptor }}">
+                                                                    </div>
+                                                                    <div class="form-group col-lg-3">
+                                                                        <label>Bobot Butir</label>
+                                                                        <input type="text" class="form-control"
+                                                                            name="bobot"
+                                                                            placeholder="contoh: 0.5"
+                                                                            value="{{ $matriks_penilaian->indikator->bobot }}">
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label>4</label>
+                                                                    <input type="text" class="form-control"
+                                                                        name="sangat_baik"
+                                                                        placeholder="isi untuk deskripsi nilai sangat baik"
+                                                                        value="{{ $matriks_penilaian->indikator->sangat_baik }}">
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label>3</label>
+                                                                    <input type="text" class="form-control"
+                                                                        name="baik"
+                                                                        placeholder="isi untuk deskripsi nilai baik"
+                                                                        value="{{ $matriks_penilaian->indikator->baik }}">
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label>2</label>
+                                                                    <input type="text" class="form-control"
+                                                                        name="cukup"
+                                                                        placeholder="isi untuk deskripsi nilai cukup"
+                                                                        value="{{ $matriks_penilaian->indikator->cukup }}">
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label>1</label>
+                                                                    <input type="text" class="form-control"
+                                                                        name="kurang"
+                                                                        placeholder="isi untuk deskripsi nilai kurang"
+                                                                        value="{{ $matriks_penilaian->indikator->kurang }}">
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label>0</label>
+                                                                    <input type="text" class="form-control"
+                                                                        name="sangat_kurang"
+                                                                        placeholder="isi untuk deskripsi nilai sangat kurang"
+                                                                        value="{{ $matriks_penilaian->indikator->sangat_kurang }}">
+                                                                </div>
+                                                            </div>
                                                         </div>
-                                                        <div class="form-group">
-                                                            <label>4</label>
-                                                            <input type="text" class="form-control" name="sangat_baik"
-                                                                value="{{$matriks_penilaian->sangat_baik}}">
-                                                        </div>
-                                                        <div class="form-group">
-                                                            <label>3</label>
-                                                            <input type="text" class="form-control" name="baik"
-                                                                value="{{$matriks_penilaian->baik}}">
-                                                        </div>
-                                                        <div class="form-group">
-                                                            <label>2</label>
-                                                            <input type="text" class="form-control" name="cukup"
-                                                                value="{{$matriks_penilaian->cukup}}">
-                                                        </div>
-                                                        <div class="form-group">
-                                                            <label>1</label>
-                                                            <input type="text" class="form-control" name="kurang"
-                                                                value="{{$matriks_penilaian->kurang}}">
-                                                        </div>
-                
-                                                </form>
+                                                    </div>
+                                                </div>
+                                                <div class="modal-footer bg-whitesmoke br">
+                                                    <div>
+                                                        <a href="{{ route('UPPS.matriks-penilaian.jenjang', $jenjang->id) }}"
+                                                            class="btn btn-secondary"><i class="fa fa-chevron-left"></i>
+                                                            Kembali</a>
+                                                    </div>
+                                                    <button type="submit" class="btn btn-primary">Simpan</button>
+                                                </div>
                                             </div>
-                                        </div>
-                                        <div class="modal-footer bg-whitesmoke br">
-                                            <div>
-                                                <a href="{{ route('UPPS.matriks-penilaian.jenjang', $jenjang->id) }}" class="btn btn-secondary"><i
-                                                    class="fa fa-chevron-left"></i> Kembali</a>
-                                            </div>
-                                            <button type="submit" class="btn btn-primary">Simpan</button>
-                                        </div>
-                                    </form>
+                                        </form>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <!--Basic table-->
+                </section>
             </div>
-            </section>
+            <footer class="main-footer">
+                @include('footer')
+                <div class="footer-right">
+                </div>
+            </footer>
         </div>
-        <footer class="main-footer">
-            @include('footer')
-            <div class="footer-right">
-            </div>
-        </footer>
     </div>
-    </div>
-
 </body>
-
 </html>
-

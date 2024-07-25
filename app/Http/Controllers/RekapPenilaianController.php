@@ -18,14 +18,20 @@ class RekapPenilaianController extends Controller
     
     public function prodi($id_prodi)
     {
+        $total= 0.0;
         $user_asesor = UserAsesor::with('tahun')->where("user_id", Auth::user()->id)->where("program_studi_id", $id_prodi)->first();
         $kriteria = Kriteria::first();
         $matriks_penilaian = MatriksPenilaian::get();
         $program_studi = ProgramStudi::findOrFail($id_prodi);
-        $matriks = DeskEvaluasi::where("matriks_penilaian_id", "!=", null)->where("program_studi_id", $user_asesor->program_studi->id)->where("tahun_id", $user_asesor->tahun_id)->get();
-        $suplemen = DeskEvaluasi::where("suplemen_id", "!=", null)->where("program_studi_id", $user_asesor->program_studi_id)->where("tahun_id", $user_asesor->tahun_id)->get();
+        $matriks = DeskEvaluasi::where("matriks_penilaian_id", "!=", null)->where("program_studi_id", $user_asesor->program_studi->id)->where("tahun_id", $user_asesor->tahun_id)
+        ->get();
+
+        foreach($matriks as $item){
+            $total += $item->nilai * $item->matriks_penilaian->indikator->bobot;
+        }
+
         
-        return view('asesor.rekap-penilaian.d3.awal', ['program_studi'=>$program_studi, 'matriks_penilaian'=>$matriks_penilaian, "matriks" => $matriks, "suplemen" => $suplemen, 'user_asesor'=>$user_asesor]);
+        return view('asesor.rekap-penilaian.d3.awal', ['program_studi'=>$program_studi, 'matriks_penilaian'=>$matriks_penilaian, "matriks" => $matriks, 'user_asesor'=>$user_asesor, 'total' => $total]);
     }
 
     public function prodiasesmen($id_prodi)
@@ -35,9 +41,8 @@ class RekapPenilaianController extends Controller
         $matriks_penilaian = MatriksPenilaian::get();
         $program_studi = ProgramStudi::findOrFail($id_prodi);
         $matriks = AsesmenLapangan::where("matriks_penilaian_id", "!=", null)->where("program_studi_id", $user_asesor->program_studi->id)->where("tahun_id", $user_asesor->tahun_id)->get();
-        $suplemen = AsesmenLapangan::where("suplemen_id", "!=", null)->where("program_studi_id", $user_asesor->program_studi_id)->where("tahun_id", $user_asesor->tahun_id)->get();
-        
-        return view('asesor.rekap-penilaian.d3.akhir', ['program_studi'=>$program_studi, 'matriks_penilaian'=>$matriks_penilaian, "matriks" => $matriks, "suplemen" => $suplemen, 'user_asesor'=>$user_asesor]);
+
+        return view('asesor.rekap-penilaian.d3.akhir', ['program_studi'=>$program_studi, 'matriks_penilaian'=>$matriks_penilaian, "matriks" => $matriks, 'user_asesor'=>$user_asesor]);
     }
     
     public function json(Request $request, $id_prodi)
@@ -46,22 +51,21 @@ class RekapPenilaianController extends Controller
         $kriteria = Kriteria::first();
         $program_studi = ProgramStudi::findOrFail($id_prodi);
         $matriks_penilaian = MatriksPenilaian::get();
-        $suplemen = Suplemen::get();
         
         $user_asesor = UserAsesor::where("user_id", Auth::user()->id)->first();
         
         $data = DeskEvaluasi::where('program_studi_id', $user_asesor->program_studi_id)
         ->where("tahun_id", $user_asesor->tahun_id)
-        ->with(["matriks_penilaian", "suplemen"])
+        ->with(["matriks_penilaian"])
         ->get();
         
         return DataTables::of($data)
         ->addIndexColumn()
         ->addColumn('sub_kriteria', function ($row) {
-            if ($row->matriks_penilaian != null) {
-                return $row->matriks_penilaian->sub_kriteria;
-            } else if ($row->suplemen != null) {
-                return $row->suplemen->sub_kriteria;
+            if ($row->matriks_penilaian->sub_kriteria != null) {
+                return $row->matriks_penilaian->sub_kriteria->sub_kriteria;
+            } else {
+                return $row->matriks_penilaian->kriteria->kriteria;
             }
         })
         ->addColumn('deskripsi', function ($row) {
@@ -80,19 +84,16 @@ class RekapPenilaianController extends Controller
         })
         ->addColumn('bobot', function ($row) {
             if ($row->matriks_penilaian != null) {
-                return $row->matriks_penilaian->bobot;
-            } else if ($row->suplemen != null) {
-                return $row->suplemen->bobot;
+                return $row->matriks_penilaian->indikator->bobot;
+            } else {
+                return ' ';
             }
         })
         ->addColumn('nilai_bobot', function ($row) {
             if ($row->matriks_penilaian != null) {
-                return '<span class="badge badge-info">' . $row->nilai * $row->matriks_penilaian->bobot . '</span>';
-            } else if ($row->suplemen != null) {
-                return '<span class="badge badge-info">' . $row->nilai * $row->suplemen->bobot . '</span>';
-            }
-            if ($row->suplemen) {
+                return '<span class="badge badge-info">' . $row->nilai * $row->matriks_penilaian->indikator->bobot . '</span>';
             } else {
+                return ' ';
             }
         })
         ->rawColumns(['butir', 'deskripsi', 'nilai', 'nilai_bobot'])
@@ -108,22 +109,20 @@ class RekapPenilaianController extends Controller
         $kriteria = Kriteria::first();
         $program_studi = ProgramStudi::findOrFail($id_prodi);
         $matriks_penilaian = MatriksPenilaian::get();
-        $suplemen = Suplemen::get();
-        
         $user_asesor = UserAsesor::where("user_id", Auth::user()->id)->first();
         
         $data = AsesmenLapangan::where('program_studi_id', $user_asesor->program_studi_id)
         ->where("tahun_id", $user_asesor->tahun_id)
-        ->with(["matriks_penilaian", "suplemen"])
+        ->with(["matriks_penilaian"])
         ->get();
         
         return DataTables::of($data)
         ->addIndexColumn()
         ->addColumn('sub_kriteria', function ($row) {
-            if ($row->matriks_penilaian != null) {
-                return $row->matriks_penilaian->sub_kriteria;
-            } else if ($row->suplemen != null) {
-                return $row->suplemen->sub_kriteria;
+            if ($row->matriks_penilaian->sub_kriteria != null) {
+                return $row->matriks_penilaian->sub_kriteria->sub_kriteria;
+            } else {
+                return $row->matriks_penilaian->kriteria->kriteria;
             }
         })
         ->addColumn('deskripsi', function ($row) {
@@ -142,19 +141,16 @@ class RekapPenilaianController extends Controller
         })
         ->addColumn('bobot', function ($row) {
             if ($row->matriks_penilaian != null) {
-                return $row->matriks_penilaian->bobot;
-            } else if ($row->suplemen != null) {
-                return $row->suplemen->bobot;
+                return $row->matriks_penilaian->indikator->bobot;
+            } else {
+                return ' ';
             }
         })
         ->addColumn('nilai_bobot', function ($row) {
             if ($row->matriks_penilaian != null) {
-                return '<span class="badge badge-info">' . $row->nilai * $row->matriks_penilaian->bobot . '</span>';
-            } else if ($row->suplemen != null) {
-                return '<span class="badge badge-info">' . $row->nilai * $row->suplemen->bobot . '</span>';
-            }
-            if ($row->suplemen) {
+                return '<span class="badge badge-info">' . $row->nilai * $row->matriks_penilaian->indikator->bobot . '</span>';
             } else {
+                return ' ';
             }
         })
         ->rawColumns(['butir', 'deskripsi', 'nilai', 'nilai_bobot'])

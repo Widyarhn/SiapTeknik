@@ -21,7 +21,7 @@ class CreateDokumenAjuansTable extends Migration
             $table->unsignedInteger('step_id')->nullable();
             $table->foreignIdFor(Timeline::class)->nullable();
             $table->string('kategori');
-            $table->boolean('status')->default(false);
+            $table->boolean('pengajuan_ulang')->default(false);
             $table->text('keterangan');
             $table->timestamps();
         });

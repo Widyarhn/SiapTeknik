@@ -154,7 +154,21 @@
                 <form action="" method="post" enctype="multipart/form-data" id="formActionEditKriteria">
                     @csrf
                     @method('PUT')
-                    <div class="modal-body" id="formEditKriteria">
+                    <input type="hidden" id="deletedLkps" name="deleted_lkps[]">
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label>Butir</label>
+                            <input type="text" class="form-control" name="butir" id="editButir">
+                        </div>
+                        <div class="form-group">
+                            <label>Kriteria</label>
+                            <input type="text" class="form-control" name="kriteria" id="editKriteria">
+                        </div>
+                        <div class="form-group">
+                            <label>List Tabel LKPS</label>
+                            <div id="editLkpsContainer"></div>
+                            <button class="btn btn-success" type="button" onclick="addLkpsEdit()">Add LKPS</button>
+                        </div>
                     </div>
                     <div class="modal-footer bg-whitesmoke br">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
@@ -164,6 +178,30 @@
             </div>
         </div>
     </div>
+
+
+    {{-- <div class="modal fade" tabindex="-1" role="dialog" id="modalEdit">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Edit Kriteria</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form action="" method="post" enctype="multipart/form-data" id="formActionEditKriteria">
+                    @csrf
+                    @method('PUT')
+                    <div class="modal-body" id="formEditKriteria">
+                    </div>
+                    <div class="modal-footer bg-whitesmoke br">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
+                        <button type="submit" class="btn btn-primary">Simpan</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div> --}}
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             document.querySelectorAll('.add-lkps').forEach(function(button) {
@@ -236,17 +274,104 @@
             });
         });
 
+        let lkpsEditIndex = 0;
+
+        function addLkpsEdit() {
+            lkpsEditIndex++;
+            $('#editLkpsContainer').append(`
+        <div class="input-group mb-3" id="edit-lkps-${lkpsEditIndex}">
+            <input type="hidden" name="lkps[${lkpsEditIndex}][id]" value="">
+            <input type="text" class="form-control" name="lkps[${lkpsEditIndex}][nama_tabel_lkps]" required>
+            <div class="input-group-append">
+                <button class="btn btn-danger" type="button" onclick="removeLkpsEdit(${lkpsEditIndex})">Remove</button>
+            </div>
+        </div>
+    `);
+        }
+
+        function removeLkpsEdit(index) {
+            let id = $(`#edit-lkps-${index} input[name^='lkps[${index}][id]']`).val();
+
+            if (id) {
+                // Tambahkan ID yang akan dihapus ke hidden field yang akan dikirim ke server
+                $('#deletedLkps').append(`<input type="hidden" name="deleted_lkps[]" value="${id}">`);
+            }
+
+            $(`#edit-lkps-${index}`).remove();
+        }
+
+        // Saat mengisi form edit dengan data
         $("body").on('click', ".btn-edit", function() {
-            let url = $(this).data("url") + "/edit"
-            $("#formActionEditKriteria").attr("action", $(this).data("url"))
+            let url = $(this).data("url");
+            $("#formActionEditKriteria").attr("action", url);
+
             $.ajax({
                 url: url,
-                type: "get",
-                success: function(data) {
-                    $("#formEditKriteria").html(data)
+                type: "GET",
+                success: function(response) {
+                    $('#editButir').val(response.kriteria.butir);
+                    $('#editKriteria').val(response.kriteria.kriteria);
+                    $('#editLkpsContainer').empty();
+                    $('#deletedLkps').empty();
+
+                    // Mengisi item yang ada
+                    response.listLkps.forEach((lkps, index) => {
+                        $('#editLkpsContainer').append(`
+                        <div class="input-group mb-3" id="edit-lkps-${index}">
+                            <input type="hidden" name="lkps[${index}][id]" value="${lkps.id}">
+                            <input type="text" class="form-control" name="lkps[${index}][nama_tabel_lkps]" value="${lkps.nama}" required>
+                            <div class="input-group-append">
+                                <button class="btn btn-danger" type="button" onclick="removeLkpsEdit(${index})">Remove</button>
+                            </div>
+                        </div>
+                    `);
+                        lkpsEditIndex = Math.max(lkpsEditIndex, index);
+                    });
                 }
-            })
-        })
+            });
+        });
+
+
+        // $("body").on('click', ".btn-edit", function() {
+        //     let url = $(this).data("url");
+        //     $("#formActionEditKriteria").attr("action", url);
+
+        //     $.ajax({
+        //         url: url,
+        //         type: "GET",
+        //         success: function(response) {
+        //             $('#editButir').val(response.kriteria.butir);
+        //             $('#editKriteria').val(response.kriteria.kriteria);
+        //             $('#editLkpsContainer').empty();
+
+        //             response.listLkps.forEach((lkps, index) => {
+        //                 $('#editLkpsContainer').append(`
+    //             <div class="input-group mb-3" id="edit-lkps-${index}">
+    //                 <input type="hidden" name="lkps[${index}][id]" value="${lkps.id}">
+    //                 <input type="text" class="form-control" name="lkps[${index}][nama_tabel_lkps]" value="${lkps.nama}" required>
+    //                 <div class="input-group-append">
+    //                     <button class="btn btn-danger" type="button" onclick="removeLkpsEdit(${index})">Remove</button>
+    //                 </div>
+    //             </div>
+    //         `);
+        //             });
+        //         }
+        //     });
+        // });
+
+
+
+        // $("body").on('click', ".btn-edit", function() {
+        //     let url = $(this).data("url") + "/edit"
+        //     $("#formActionEditKriteria").attr("action", $(this).data("url"))
+        //     $.ajax({
+        //         url: url,
+        //         type: "get",
+        //         success: function(data) {
+        //             $("#formEditKriteria").html(data)
+        //         }
+        //     })
+        // })
 
 
         $("body").on('click', '#delete', function(e) {

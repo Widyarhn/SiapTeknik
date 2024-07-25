@@ -125,6 +125,7 @@ class TimelineController extends Controller
                     'tanggal_mulai' => $validatedData['tanggal_mulai'],
                     'tanggal_akhir' => $validatedData['tanggal_akhir'],
                     'status' => false, 
+                    'tahap' => "1", 
                 ]);
             });
 

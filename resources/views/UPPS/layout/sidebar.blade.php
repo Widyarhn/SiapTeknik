@@ -102,7 +102,7 @@
             <li class="menu-header">Akreditasi</li>
             <li class="{{ Request::segment('1') == 'akreditasi' ? 'active' : '' }}">
                 <a href="{{ route('akreditasi.index') }}" class="nav-link">
-                    <i class="fas fa-calendar"></i>
+                    <i class="fas fa-calendar-check"></i>
                     <span>Akreditasi Program Studi</span>
                 </a>
             </li>

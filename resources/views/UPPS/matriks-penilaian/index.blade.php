@@ -68,9 +68,10 @@
                                                 <thead>
                                                     <tr>
                                                         <th>No</th>
-                                                        <th width="35%">Informasi</th>
-                                                        <th width="50%">Deskripsi Nilai</th>
-                                                        <th width="15%">Aksi</th>
+                                                        <th >Informasi</th>
+                                                        <th >Indikator</th>
+                                                        <th >Deskripsi Nilai</th>
+                                                        <th >Aksi</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody></tbody>
@@ -99,6 +100,10 @@
                     {
                         data: 'informasi',
                         name: 'informasi'
+                    },
+                    {
+                        data: 'indikator',
+                        name: 'indikator'
                     },
                     {
                         data: 'nilai',

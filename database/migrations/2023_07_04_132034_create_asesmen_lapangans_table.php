@@ -23,7 +23,9 @@ class CreateAsesmenLapangansTable extends Migration
     {
         Schema::create('asesmen_lapangans', function (Blueprint $table) {
             $table->id();
-            $table->foreignIdFor(AspekPenilaian::class)->nullable();
+            $table->foreignIdFor(MatriksPenilaian::class)->nullable();
+            $table->foreignIdFor(Tahun::class)->nullable();
+            $table->foreignIdFor(ProgramStudi::class)->nullable();
             $table->foreignIdFor(UserAsesor::class)->nullable();
             $table->foreignIdFor(Timeline::class)->nullable();
             $table->float('nilai');

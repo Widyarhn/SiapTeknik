@@ -55,14 +55,15 @@ class AjuanProdiController extends Controller
             $surat_pengantar->file = $nama_file_storage;
             $surat_pengantar->program_studi_id = $request->program_studi_id;
             $surat_pengantar->tahun_id = $request->tahun_id;
+            $surat_pengantar->status = false;
             $surat_pengantar->save();
 
             // Simpan ke tabel dokumen_ajuan
             $dokumen_ajuan = new DokumenAjuan;
             $dokumen_ajuan->step_id = $surat_pengantar->id; // menghubungkan dengan ID lkps
             $dokumen_ajuan->program_studi_id = $request->program_studi_id;
-            $dokumen_ajuan->kategori = 'Surat Pengantar';
-            $dokumen_ajuan->status = false; // atau nilai default yang sesuai
+            $dokumen_ajuan->kategori = 'surat_pengantar';
+            $dokumen_ajuan->pengajuan_ulang = false; // atau nilai default yang sesuai
             $dokumen_ajuan->keterangan = 'Pengajuan Surat Pengantar';
             $dokumen_ajuan->save();
 
@@ -104,12 +105,14 @@ class AjuanProdiController extends Controller
             $surat_pengantar->program_studi_id = $request->program_studi_id;
             $surat_pengantar->tahun_id = $request->tahun_id;
             $surat_pengantar->file = $nama_file_storage;
+            $surat_pengantar->status = false;
             $surat_pengantar->save();
 
             // Update data Dokumen Ajuan yang terkait
             $dokumen_ajuan = DokumenAjuan::where('step_id', $surat_pengantar->id)->firstOrFail();
             $dokumen_ajuan->program_studi_id = $request->program_studi_id;
             $dokumen_ajuan->keterangan = 'Update Surat Pengantar';
+            $dokumen_ajuan->save();
 
             // Commit transaksi jika semua operasi berhasil
             DB::commit();
@@ -135,14 +138,15 @@ class AjuanProdiController extends Controller
             $lkps->file = $nama_file_storage;
             $lkps->program_studi_id = $request->program_studi_id;
             $lkps->tahun_id = $request->tahun_id;
+            $lkps->status = false;
             $lkps->save();
 
             // Simpan ke tabel dokumen_ajuan
             $dokumen_ajuan = new DokumenAjuan;
             $dokumen_ajuan->step_id = $lkps->id; // menghubungkan dengan ID lkps
             $dokumen_ajuan->program_studi_id = $request->program_studi_id;
-            $dokumen_ajuan->kategori = 'LKPS';
-            $dokumen_ajuan->status = false; // atau nilai default yang sesuai
+            $dokumen_ajuan->kategori = 'lkps';
+            $dokumen_ajuan->pengajuan_ulang = false; // atau nilai default yang sesuai
             $dokumen_ajuan->keterangan = 'Pengajuan Dokumen LKPS';
             $dokumen_ajuan->save();
 
@@ -177,6 +181,7 @@ class AjuanProdiController extends Controller
             $lkps->program_studi_id = $request->program_studi_id;
             $lkps->tahun_id = $request->tahun_id;
             $lkps->file = $nama_file_storage;
+            $lkps->status = false;
             $lkps->save();
 
             // Update data Dokumen Ajuan yang terkait
@@ -218,14 +223,15 @@ class AjuanProdiController extends Controller
             $led->file = $nama_file_storage;
             $led->program_studi_id = $request->program_studi_id;
             $led->tahun_id = $request->tahun_id;
+            $led->status = false;
             $led->save();
 
             // Simpan ke tabel dokumen_ajuan
             $dokumen_ajuan = new DokumenAjuan;
             $dokumen_ajuan->step_id = $led->id; // menghubungkan dengan ID lkps
             $dokumen_ajuan->program_studi_id = $request->program_studi_id;
-            $dokumen_ajuan->kategori = 'LED';
-            $dokumen_ajuan->status = false; // atau nilai default yang sesuai
+            $dokumen_ajuan->kategori = 'led';
+            $dokumen_ajuan->pengajuan_ulang = false; // atau nilai default yang sesuai
             $dokumen_ajuan->keterangan = 'Pengajuan Dokumen LED';
             $dokumen_ajuan->save();
 
@@ -261,6 +267,7 @@ class AjuanProdiController extends Controller
             $led->file = $nama_file_storage;
             $led->program_studi_id = $request->program_studi_id;
             $led->tahun_id = $request->tahun_id;
+            $led->status = false;
             $led->save();
 
             // Update data Dokumen Ajuan yang terkait

@@ -41,19 +41,17 @@
                                                 Dokumen Ajuan</a>
                                         </li>
                                         <li class="nav-item">
-                                            <a class="nav-link active"
+                                            <a class="nav-link"
                                                 href="{{ route('akreditasi.asesmenKecukupan') }}"><i
                                                     class="fas fa-regular fa-circle"></i>
                                                 Asesmen Kecukupan</a>
                                         </li>
                                         <li class="nav-item">
-                                            <a class="nav-link" href="{{ route('akreditasi.asesmenLapangan') }}"><i
-                                                    class="fas fa-circle"></i> Asesmen
+                                            <a class="nav-link active" href="{{ route('akreditasi.asesmenLapangan') }}"><i class="fas fa-circle"></i> Asesmen
                                                 Lapangan</a>
                                         </li>
                                         <li class="nav-item">
-                                            <a class="nav-link" href="{{ route('akreditasi.selesai') }}"><i
-                                                    class="fas  fa-solid fa-check"></i>
+                                            <a class="nav-link" href="{{ route('akreditasi.selesai') }}"><i class="fas  fa-solid fa-check"></i>
                                                 Selesai</a>
                                         </li>
                                     </ul>
@@ -62,33 +60,53 @@
                         </div>
 
                         <div class="row">
-                            <div class="col-md-12">
-                                <div class="card" id="settings-card">
-                                    {{-- <div class="card-header">
-                                        <h4>Data Elemen Penilaian Desk Evaluasi</h4>
-                                    </div> --}}
+                            <div class="col-md-4">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h4>Asesmen Lapangan</h4>
+                                    </div>
                                     <div class="card-body">
-                                        <div class="table-responsive">
-                                            <table class="table table-striped" id="asesmenKecukupanTable">
-                                                <thead>
-                                                    <tr>
-                                                        <th>No</th>
-                                                        <th>Tahun</th>
-                                                        <th>Program Studi</th>
-                                                        <th>Nilai Asesor 1</th>
-                                                        <th>Nilai Asesor 2</th>
-                                                        <th>Aksi</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody></tbody>
-                                            </table>
+                                        <ul class="nav nav-pills flex-column">
+                                            @foreach ($timeline as $t)
+                                                <li class="nav-item"><a href="#" class="nav-link active"
+                                                        data-id="{{ $t->program_studi->id }}">
+                                                        {{ $t->program_studi->jenjang->jenjang }}
+                                                        {{ $t->program_studi->nama }}</a>
+                                                </li>
+                                            @endforeach
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-8">
+                                <form id="setting-form">
+                                    <input type="hidden" id="program_studi_id" value="">
+
+                                    <div class="card" id="settings-card">
+                                        <div class="card-header">
+                                            <h4>Data Elemen Penilaian Asesmen Lapangan</h4>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="table-responsive">
+                                                <table class="table table-striped" id="elemenTable">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>No</th>
+                                                            <th>Butir</th>
+                                                            <th>Kriteria</th>
+                                                            <th>Aksi</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody></tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                        <div class="card-footer bg-whitesmoke text-md-right">
+                                            <button class="btn btn-primary" id="save-btn">Save Changes</button>
+                                            <button class="btn btn-secondary" type="button">Reset</button>
                                         </div>
                                     </div>
-                                    {{-- <div class="card-footer bg-whitesmoke text-md-right">
-                                        <button class="btn btn-primary" id="save-btn">Save Changes</button>
-                                        <button class="btn btn-secondary" type="button">Reset</button>
-                                    </div> --}}
-                                </div>
+                                </form>
                             </div>
                         </div>
                     </div>
@@ -102,31 +120,25 @@
         </div>
     </div>
 
-    <script>
+    {{-- <script>
+
         $(function() {
-            $('#asesmenKecukupanTable').dataTable({
+            $('#elemenTable').dataTable({
                 processing: true,
                 serverSide: true,
-                ajax: "{{ route('Upps.asesmen-kecukupan.json') }}",
+                ajax: "{{ route('asesmen-kecukupan.json') }}",
+                // url: "/nilai-deskeval-d3/json/kriteria_id/program_studi_id",
                 columns: [{
                         data: 'DT_RowIndex',
                         name: 'DT_RowIndex',
                     },
                     {
-                        data: 'tahun',
-                        name: 'tahun'
+                        data: 'butir',
+                        name: 'butir'
                     },
                     {
-                        data: 'prodi',
-                        name: 'prodi'
-                    },
-                    {
-                        data: 'nilai_asesor1',
-                        name: 'nilai_asesor1'
-                    },
-                    {
-                        data: 'nilai_asesor2',
-                        name: 'nilai_asesor2'
+                        data: 'kriteria',
+                        name: 'kriteria'
                     },
                     {
                         data: 'action',
@@ -137,7 +149,7 @@
                 ],
             })
         })
-    </script>
+    </script> --}}
 
 </body>
 

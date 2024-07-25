@@ -8,7 +8,8 @@ use Illuminate\Database\Eloquent\Model;
 class Lkps extends Model
 {
     protected $table = 'lkpss';
-    protected $fillable = ['tahun_id', 'file', 'id'];
+    protected $fillable = ['tahun_id', 'file', 'id', 'program_studi_id'];  // Tambahkan 'program_studi_id' dan 'status' jika perlu
+
 
     public function program_studi()
     {

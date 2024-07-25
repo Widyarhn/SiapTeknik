@@ -1,6 +1,9 @@
 <?php
 
 use App\Models\AspekPenilaian;
+use App\Models\MatriksPenilaian;
+use App\Models\ProgramStudi;
+use App\Models\Tahun;
 use App\Models\Timeline;
 use App\Models\UserAsesor;
 use Illuminate\Database\Migrations\Migration;
@@ -18,7 +21,9 @@ class CreateDeskEvaluasisTable extends Migration
     {
         Schema::create('desk_evaluasis', function (Blueprint $table) {
             $table->id();
-            $table->foreignIdFor(AspekPenilaian::class)->nullable();
+            $table->foreignIdFor(MatriksPenilaian::class)->nullable();
+            $table->foreignIdFor(Tahun::class)->nullable();
+            $table->foreignIdFor(ProgramStudi::class)->nullable();
             $table->foreignIdFor(UserAsesor::class)->nullable();
             $table->foreignIdFor(Timeline::class)->nullable();
             $table->float('nilai');

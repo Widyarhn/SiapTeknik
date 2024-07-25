@@ -31,72 +31,82 @@ class MatriksPenilaianController extends Controller
 
     public function json(Request $request, $id_jenjang)
     {
-        $data = MatriksPenilaian::where('jenjang_id', $id_jenjang)->with(['jenjang', 'kriteria', 'sub_kriteria', 'indikator'])->orderBy('created_at', 'ASC')
+        $data = MatriksPenilaian::where('jenjang_id', $id_jenjang)->with(['jenjang', 'kriteria', 'sub_kriteria', 'indikator'])->orderBy('kriteria_id', 'ASC')
             ->get();
 
         return DataTables::of($data)
             ->addIndexColumn()
             ->addColumn('informasi', function ($row) {
                 $informasi = '<table>
-        <tr>
-        </tr>
-            <th>Kriteria</th>
-            <td>
-            <h6>' . $row->kriteria->kriteria . '</h6>
-            </td>
-        <tr>
-        <tr>
-        <th>Deskripsi</th>
-        <td>
-            ' . $row->indikator->deskriptor . '
-        </td>
-    </tr>
-            <th>Bobot</th>
-            <td>
-                ' . $row->indikator->bobot . '
-            </td>
-        </tr>
-       ';
+                    <tr>
+                        <th>Butir</th>
+                        <td>
+                            <h6>' . $row->kriteria->butir . '</h6>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Kriteria</th>
+                        <td>
+                            <h6>' . $row->kriteria->kriteria . '</h6>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Bobot</th>
+                        <td>
+                            ' . $row->indikator->bobot . '
+                        </td>
+                    </tr>
+                </table>';
                 return $informasi;
             })
+            ->addColumn('indikator', function ($row) {
+                $indikator = '<table>
+                    <tr>
+                        <td>
+                            ' . $row->indikator->deskriptor . '
+                        </td>
+                    </tr>
+                </table>';
+                return $indikator;
+            })
             ->addColumn('nilai', function ($row) {
-                $nilai = ' <table>
-        <tr>
-            <th>' . $row->kriteria->butir . ' ' . $row->no_butir . '</th>
-            <th>
-             ' . $row->sub_kriteria->sub_kriteria . '
-            </th>
-        </tr>
-        <tr>
-            <th>4</th>
-            <td>
-                ' . $row->indikator->sangat_baik . '
-            </td>
-        </tr>
-        <tr>
-            <th>3</th>
-            <td>
-                ' . $row->indikator->baik . ' 
-            </td>
-        </tr>
-        <tr>
-            <th>2</th>
-            <td>
-                ' . $row->indikator->cukup . ' 
-            </td>
-        </tr>
-        <tr>
-            <th>1</th>
-            <td>
-                ' . $row->indikator->kurang . ' 
-            </td>
-        </tr> 
-        <tr>
-            <th>0</th>
-            <td>
-                ' . $row->indikator->sangat_kurang . ' 
-            </td>
-        </tr></table>';
+                $subKriteria = optional($row->sub_kriteria)->sub_kriteria;
+                $nilai = '<table>
+                    <tr>
+                        <th><h6>' . $row->kriteria->butir . '</h6></th>
+                        <th>' . ($subKriteria ? $subKriteria : '') . '</th>
+                    </tr>
+                    <tr>
+                        <th>4</th>
+                        <td>
+                            ' . $row->indikator->sangat_baik . '
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>3</th>
+                        <td>
+                            ' . $row->indikator->baik . ' 
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>2</th>
+                        <td>
+                            ' . $row->indikator->cukup . ' 
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>1</th>
+                        <td>
+                            ' . $row->indikator->kurang . ' 
+                        </td>
+                    </tr> 
+                    <tr>
+                        <th>0</th>
+                        <td>
+                            ' . $row->indikator->sangat_kurang . ' 
+                        </td>
+                    </tr>
+                </table>';
                 return $nilai;
             })
             ->addColumn('action', function ($row) use ($id_jenjang) {
@@ -106,7 +116,7 @@ class MatriksPenilaianController extends Controller
         </div>';
             })
 
-            ->rawColumns(['informasi', 'nilai', 'action'])
+            ->rawColumns(['informasi', 'indikator', 'nilai', 'action'])
             ->make(true);
     }
 
@@ -126,9 +136,9 @@ class MatriksPenilaianController extends Controller
         $validatedData = $request->validate([
             'jenjang_id' => 'required',
             'kriteria_id' => 'required',
-            'bobot' => 'required|numeric',
             'sub_kriteria' => 'nullable',
             'indikator' => 'required|array', // Menjadikan 'indikator' sebagai array wajib
+            'indikator.*.bobot' => 'sometimes|required|numeric',
             'indikator.*.deskriptor' => 'sometimes|required|min:6',
             'indikator.*.sangat_baik' => 'sometimes|required|min:6',
             'indikator.*.baik' => 'sometimes|required|min:6',
@@ -147,24 +157,31 @@ class MatriksPenilaianController extends Controller
         }
 
         foreach ($request->indikator as $indikatorData) {
-            $indikator = Indikator::create([
-                'deskriptor' => $indikatorData['deskriptor'],
-                'sangat_baik' => $indikatorData['sangat_baik'],
-                'baik' => $indikatorData['baik'],
-                'cukup' => $indikatorData['cukup'],
-                'kurang' => $indikatorData['kurang'],
-                'sangat_kurang' => $indikatorData['sangat_kurang'],
-                'sub_kriteria_id' => $subKriteriaId,
-                'bobot' => $request->bobot,
-            ]);
+            if (isset($indikatorData['deskriptor']) && isset($indikatorData['sangat_baik']) && isset($indikatorData['baik']) && isset($indikatorData['cukup']) && isset($indikatorData['kurang']) && isset($indikatorData['sangat_kurang']) && isset($indikatorData['bobot'])) {
+                $indikator = Indikator::create([
+                    'deskriptor' => $indikatorData['deskriptor'],
+                    'sangat_baik' => $indikatorData['sangat_baik'],
+                    'baik' => $indikatorData['baik'],
+                    'cukup' => $indikatorData['cukup'],
+                    'kurang' => $indikatorData['kurang'],
+                    'sangat_kurang' => $indikatorData['sangat_kurang'],
+                    'sub_kriteria_id' => $subKriteriaId,
+                    'bobot' => $indikatorData['bobot'],
+                ]);
 
-            MatriksPenilaian::create([
-                'jenjang_id' => $request->jenjang_id,
-                'kriteria_id' => $request->kriteria_id,
-                'sub_kriteria_id' => $subKriteriaId,
-                'indikator_id' => $indikator->id
-            ]);
+                MatriksPenilaian::create([
+                    'jenjang_id' => $request->jenjang_id,
+                    'kriteria_id' => $request->kriteria_id,
+                    'sub_kriteria_id' => $subKriteriaId,
+                    'indikator_id' => $indikator->id,
+                ]);
+            } else {
+                // Handle the case where data is missing
+                return response()->json(['error' => 'Incomplete data in indikator array'], 422);
+            }
         }
+
+        // return response()->json(['success' => 'Data saved successfully'], 200);
 
         return back()->with('success', 'Data Matriks Penilaian Berhasil Ditambahkan');
     }
@@ -183,6 +200,7 @@ class MatriksPenilaianController extends Controller
 
     public function update(Request $request, $id, $id_jenjang)
     {
+        // Validasi data
         $validatedData = $request->validate([
             'kriteria_id' => 'required',
             'sub_kriteria' => 'required',
@@ -191,29 +209,45 @@ class MatriksPenilaianController extends Controller
             'baik' =>  ['required', 'min:6'],
             'cukup' =>  ['required', 'min:6'],
             'kurang' =>  ['required', 'min:6'],
+            'sangat_kurang' =>  ['required', 'min:6'],
             'bobot' => 'required|numeric',
         ]);
-        $matriks_penilaian = MatriksPenilaian::where('jenjang_id', $id_jenjang)->find($id);
-        $matriks_penilaian->jenis_id = $request->jenis_id;
-        $matriks_penilaian->jenjang_id = $request->jenjang_id;
-        $matriks_penilaian->kriteria_id = $request->kriteria_id;
-        $matriks_penilaian->golongan_id = $request->golongan_id;
-        $matriks_penilaian->sub_kriteria = $request->sub_kriteria;
-        $matriks_penilaian->no_butir = $request->no_butir;
-        $matriks_penilaian->deskriptor = $request->deskriptor;
-        $matriks_penilaian->sangat_baik = $request->sangat_baik;
-        $matriks_penilaian->baik = $request->baik;
-        $matriks_penilaian->cukup = $request->cukup;
-        $matriks_penilaian->kurang = $request->kurang;
-        $matriks_penilaian->bobot = $request->bobot;
+
+        // Temukan objek MatriksPenilaian
+        $matriks_penilaian = MatriksPenilaian::where('jenjang_id', $id_jenjang)->findOrFail($id);
+        $matriks_penilaian->jenjang_id = $request->input('jenjang_id', $matriks_penilaian->jenjang_id);
+        $matriks_penilaian->kriteria_id = $request->input('kriteria_id', $matriks_penilaian->kriteria_id);
         $matriks_penilaian->save();
 
-        return back()->with('success', 'Data Matriks Penilaian Berhasil Disimpan');
+        // Temukan dan perbarui SubKriteria
+        $sub_kriteria = SubKriteria::where('id', $matriks_penilaian->sub_kriteria_id)->firstOrFail();
+        $sub_kriteria->sub_kriteria = $request->input('sub_kriteria', $sub_kriteria->sub_kriteria);
+        $sub_kriteria->save();
+
+        // Temukan dan perbarui Indikator
+        $indikator = Indikator::where('id', $matriks_penilaian->indikator_id)->firstOrFail();
+        $indikator->deskriptor = $request->input('deskriptor', $indikator->deskriptor);
+        $indikator->sangat_baik = $request->input('sangat_baik', $indikator->sangat_baik);
+        $indikator->baik = $request->input('baik', $indikator->baik);
+        $indikator->cukup = $request->input('cukup', $indikator->cukup);
+        $indikator->kurang = $request->input('kurang', $indikator->kurang);
+        $indikator->sangat_kurang = $request->input('sangat_kurang', $indikator->sangat_kurang);
+        $indikator->bobot = $request->input('bobot', $indikator->bobot);
+        $indikator->save();
+
+        return back()->with('success', 'Data Matriks Penilaian Berhasil Diperbarui');
     }
+
 
     public function destroy($id)
     {
         $matriks_penilaian = MatriksPenilaian::find($id);
+
+        $sub_kriteria = SubKriteria::where('id', $matriks_penilaian->sub_kriteria_id)->firstOrFail();
+        $indikator = Indikator::where('id', $matriks_penilaian->indikator_id)->firstOrFail();
+
         $matriks_penilaian->delete();
+        $sub_kriteria->delete();
+        $indikator->delete();
     }
 }

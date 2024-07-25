@@ -41,8 +41,9 @@ use Illuminate\Support\Facades\Route;
 | routes are loaded by the RouteServiceProvider and all of them will
 | be assigned to the "web" middleware group. Make something great!
 |
-*/    
-Route::group(['middleware' => ['guest']], function() {
+*/
+
+Route::group(['middleware' => ['guest']], function () {
     Route::get('/', [LoginController::class, 'index'])->name('login');
     Route::get('/forgot-password', [LoginController::class, 'forgotpw'])->name('forgot-password');
     Route::post('/reset-password', [LoginController::class, 'resetPassword'])->name('password.resetPassword');
@@ -51,15 +52,23 @@ Route::group(['middleware' => ['guest']], function() {
     Route::post('/login/auth', [LoginController::class, 'auth'])->name('login.auth');
 });
 
-Route::group(["middleware" => ["autentikasi"]], function() {
-    Route::group(["middleware" => ["can:UPPS"]], function() {
+Route::group(["middleware" => ["autentikasi"]], function () {
+    Route::group(["middleware" => ["can:UPPS"]], function () {
         Route::get('timeline/json', [TimelineController::class, 'json'])->name('UPPS.timeline.json');
         Route::post('timeline/store', [TimelineController::class, 'store'])->name('UPPS.timeline.store');
         Route::resource('timeline', TimelineController::class);
-        
+
+        Route::post('akreditasi/dokumen_ajuan/{id}', [AkreditasiController::class, 'selesai'])->name('dokumen_selesai');
+        Route::post('akreditasi/approve/{id}/{type?}', [AkreditasiController::class, 'approve'])->name('dokumen_approve');
+        Route::post('akreditasi/disapprove/{id}', [AkreditasiController::class, 'disapprove'])->name('dokumen_disapprove');
+        Route::get('akreditasi/asesmen-kecukupan/show', [AkreditasiController::class, 'show'])->name('akreditasi.asesmenKecukupan.show');
+        Route::get('akreditasi/asesmen-kecukupan/json', [AkreditasiController::class, 'jsonAk'])->name('Upps.asesmen-kecukupan.json');
+        Route::get('akreditasi/asesmen-lapangan', [AkreditasiController::class, 'asesmenLapangan'])->name('akreditasi.asesmenLapangan');
         Route::get('akreditasi/asesmen-kecukupan', [AkreditasiController::class, 'asesmenKecukupan'])->name('akreditasi.asesmenKecukupan');
+        Route::get('akreditasi/selesai', [AkreditasiController::class, 'finish'])->name('akreditasi.selesai');
         Route::get('akreditasi/detail/{id_prodi}', [AkreditasiController::class, 'detail'])->name('UPPS.akreditasi.detail');
         Route::post('akreditasi/penugasanProdi', [AkreditasiController::class, 'penugasanProdi'])->name('UPPS.akreditasi.penugasanProdi');
+        Route::post('akreditasi/penugasanAsesor', [AkreditasiController::class, 'penugasanAsesor'])->name('UPPS.akreditasi.penugasanAsesor');
         Route::get('akreditasi/json', [AkreditasiController::class, 'json'])->name('UPPS.akreditasi.json');
         Route::post('akreditasi/store', [AkreditasiController::class, 'store'])->name('UPPS.akreditasi.store');
         Route::resource('akreditasi', AkreditasiController::class);
@@ -71,31 +80,31 @@ Route::group(["middleware" => ["autentikasi"]], function() {
         Route::get('berita-acara/asesmenLapanganTable', [DashboardUPPSController::class, 'asesmenLapanganTable'])->name('berita-acara.asesmenLapanganTable');
         Route::post('tahun-akreditasi/store', [DashboardUPPSController::class, 'store'])->name('tahun-akreditasi.store');
         Route::resource('dashboard-UPPS', DashboardUPPSController::class);
-        
+
         Route::post('user-asesor/store', [UserAsesorController::class, 'store'])->name('UPPS.user.store');
         Route::get('user-asesor/jsonAsesor/{id}', [UserAsesorController::class, 'jsonAsesor'])->name('UPPS.user.jsonAsesor');
         Route::get('user-asesor/asesor/{id}', [UserAsesorController::class, 'asesor'])->name('UPPS.user-asesor.asesor');
         Route::resource('user-asesor', UserAsesorController::class);
-        
+
         Route::get('user/json', [UserController::class, 'json'])->name('UPPS.user.json');
         Route::post('user/store', [UserController::class, 'store'])->name('UPPS.user.create');
         Route::resource('user', UserController::class);
-        
+
         Route::post('user-prodi/store', [UserProdiController::class, 'store'])->name('UPPS.user-prodi.store');
         Route::get('user-prodi/jsonProdi{id}', [UserProdiController::class, 'jsonProdi'])->name('UPPS.user-prodi.jsonProdi');
         Route::get('user-prodi/prodi/{id}', [UserProdiController::class, 'prodi'])->name('UPPS.user-prodi.prodi');
         Route::resource('user-prodi', UserProdiController::class);
-        
+
         Route::post('prodi/store', [ProgramStudiController::class, 'store'])->name('UPPS.prodi.store');
         Route::get('prodi/json', [ProgramStudiController::class, 'json'])->name('UPPS.prodi.json');
         Route::resource('prodi', ProgramStudiController::class);
-        
+
         Route::post('upps-datadukung/update/{id_prodi}', [DataDukungUppsController::class, 'update'])->name('Upps.data-dukung.update');
         Route::get('upps-datakung/data/{id_prodi}', [DataDukungUppsController::class, 'data'])->name('Upps.data-dukung.data');
         Route::get('upps-datadukung/elemen/{id_prodi}', [DataDukungUppsController::class, 'elemen'])->name('Upps.data-dukung.elemen');
         Route::get('upps-datadukung/download/{id}', [DataDukungUppsController::class, 'download'])->name('Upps.data-dukung.download');
         Route::resource('upps-datadukung', DataDukungUppsController::class);
-        
+
         Route::post('upps-dokumenajuan/tugasLed', [AjuanUppsController::class, 'tugasLed'])->name('upps.dokumenajuan.tugasLed');
         Route::post('upps-dokumenajuan/approveLed/{id}', [AjuanUppsController::class, 'approveLed'])->name('upps.dokumenajuan.approveLed');
         Route::get('upps-dokumenajuan/assignLed/{id}/{id_prodi}', [AjuanUppsController::class, 'assignLed'])->name('upps.dokumenajuan.assignLed');
@@ -103,24 +112,26 @@ Route::group(["middleware" => ["autentikasi"]], function() {
         Route::get('upps-dokumenajuan/assignLkps/{id}/{id_prodi}', [AjuanUppsController::class, 'assignLkps'])->name('upps.dokumenajuan.assignLkps');
         Route::post('upps-dokumenajuan/tugasLkps', [AjuanUppsController::class, 'tugasLkps'])->name('upps.dokumenajuan.tugasLkps');
         Route::get('upps-dokumenajuan/prodi/{id_prodi}', [AjuanUppsController::class, 'prodi'])->name('upps.dokumenajuan.prodi');
-        
+
         Route::post('instrumen/store', [InstrumenController::class, 'store'])->name('UPPS.instrumen.store');
         Route::get('instrumen/json/{id}', [InstrumenController::class, 'json'])->name('UPPS.instrumen.json');
         Route::get('instrumen/jenjang/{id}', [InstrumenController::class, 'jenjang'])->name('UPPS.instrumen.jenjang');
         Route::resource('instrumen', InstrumenController::class);
-        
+
         Route::post('kriteria/store', [KriteriaController::class, 'store'])->name('UPPS.matriks-penilaian.kriteria.store');
         Route::get('kriteria/json', [KriteriaController::class, 'json'])->name('UPPS.matriks-penilaian.kriteria.json');
+        Route::get('/kriteria/{id}', [KriteriaController::class, 'show'])->name('kriteria.show');
+        Route::put('/kriteria/{id}', [KriteriaController::class, 'update'])->name('kriteria.update');
         Route::resource('kriteria', KriteriaController::class);
-        
+
         Route::post('golongan/store', [GolonganController::class, 'store'])->name('UPPS.matriks-penilaian.golongan.store');
         Route::get('golongan/tableGolongan', [GolonganController::class, 'tableGolongan'])->name('UPPS.matriks-penilaian.golongan.tableGolongan');
         Route::resource('golongan', GolonganController::class);
-        
+
         Route::post('jenis/store', [JenisController::class, 'store'])->name('UPPS.matriks-penilaian.jenis.store');
         Route::get('jenis/tableJenis', [JenisController::class, 'tableJenis'])->name('UPPS.matriks-penilaian.jenis.tableJenis');
         Route::resource('jenis', JenisController::class);
-        
+
         Route::get('matriks-penilaian/json{id_jenjang}', [MatriksPenilaianController::class, 'json'])->name('UPPS.matriks-penilaian.json');
         Route::post('matriks-penilaian/store', [MatriksPenilaianController::class, 'store'])->name('UPPS.matriks-penilaian.store');
         Route::get('matriks-penilaian/create/{id}', [MatriksPenilaianController::class, 'create'])->name('UPPS.matriks-penilaian.create');
@@ -128,7 +139,7 @@ Route::group(["middleware" => ["autentikasi"]], function() {
         Route::post('matriks-penilaian/update/{id}/{id_jenjang}', [MatriksPenilaianController::class, 'update'])->name('UPPS.matriks-penilaian.update');
         Route::get('matriks-penilaian/jenjang/{id}', [MatriksPenilaianController::class, 'jenjang'])->name('UPPS.matriks-penilaian.jenjang');
         Route::resource('matriks-penilaian', MatriksPenilaianController::class);
-        
+
         Route::post('suplemen-d3/update/{id}/{id_prodi}', [SuplemenController::class, 'update'])->name('UPPS.suplemen-d3.update');
         Route::get('suplemen-d3/edit/{id}/{id_prodi}', [SuplemenController::class, 'edit'])->name('UPPS.suplemen-d3.edit');
         Route::get('suplemen-d3/create/{id_prodi}', [SuplemenController::class, 'create'])->name('UPPS.suplemen-d3.create');
@@ -137,7 +148,7 @@ Route::group(["middleware" => ["autentikasi"]], function() {
         Route::get('suplemen-d3/json/{id_prodi}', [SuplemenController::class, 'json'])->name('UPPS.suplemen-d3.json');
         Route::resource('suplemen-d3', SuplemenController::class);
     });
-    Route::group(["middleware" => ["can:Asesor"]], function() {
+    Route::group(["middleware" => ["can:Asesor"]], function () {
         Route::get('dashboard-asesor/berita-acara/pdf', [DashboardAsesorController::class, 'pdf'])->name('dashboard-asesor.pdf');
         Route::get('dashboard-asesor/berita-acara/show', [DashboardAsesorController::class, 'show'])->name('dashboard-asesor.pdf.show');
         Route::get('dashboard-asesor/berita-acara/asesmen', [DashboardAsesorController::class, 'asesmen'])->name('dashboard-asesor.pdf.asesmen');
@@ -146,50 +157,47 @@ Route::group(["middleware" => ["autentikasi"]], function() {
         Route::post('dashboard-asesor/berita-acara/deskEval', [DashboardAsesorController::class, 'deskEval'])->name('dashboard-asesor.berita-acara.deskEval');
         Route::post('dashboard-asesor/berita-acara/asesmenLapangan', [DashboardAsesorController::class, 'asesmenLapangan'])->name('dashboard-asesor.berita-acara.asesmenLapangan');
         Route::resource('dashboard-asesor', DashboardAsesorController::class);
-        /**instrumen  */
+    
         Route::get('instrumen-asesor/instrumen/{id}', [InstrumenAsesorController::class, 'instrumen'])->name('instrumen-asesor.instrumen');
-        /**data prodi ajuan */
+        
         Route::get('asesor-ajuanprodi/getLkps/{id_prodi}', [AjuanAsesorController::class, 'getLkps'])->name('asesor-ajuanprodi.getLkps');
         Route::get('asesor-ajuanprodi/prodi/{id_prodi}', [AjuanAsesorController::class, 'prodi'])->name('asesor-ajuanprodi.prodi');
-        /*data prodi data dukung*/ 
+        
         Route::get('datadukung-d3/download/{id}', [DataDukungAsesorController::class, 'download'])->name('asesor.data-prodi.data-dukung.download');
         Route::get('datadukung-d3/json/{id_prodi}', [DataDukungAsesorController::class, 'json'])->name('asesor.data-prodi.data-dukung.json');
         Route::get('datadukung-d3/show/{id}', [DataDukungAsesorController::class, 'show'])->name('asesor.data-prodi.data-dukung.show');
         Route::resource('datadukung-d3', DataDukungAsesorController::class);
-        /**tambah keterangn */
+        
         Route::get('rekap-nilaid3/store', [RekapPenilaianController::class, 'store'])->name('rekap-nilaid3.store');
-        /**rekap nilai */
-        Route::get('rekap-nilaid3/json/{id_prodi}', [RekapPenilaianController::class, 'json'])->name('rekap-nilaid3.json');
-        Route::get('rekap-nilaid3/suplemen/{id_prodi}', [RekapPenilaianController::class, 'suplemen'])->name('rekap-nilaid3.suplemen');
-        Route::get('rekap-nilaid3/jsonAkhir/{id_prodi}', [RekapPenilaianController::class, 'jsonAkhir'])->name('rekap-nilaid3.jsonAkhir');
-        Route::get('rekap-nilaid3/nilaiakhir', [RekapPenilaianController::class, 'indexAkhir'])->name('rekap-nilaid3.indexAkhir');
-        Route::get('rekap-nilaid3/prodi/{id_prodi}', [RekapPenilaianController::class, 'prodi'])->name('rekap-nilaid3.prodi');
-        Route::get('rekap-nilaiasesmen/prodiasesmen/{id_prodi}', [RekapPenilaianController::class, 'prodiasesmen'])->name('rekap-nilaiasesmen.prodiasesmen');
-        Route::resource('rekap-nilaid3', RekapPenilaianController::class);
-        /**nilai desk evaluasi */
-        Route::post('nilai-deskeval/store', [NilaiDeskEvalController::class, 'store'])->name('nilai-deskeval.store');
-        Route::get('nilai-deskeval/json/{id}', [NilaiDeskEvalController::class, 'json'])->name('nilai-deskeval.json');
-        Route::get('nilai-deskeval/show/{id}/{id_prodi}', [NilaiDeskEvalController::class, 'show'])->name('asesor.penilaian.desk-evaluasi.show');
-        Route::post('nilai-deskeval/update/{id}', [NilaiDeskEvalController::class, 'update'])->name('asesor.penilaian.desk-evaluasi.update');
-        Route::get('nilai-deskeval/elemen/{id_prodi}', [NilaiDeskEvalController::class, 'elemen'])->name('asesor.penilaian.desk-evaluasi.elemen');
-        Route::resource('nilai-deskeval', NilaiDeskEvalController::class);
-        /**nilai asesmen lapangan */
+        
+        Route::get('rekap-nilaiAk/json/{id_prodi}', [RekapPenilaianController::class, 'json'])->name('rekap-nilaiAk.json');
+        Route::get('rekap-nilaiAl/json/{id_prodi}', [RekapPenilaianController::class, 'jsonAkhir'])->name('rekap-nilaiAl.jsonAkhir');
+        Route::get('rekap-nilaiAk/prodi/{id_prodi}', [RekapPenilaianController::class, 'prodi'])->name('rekap-nilaiAk.prodi');
+        Route::get('rekap-nilaiAl/prodi/{id_prodi}', [RekapPenilaianController::class, 'prodiasesmen'])->name('rekap-nilaiAl.prodi');
+        Route::resource('rekap-nilai', RekapPenilaianController::class);
+        
+        Route::post('nilai-asesmen-kecukupan/store', [NilaiDeskEvalController::class, 'store'])->name('asesmen-kecukupan.store');
+        Route::get('nilai-asesmen-kecukupan/json/{id}', [NilaiDeskEvalController::class, 'json'])->name('asesmen-kecukupan.json');
+        Route::get('nilai-asesmen-kecukupan/show/{id}/{id_prodi}', [NilaiDeskEvalController::class, 'show'])->name('asesor.penilaian.asesmen-kecukupan.show');
+        Route::post('nilai-asesmen-kecukupan/update/{id}', [NilaiDeskEvalController::class, 'update'])->name('asesor.penilaian.asesmen-kecukupan.update');
+        Route::get('nilai-asesmen-kecukupan/elemen/{id_prodi}', [NilaiDeskEvalController::class, 'elemen'])->name('asesor.penilaian.asesmen-kecukupan.elemen');
+        Route::resource('nilai-asesmen-kecukupan', NilaiDeskEvalController::class);
+        
         Route::post('nilai-asesmenlapangan/store', [NilaiAsesmenLapanganD3Controller::class, 'store'])->name('nilai-asesmenlapangan.store');
         Route::post('nilai-asesmenlapangan/update/{id}', [NilaiAsesmenLapanganD3Controller::class, 'update'])->name('nilai-asesmenlapangan.update');
         Route::get('nilai-asesmenlapangan/json/{id}', [NilaiAsesmenLapanganD3Controller::class, 'json'])->name('nilai-asesmenlapangan.json');
         Route::get('nilai-asesmenlapangan/elemen/{id_prodi}', [NilaiAsesmenLapanganD3Controller::class, 'elemen'])->name('nilai-asesmenlapangan.elemen');
         Route::get('nilai-asesmenlapangan/show/{id}/{id_prodi}', [NilaiAsesmenLapanganD3Controller::class, 'show'])->name('asesor.penilaian.asesmen-lapangan.show');
         Route::resource('nilai-asesmenlapangan', NilaiAsesmenLapanganD3Controller::class);
-        /**Nilai per elemen asesor */
+        
         Route::get('nilai-perelemen/jsonBagian/{id}', [NilaiController::class, 'jsonBagian'])->name('nilai-perelemen.jsonBagian');
         Route::get('nilai-perelemen/{id}', [NilaiController::class, 'bagian'])->name('nilai-perelemen.bagian');
         Route::resource('nilai-akreditasi', NilaiController::class);
-        /**History nilai */
+        
         Route::get('nilai-deskeval/history/{id_prodi}', [NilaiDeskEvalController::class, 'history'])->name('asesor.nilai-deskeval.history');
         Route::get('nilai-deskeval/jsonHistory/{id_prodi}', [NilaiDeskEvalController::class, 'jsonHistory'])->name('asesor.nilai-deskeval.jsonHistory');
-        
     });
-    Route::group(["middleware" => ["can:Prodi"]], function() {
+    Route::group(["middleware" => ["can:Prodi"]], function () {
         Route::resource('dashboard-prodi', DashboardProdiController::class);
         /**instrumen prodi */
         Route::get('instrumen-prodi/instrumen/{id}', [InstrumenProdiController::class, 'instrumen'])->name('prodi.instrumen');
@@ -222,7 +230,7 @@ Route::group(["middleware" => ["autentikasi"]], function() {
         Route::resource('data-dukung', DataDukungProdiController::class);
         /**nilai prodi */
         Route::get('nilai-d3/json', [NilaiProdiController::class, 'json'])->name('prodi.diploma-tiga.nilai.json');
-        Route::resource('nilai-d3', NilaiProdiController::class); 
+        Route::resource('nilai-d3', NilaiProdiController::class);
     });
     Route::post('logout', [LoginController::class, 'logout'])->name('logout');
 });

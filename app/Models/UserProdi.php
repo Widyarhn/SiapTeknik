@@ -52,4 +52,8 @@ class UserProdi extends Model
     {
         return $this->belongsTo("App\Models\Led", "program_studi_id", "program_studi_id");
     }
+    public function surat_pengantar()
+    {
+        return $this->belongsTo("App\Models\SuratPengantar", "program_studi_id", "program_studi_id");
+    }
 }

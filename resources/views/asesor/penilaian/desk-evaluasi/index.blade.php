@@ -21,16 +21,16 @@
             <div class="main-content">
                 <section class="section">
                     <div class="section-header">
-                        <h1>Desk Evaluasi {{$program_studi->jenjang->jenjang}} {{$program_studi->nama}} </h1>
+                        <h1>Asesmen Kecukupan {{$program_studi->jenjang->jenjang}} {{$program_studi->nama}}</h1>
                         <div class="section-header-breadcrumb">
                             <div class="breadcrumb-item active"><a href="{{ url('dashboard-asesor') }}">Dashboard</a></div>
-                            <div class="breadcrumb-item">Elemen Penilaian {{$program_studi->jenjang->jenjang}} {{$program_studi->nama}} </div>
+                            <div class="breadcrumb-item">Asesmen Kecukupan</div>
                         </div>
                     </div>
                     @if($user_asesor->tahun->is_active==0)
                     <div class="section-body">
                         <h2 class="section-title">Data Elemen Penilaian {{$program_studi->jenjang->jenjang}} {{$program_studi->nama}} </h2>
-                        <p class="section-lead">Informasi Elemen Penilaian Desk Evaluasi jenjang {{$program_studi->jenjang->jenjang}} {{$program_studi->nama}}  lingkup INFOKOM</p>
+                        <p class="section-lead">Informasi Elemen Penilaian Asesmen Kecukupan Jenjang {{$program_studi->jenjang->jenjang}} {{$program_studi->nama}}  Lingkup Teknik</p>
                         <!--Basic table-->
                         <div class="row">
                             <div class="col-12">
@@ -70,8 +70,7 @@
                 $('#elemenTable').dataTable({
                     processing: true,
                     serverSide: true,
-                    ajax: "{{ route('nilai-deskeval.json', $program_studi->id) }}",
-                    // url: "/nilai-deskeval-d3/json/kriteria_id/program_studi_id",
+                    ajax: "{{ route('asesmen-kecukupan.json', $program_studi->id) }}",
                     columns: [{
                             data: 'DT_RowIndex',
                             name: 'DT_RowIndex',

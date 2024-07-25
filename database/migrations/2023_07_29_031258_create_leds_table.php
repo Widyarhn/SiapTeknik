@@ -21,6 +21,8 @@ class CreateLedsTable extends Migration
             $table->foreignIdFor(ProgramStudi::class)->nullable();
             $table->foreignIdFor(Tahun::class)->nullable();
             $table->string('file');
+            $table->boolean('status')->default(false);
+            $table->text('keterangan')->nullable();
             $table->timestamps();
         });
     }

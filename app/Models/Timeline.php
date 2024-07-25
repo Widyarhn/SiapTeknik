@@ -10,8 +10,7 @@ class Timeline extends Model
     use HasFactory;
 
     protected $table = 'timelines';
-    protected $fillable = ['tahun_id', 'program_studi_id','kegiatan','tanggal_mulai', 'tanggal_akhir', 'status' ];
-
+    protected $guarded = [];
     public function program_studi()
     {
         return $this->belongsTo(ProgramStudi::class);

@@ -43,13 +43,14 @@
                     @endif
 
                     <div class="row">
-                        <div class="col-lg-3 col-md-3 col-sm-12">
+                        <div class="col-lg-4 col-md-4 col-sm-12">
                             <div class="card card-statistic-2">
-                                <div class="card-icon shadow-warning bg-warning">
-                                    <i class="far fa-lightbulb"></i>
+                                <div class="card-icon shadow-warning bg-warning"
+                                    style="margin-left: 16px;margin-top: 16px;margin-bottom: 16px;margin-right: 16px;">
+                                    <i class="fas fa-file-alt"></i>
                                 </div>
                                 <div class="card-wrap">
-                                    <div class="card-header">
+                                    <div class="card-header" style="padding-top: 16px;">
                                         <h4>Dokumen Ajuan</h4>
                                     </div>
                                     <div class="card-body">
@@ -58,70 +59,86 @@
                                         @else
                                             {{ count($dokumen_ajuan) }}
                                         @endif
-                                        <div class="btn-group dropright m-2">
+                                        <div class="btn-group dropright">
                                             @if (count($dokumen_ajuan) == 0)
                                             @else
                                                 <a href="{{ route('akreditasi.index') }}"
-                                                    class="btn btn-outline-warning btn-sm"
-                                                    aria-haspopup="true" aria-expanded="false"
-                                                    style="border-radius: 30px;">
+                                                    class="btn btn-outline-warning btn-sm ml-2" aria-haspopup="true"
+                                                    aria-expanded="false" style="border-radius: 30px;">
                                                     View Docs
                                                 </a>
-                                                {{-- <div class="dropdown-menu dropright"
-                                                    style="width: auto;box-shadow:0 4px 8px rgba(0, 0, 0, 0.13)">
-                                                    @foreach ($dokumen_ajuan as $p)
-                                                        <a class="dropdown-item" value="{{ $p->program_studi_id }}"
-                                                            href="{{ route('upps.dokumenajuan.prodi', $p->program_studi_id) }}">
-                                                            {{ $p->program_studi->jenjang->jenjang }}
-                                                            {{ $p->program_studi->nama }}
-                                                        </a>
-                                                    @endforeach
-                                                </div> --}}
                                             @endif
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="col-lg-3 col-md-3 col-sm-12">
-                            <a href="{{ route('akreditasi.index') }}">
+                        <div class="col-lg-4 col-md-4 col-sm-12">
+                            <a href="{{ route('akreditasi.asesmenKecukupan') }}">
                                 <div class="card card-statistic-2">
-                                    <div class="card-icon shadow-primary bg-primary">
-                                        <i class="fas fa-calendar"></i>
+                                    <div class="card-icon shadow-info bg-info"
+                                        style="margin-left: 16px;margin-top: 16px;margin-bottom: 16px;margin-right: 16px;">
+                                        <i class="fas fa-clipboard-list"></i>
                                     </div>
                                     <div class="card-wrap">
-                                        <div class="card-header">
-                                            <h4>Lihat dan Kelola</h4>
+                                        <div class="card-header" style="padding-top:16px;">
+                                            <h4>Tahap Asesmen</h4>
                                         </div>
-                                        <div class="card-body">
-                                            Akreditasi
+                                        <div class="card-body" style="font-size: 24.5px;">
+                                            Kecukupan
                                         </div>
                                     </div>
                                 </div>
                             </a>
                         </div>
-                        <div class="col-lg-3 col-md-3 col-sm-12">
+                        <div class="col-lg-4 col-md-4 col-sm-12">
+                            <a href="{{ route('akreditasi.asesmenLapangan') }}">
+                                <div class="card card-statistic-2">
+                                    <div class="card-icon shadow-success bg-success"
+                                        style="margin-left: 16px;margin-top: 16px;margin-bottom: 16px;margin-right: 16px;">
+                                        <i class="fas fa-clipboard-check"></i>
+                                    </div>
+                                    <div class="card-wrap">
+                                        <div class="card-header" style="padding-top:16px;">
+                                            <h4>Tahap Asesmen</h4>
+                                        </div>
+                                        <div class="card-body" style="font-size: 24.5px;">
+                                            Lapangan
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-6 col-md-6 col-sm-12">
                             <a href="{{ route('user.index') }}">
                                 <div class="card card-statistic-2">
-                                    <div class="card-icon shadow-info bg-info">
+                                    <div class="card-icon shadow-secondary bg-secondary"
+                                        style="margin-left: 16px;margin-top: 16px;margin-bottom: 16px;margin-right: 16px;">
                                         <i class="fas fa-users"></i>
                                     </div>
                                     <div class="card-wrap">
-                                        <div class="card-header">
+                                        <div class="card-header" style="padding-top: 15px;">
                                             <h4>Lihat dan Kelola</h4>
                                         </div>
                                         <div class="card-body">
-                                            User
+                                            Users
                                         </div>
                                     </div>
                                 </div>
                             </a>
                         </div>
-                        <div class="col-lg-3 col-md-3 col-sm-12">
+                        <div class="col-lg-6 col-md-6 col-sm-12">
                             <a href="{{ route('prodi.index') }}">
                                 <div class="card card-statistic-2">
-                                    <div class="card-wrap" style="padding-bottom: 24px; padding-left: 10px;">
-                                        <div class="card-header">
+                                    <div class="card-icon shadow-secondary bg-secondary"
+                                        style="margin-left: 16px;margin-top: 16px;margin-bottom: 16px;margin-right: 16px;">
+                                        <i class="fas fa-university"></i>
+                                    </div>
+                                    <div class="card-wrap">
+                                        <div class="card-header" style="padding-top: 15px;">
                                             <h4>Lihat dan Kelola</h4>
                                         </div>
                                         <div class="card-body">
@@ -347,46 +364,52 @@
                 </div>
                 <div class="modal-body">
                     <div class="card-body">
-                        <div class="form-group row align-items-center" style=" margin-bottom: 3px;" >
-                            <label for="site-title" class="form-control-label col-sm-3 text-md-right">Akreditasi</label>
+                        <div class="form-group row align-items-center" style=" margin-bottom: 3px;">
+                            <label for="site-title"
+                                class="form-control-label col-sm-3 text-md-right">Akreditasi</label>
                             <div class="col-sm-6 col-md-9">
-                                <p class="mt-2" id="site-title" >: Tgl awal s/d tanggal akhir </p>
+                                <p class="mt-2" id="site-title">: Tgl awal s/d tanggal akhir </p>
                             </div>
                         </div>
-                        <div class="form-group row align-items-center" style=" margin-bottom: 3px;" >
+                        <div class="form-group row align-items-center" style=" margin-bottom: 3px;">
                             <label for="site-title" class="form-control-label col-sm-3 text-md-right">Status</label>
                             <div class="col-sm-6 col-md-9">
-                                <p class="mt-2" id="site-title" >: Tgl awal s/d tanggal akhir </p>
+                                <p class="mt-2" id="site-title">: Tgl awal s/d tanggal akhir </p>
                             </div>
                         </div>
-                        <div class="form-group row align-items-center" style=" margin-bottom: 3px;" >
-                            <label for="site-title" class="form-control-label col-sm-3 text-md-right">Pengajuan Dokumen</label>
+                        <div class="form-group row align-items-center" style=" margin-bottom: 3px;">
+                            <label for="site-title" class="form-control-label col-sm-3 text-md-right">Pengajuan
+                                Dokumen</label>
                             <div class="col-sm-6 col-md-9">
-                                <p class="mt-2" id="site-title" >: Tgl awal s/d tanggal akhir </p>
+                                <p class="mt-2" id="site-title">: Tgl awal s/d tanggal akhir </p>
                             </div>
                         </div>
-                        <div class="form-group row align-items-center" style=" margin-bottom: 3px;" >
-                            <label for="site-title" class="form-control-label col-sm-3 text-md-right">Asesmen Kecukupan</label>
+                        <div class="form-group row align-items-center" style=" margin-bottom: 3px;">
+                            <label for="site-title" class="form-control-label col-sm-3 text-md-right">Asesmen
+                                Kecukupan</label>
                             <div class="col-sm-6 col-md-9">
-                                <p class="mt-2" id="site-title" >: Tgl awal s/d tanggal akhir </p>
+                                <p class="mt-2" id="site-title">: Tgl awal s/d tanggal akhir </p>
                             </div>
                         </div>
-                        <div class="form-group row align-items-center" style=" margin-bottom: 3px;" >
-                            <label for="site-title" class="form-control-label col-sm-3 text-md-right">Asesmen Lapangan</label>
+                        <div class="form-group row align-items-center" style=" margin-bottom: 3px;">
+                            <label for="site-title" class="form-control-label col-sm-3 text-md-right">Asesmen
+                                Lapangan</label>
                             <div class="col-sm-6 col-md-9">
-                                <p class="mt-2" id="site-title" >: Tgl awal s/d tanggal akhir </p>
+                                <p class="mt-2" id="site-title">: Tgl awal s/d tanggal akhir </p>
                             </div>
                         </div>
-                        <div class="form-group row align-items-center" style=" margin-bottom: 3px;" >
-                            <label for="site-title" class="form-control-label col-sm-3 text-md-right">Berita Acara</label>
+                        <div class="form-group row align-items-center" style=" margin-bottom: 3px;">
+                            <label for="site-title" class="form-control-label col-sm-3 text-md-right">Berita
+                                Acara</label>
                             <div class="col-sm-6 col-md-9">
-                                <p class="mt-2" id="site-title" >: Tgl awal s/d tanggal akhir </p>
+                                <p class="mt-2" id="site-title">: Tgl awal s/d tanggal akhir </p>
                             </div>
                         </div>
-                        <div class="form-group row align-items-center" style=" margin-bottom: 3px;" >
-                            <label for="site-title" class="form-control-label col-sm-3 text-md-right">Sertifikat</label>
+                        <div class="form-group row align-items-center" style=" margin-bottom: 3px;">
+                            <label for="site-title"
+                                class="form-control-label col-sm-3 text-md-right">Sertifikat</label>
                             <div class="col-sm-6 col-md-9">
-                                <p class="mt-2" id="site-title" >: Tgl awal s/d tanggal akhir </p>
+                                <p class="mt-2" id="site-title">: Tgl awal s/d tanggal akhir </p>
                             </div>
                         </div>
                     </div>

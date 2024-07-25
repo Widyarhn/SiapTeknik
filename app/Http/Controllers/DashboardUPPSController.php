@@ -26,10 +26,31 @@ class DashboardUPPSController extends Controller
             "timeline" => Timeline::with(['tahun', 'program_studi.jenjang'])->get(),
             "tahun" => Tahun::all(),
             "program_studi" => ProgramStudi::with('jenjang')->get(),
-            "dokumen_ajuan" => DokumenAjuan::where('status', 0)
-                ->with(['program_studi.jenjang'])
-                ->get(),
-            "status_1" => DokumenAjuan::where('status', 1)
+            "dokumen_ajuan" => Timeline::where('kegiatan', 'Pengajuan Dokumen')
+            ->where('status', 1)
+            ->where('selesai', 0)
+            ->whereHas('tahun', function ($query) {
+                $query->where('is_active', 0);
+            })
+            ->get(),
+
+            "asesmen_kecukupan" => Timeline::where('kegiatan', 'Asesmen Kecukupan')
+            ->where('status', 1)
+            ->where('selesai', 0)
+            ->whereHas('tahun', function ($query) {
+                $query->where('is_active', 0);
+            })
+            ->get(),
+
+            "asesmen_lapangan" => Timeline::where('kegiatan', 'Asesmen Lapangan')
+            ->where('status', 1)
+            ->where('selesai', 0)
+            ->whereHas('tahun', function ($query) {
+                $query->where('is_active', 0);
+            })
+            ->get(),
+
+            "status_1" => DokumenAjuan::where('pengajuan_ulang', 1)
                 ->with(['program_studi.jenjang'])
                 ->get(),
             "user" => User::where('role_id', '2')->get(),
@@ -37,7 +58,6 @@ class DashboardUPPSController extends Controller
 
         return view('UPPS.layout.main', $data);
     }
-
 
     public function json(Request $request)
     {

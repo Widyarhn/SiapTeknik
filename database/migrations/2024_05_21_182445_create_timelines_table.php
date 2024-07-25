@@ -24,6 +24,8 @@ class CreateTimelinesTable extends Migration
             $table->date('tanggal_mulai');
             $table->date('tanggal_akhir');
             $table->boolean('status')->default(false);
+            $table->boolean('selesai')->default(false);
+            $table->char('tahap')->default("1");
             $table->timestamps();
         });
     }
