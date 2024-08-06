@@ -5,12 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class BaAsesmenLapangan extends Model
+class BeritaAcara extends Model
 {
     use HasFactory;
-    protected $table = 'ba_asesmen_lapangans';
+    protected $table = 'berita_acaras';
 
-    protected $fillable = ['tahun_id', 'file', 'program_studi_id', 'status'];
+    protected $guarded = [];
 
     public function program_studi()
     {

@@ -9,7 +9,7 @@ class Tahun extends Model
 {
     use HasFactory;
     protected $table = 'tahuns';
-    protected $fillable = ['id', 'tahun', 'is_active', 'mulai_akreditasi', 'akhir_akreditasi'];
+    protected $guarded = [];
 
     public function user_prodi()
     {
@@ -36,14 +36,19 @@ class Tahun extends Model
         return $this->hasMany('App\Models\Led');
     }
 
+    public function data_dukung()
+    {
+        return $this->hasMany('App\Models\DataDukung');
+    }
+
     public function sertifikat()
     {
         return $this->hasMany('App\Models\Sertifikat');
     }
 
-    public function ba_asesmen_lapangan()
+    public function berita_acara()
     {
-        return $this->hasMany('App\Models\BaAsesmenLapangan');
+        return $this->hasMany('App\Models\BeritaAcara');
     }
     public function timeline()
     {

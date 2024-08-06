@@ -9,7 +9,7 @@ class SuratPengantar extends Model
 {
     use HasFactory;
     protected $table = 'surat_pengantars';
-    protected $fillable = ['tahun_id', 'file', 'id'];
+    protected $guarded = [];
 
     public function program_studi()
     {
@@ -20,15 +20,10 @@ class SuratPengantar extends Model
     {
         return $this->belongsTo(Tahun::class);
     } 
-
-    public function user()
-    {
-        return $this->belongsTo(User::class);
-    }
     
-    public function dokumen_ajuan()
+    public function pengajua_dokumen()
     {
-        return $this->hasMany('App\Models\DokumenAjuan');
+        return $this->hasOne('App\Models\PengajuanDokumen');
     }
     
 }

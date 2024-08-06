@@ -1,0 +1,127 @@
+@if (!empty($m->asesmen_kecukupan->user_asesor_id == Auth::user()->user_asesor->id))
+                                                            <form
+                                                                action="{{ route('asesor.penilaian.asesmen-kecukupan.update', $m->asesmen_kecukupan->id) }}"
+                                                                method="post" enctype="multipart/form-data"
+                                                                id="formActionStore">
+                                                                @csrf
+                                                                @method('POST')
+                                                                <tr>
+                                                                    <th>
+                                                                        <div class="badge badge-primary">
+                                                                            Nilai
+                                                                        </div>
+                                                                    </th>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td>
+                                                                        <input type="hidden" id="formActionUpdate" />
+                                                                        {{-- <input type="hidden"
+                                                                            value="{{ $program_studi->id }}"
+                                                                            name="program_studi_id" /> --}}
+                                                                        <input type="hidden"
+                                                                            value="{{ $m->id }}"
+                                                                            name="m_id" />
+                                                                        {{-- <input type="hidden"
+                                                                            value="{{ $user_asesor->tahun->id }}"
+                                                                            name="tahun_id" /> --}}
+                                                                        <input type="hidden"
+                                                                            value="{{ $user_asesor->id }}"
+                                                                            name="user_asesor_id" />
+                                                                        <input type="hidden"
+                                                                            value="{{ $user_asesor->timeline->id }}"
+                                                                            name="timeline_id" />
+
+                                                                        <input type="text" placeholder="1-4"
+                                                                            name="nilai"
+                                                                            value=" {{ $m->asesmen_kecukupan->nilai }}"
+                                                                            class="form-control text-center" />
+                                                                    </td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <th>
+                                                                        <div class="badge badge-primary">
+                                                                            Deskripsi Nilai
+                                                                        </div>
+                                                                    </th>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td>
+                                                                        <textarea name="deskripsi" class="form-control">{{ $m->asesmen_kecukupan->deskripsi }}</textarea>
+                                                                    </td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td>
+                                                                        <div class="d-grid col-md-6 mt-2">
+                                                                            <div class="btn-group">
+                                                                                <button type="submit"
+                                                                                    class="btn btn-outline-warning">
+                                                                                    Edit
+                                                                                </button>
+                                                                            </div>
+                                                                        </div>
+                                                                    </td>
+                                                                </tr>
+                                                            </form>
+                                                        @else
+                                                            <form action="{{ route('asesmen-kecukupan.store') }}"
+                                                                method="post" enctype="multipart/form-data"
+                                                                id="formActionStore">
+                                                                @csrf
+                                                                @method('POST')
+                                                                <tr>
+                                                                    <th>
+                                                                        <div class="badge badge-primary">
+                                                                            Nilai
+                                                                        </div>
+                                                                    </th>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td>
+                                                                        <input type="hidden" id="formActionStore" />
+                                                                        {{-- <input type="hidden"
+                                                                            value="{{ $program_studi->id }}"
+                                                                            name="program_studi_id" /> --}}
+                                                                        <input type="hidden"
+                                                                            value="{{ $m->id }}"
+                                                                            name="m_id" />
+                                                                        {{-- <input type="hidden"
+                                                                            value="{{ $user_asesor->tahun->id }}"
+                                                                            name="tahun_id" /> --}}
+                                                                        <input type="hidden"
+                                                                            value="{{ $user_asesor->id }}"
+                                                                            name="user_asesor_id" />
+                                                                        <input type="hidden"
+                                                                            value="{{ $user_asesor->timeline->id }}"
+                                                                            name="timeline_id" />
+
+                                                                        <input type="text" placeholder="1-4"
+                                                                            name="nilai"
+                                                                            class="form-control text-center">
+                                                                    </td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <th>
+                                                                        <div class="badge badge-primary">
+                                                                            Deskripsi Nilai
+                                                                        </div>
+                                                                    </th>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td>
+                                                                        <textarea name="deskripsi" class="form-control"></textarea>
+                                                                    </td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td>
+                                                                        <div class="d-grid col-md-6 mt-2">
+                                                                            <div class="btn-group">
+                                                                                <button type="submit"
+                                                                                    class="btn btn-outline-primary">
+                                                                                    Tambahkan
+                                                                                </button>
+                                                                            </div>
+                                                                        </div>
+                                                                    </td>
+                                                                </tr>
+                                                            </form>
+                                                        @endif

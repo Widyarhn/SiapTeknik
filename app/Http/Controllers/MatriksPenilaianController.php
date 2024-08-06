@@ -8,6 +8,7 @@ use App\Models\Jenjang;
 use App\Models\Kriteria;
 use App\Models\SubKriteria;
 use App\Models\Indikator;
+use App\Models\Rumus;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use Yajra\DataTables\DataTables;
@@ -60,10 +61,11 @@ class MatriksPenilaianController extends Controller
                 return $informasi;
             })
             ->addColumn('indikator', function ($row) {
+                $noButir = optional($row->indikator)->no_butir;
                 $indikator = '<table>
                     <tr>
                         <td>
-                            ' . $row->indikator->deskriptor . '
+                            ' . ($noButir ? $noButir : '').' '.$row->indikator->deskriptor . '
                         </td>
                     </tr>
                 </table>';
@@ -136,9 +138,12 @@ class MatriksPenilaianController extends Controller
         $validatedData = $request->validate([
             'jenjang_id' => 'required',
             'kriteria_id' => 'required',
+            'rumus' => 'nullable',
             'sub_kriteria' => 'nullable',
             'indikator' => 'required|array', // Menjadikan 'indikator' sebagai array wajib
-            'indikator.*.bobot' => 'sometimes|required|numeric',
+            'indikator.*.bobot' => 'sometimes|nullable|numeric',
+            'indikator.*.check' => 'sometimes|nullable',
+            'indikator.*.no_butir' => 'sometimes|nullable|max:2',
             'indikator.*.deskriptor' => 'sometimes|required|min:6',
             'indikator.*.sangat_baik' => 'sometimes|required|min:6',
             'indikator.*.baik' => 'sometimes|required|min:6',
@@ -148,16 +153,58 @@ class MatriksPenilaianController extends Controller
         ]);
 
         $subKriteriaId = null;
+
         if ($request->filled('sub_kriteria')) {
             $subKriteria = SubKriteria::firstOrCreate([
                 'kriteria_id' => $request->kriteria_id,
                 'sub_kriteria' => $request->sub_kriteria
             ]);
             $subKriteriaId = $subKriteria->id;
+
+            if($request->rumus){
+                $rumus = Rumus::create([
+                    'sub_kriteria_id' => $subKriteriaId,
+                    'rumus' => $request->rumus,
+                ]);
+            }
         }
 
+        // Mengidentifikasi indikator dengan butir deskripsi
+        $indikatorDenganDeskripsi = array_filter($request->indikator, function ($item) {
+            return !empty($item['no_butir']);
+        });
+
+        
+
+        // Mengidentifikasi indikator dengan butir deskripsi dan bobot
+        $indikatorDenganBobot = array_filter($indikatorDenganDeskripsi, function ($item) {
+            return !is_null($item['bobot']);
+        });
+
+        // Hitung bobot rata-rata per indikator dengan butir deskripsi
+        $bobotPerIndikator = null;
+        if (count($indikatorDenganBobot) > 0) {
+            $totalBobot = array_sum(array_column($indikatorDenganBobot, 'bobot'));
+            $bobotPerIndikator = $totalBobot / count($indikatorDenganDeskripsi);
+        }
         foreach ($request->indikator as $indikatorData) {
-            if (isset($indikatorData['deskriptor']) && isset($indikatorData['sangat_baik']) && isset($indikatorData['baik']) && isset($indikatorData['cukup']) && isset($indikatorData['kurang']) && isset($indikatorData['sangat_kurang']) && isset($indikatorData['bobot'])) {
+            if (isset($indikatorData['deskriptor']) && isset($indikatorData['sangat_baik']) && isset($indikatorData['baik']) && isset($indikatorData['cukup']) && isset($indikatorData['kurang']) && isset($indikatorData['sangat_kurang'])) {
+                // Tentukan nilai bobot yang akan disimpan
+                $bobot = null;
+
+                if (!empty($indikatorData['no_butir'])) {
+                    if (!is_null($indikatorData['bobot'])) {
+                        // Jika ada bobot, gunakan bobot yang sudah ada
+                        $bobot = $bobotPerIndikator;
+                    } else {
+                        // Jika tidak ada bobot, gunakan bobot rata-rata per indikator dengan deskripsi
+                        $bobot = $bobotPerIndikator;
+                    }
+                } else {
+                    // Jika tidak ada butir deskripsi, simpan bobot langsung jika ada
+                    $bobot = $indikatorData['bobot'] ?? null;
+                }
+
                 $indikator = Indikator::create([
                     'deskriptor' => $indikatorData['deskriptor'],
                     'sangat_baik' => $indikatorData['sangat_baik'],
@@ -166,7 +213,9 @@ class MatriksPenilaianController extends Controller
                     'kurang' => $indikatorData['kurang'],
                     'sangat_kurang' => $indikatorData['sangat_kurang'],
                     'sub_kriteria_id' => $subKriteriaId,
-                    'bobot' => $indikatorData['bobot'],
+                    'bobot' => $bobot,
+                    'no_butir' => $indikatorData['no_butir'],
+                    'rumus_id' => array_key_exists('check', $indikatorData) ? $rumus->id : null,
                 ]);
 
                 MatriksPenilaian::create([
@@ -180,8 +229,6 @@ class MatriksPenilaianController extends Controller
                 return response()->json(['error' => 'Incomplete data in indikator array'], 422);
             }
         }
-
-        // return response()->json(['success' => 'Data saved successfully'], 200);
 
         return back()->with('success', 'Data Matriks Penilaian Berhasil Ditambahkan');
     }

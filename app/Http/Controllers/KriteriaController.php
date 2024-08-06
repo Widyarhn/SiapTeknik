@@ -12,19 +12,19 @@ class KriteriaController extends Controller
 {
     public function index(Request $request)
     {
-        $listLkps = ListLkps::with('kriteria')->get();
-        return view('UPPS.matriks-penilaian.kriteria.index', $listLkps);
+        // $listLkps = ListLkps::with('kriteria')->get();
+        return view('UPPS.matriks-penilaian.kriteria.index');
     }
 
     public function json(Request $request)
     {
-        $data = Kriteria::with('list_lkps')->orderBy('id', 'ASC')->get();
+        $data = Kriteria::orderBy('id', 'ASC')->get();
 
-        $data = $data->map(function ($kriteria) {
-            $listLkpsNames = $kriteria->list_lkps->pluck('nama')->toArray();
-            $kriteria->listLkpsNames = !empty($listLkpsNames) ? implode('<br>', $listLkpsNames) : '-';
-            return $kriteria;
-        });
+        // $data = $data->map(function ($kriteria) {
+        //     $listLkpsNames = $kriteria->list_lkps->pluck('nama')->toArray();
+        //     $kriteria->listLkpsNames = !empty($listLkpsNames) ? implode('<br>', $listLkpsNames) : '-';
+        //     return $kriteria;
+        // });
 
         return DataTables::of($data)
             ->addIndexColumn()
@@ -34,7 +34,8 @@ class KriteriaController extends Controller
                 <a href="javascript:void(0)" data-route="' . route('kriteria.destroy', $row->id) . '" id="delete" class="btn btn-danger btn-md"><i class="fa fa-trash"></i></a>
                 </div>';
             })
-            ->rawColumns(['listLkpsNames', 'action'])
+            // ->rawColumns(['listLkpsNames', 'action'])
+            ->rawColumns([ 'action'])
             ->make(true);
     }
 
@@ -53,16 +54,16 @@ class KriteriaController extends Controller
                 'butir' => $validatedData['butir'],
                 'kriteria' => $validatedData['kriteria'],
             ]);
-            if (!empty($validatedData['lkps'])) {
-                foreach ($validatedData['lkps'] as $lkpsItem) {
-                    if (!empty($lkpsItem['nama_tabel_lkps'])) { // Hanya simpan jika 'nama_tabel_lkps' tidak null
-                        ListLkps::create([
-                            'kriteria_id' => $kriteria->id,
-                            'nama' => $lkpsItem['nama_tabel_lkps'],
-                        ]);
-                    }
-                }
-            }
+            // if (!empty($validatedData['lkps'])) {
+            //     foreach ($validatedData['lkps'] as $lkpsItem) {
+            //         if (!empty($lkpsItem['nama_tabel_lkps'])) { // Hanya simpan jika 'nama_tabel_lkps' tidak null
+            //             ListLkps::create([
+            //                 'kriteria_id' => $kriteria->id,
+            //                 'nama' => $lkpsItem['nama_tabel_lkps'],
+            //             ]);
+            //         }
+            //     }
+            // }
         });
 
         return redirect()->back()->with('success', 'Data Kriteria Berhasil Ditambahkan');
@@ -71,11 +72,11 @@ class KriteriaController extends Controller
     public function show($id)
     {
         $kriteria = Kriteria::find($id);
-        $listLkps = ListLkps::where('kriteria_id', $id)->get();
+        // $listLkps = ListLkps::where('kriteria_id', $id)->get();
 
         return response()->json([
             'kriteria' => $kriteria,
-            'listLkps' => $listLkps,
+            // 'listLkps' => $listLkps,
         ]);
     }
 
@@ -102,51 +103,35 @@ class KriteriaController extends Controller
         }
         $kriteria->save();
 
-        $deletedLkpsIds = $request->input('deleted_lkps', []);
+        // $deletedLkpsIds = $request->input('deleted_lkps', []);
 
-        // Delete the ListLkps that are marked for deletion
-        if (!empty($deletedLkpsIds)) {
-            ListLkps::whereIn('id', $deletedLkpsIds)->delete();
-        }
+        // // Delete the ListLkps that are marked for deletion
+        // if (!empty($deletedLkpsIds)) {
+        //     ListLkps::whereIn('id', $deletedLkpsIds)->delete();
+        // }
         
-        // Mengupdate atau menambah ListLkps
-        if (isset($validatedData['lkps'])) {
-            // Mengupdate ListLkps yang ada
-            foreach ($validatedData['lkps'] as $lkpsItem) {
-                if (isset($lkpsItem['id'])) {
-                    $listLkps = ListLkps::find($lkpsItem['id']);
-                    if ($listLkps) {
-                        $listLkps->nama = $lkpsItem['nama_tabel_lkps'] ?? $listLkps->nama;
-                        $listLkps->save();
-                    }
-                } else if (!empty($lkpsItem['nama_tabel_lkps'])) {
-                    // Menambah ListLkps baru jika id tidak ada
-                    ListLkps::create([
-                        'kriteria_id' => $kriteria->id,
-                        'nama' => $lkpsItem['nama_tabel_lkps'],
-                    ]);
-                }
-            }
-        }
+        // // Mengupdate atau menambah ListLkps
+        // if (isset($validatedData['lkps'])) {
+        //     // Mengupdate ListLkps yang ada
+        //     foreach ($validatedData['lkps'] as $lkpsItem) {
+        //         if (isset($lkpsItem['id'])) {
+        //             $listLkps = ListLkps::find($lkpsItem['id']);
+        //             if ($listLkps) {
+        //                 $listLkps->nama = $lkpsItem['nama_tabel_lkps'] ?? $listLkps->nama;
+        //                 $listLkps->save();
+        //             }
+        //         } else if (!empty($lkpsItem['nama_tabel_lkps'])) {
+        //             // Menambah ListLkps baru jika id tidak ada
+        //             ListLkps::create([
+        //                 'kriteria_id' => $kriteria->id,
+        //                 'nama' => $lkpsItem['nama_tabel_lkps'],
+        //             ]);
+        //         }
+        //     }
+        // }
 
         return redirect()->back()->with('success', 'Data Kriteria Berhasil Diperbarui');
     }
-
-    // public function edit(Request $request, $id)
-    // {
-    //     $kriteria = Kriteria::find($id);
-    //     $listLkps = ListLkps::with('kriteria')->where('kriteria_id', $kriteria)->get();
-    //     return view('UPPS.matriks-penilaian.kriteria.edit', compact('kriteria', 'listLkps'));
-    // }
-
-    // public function update(Request $request, $id)
-    // {
-    //     $kriteria = Kriteria::find($id);
-    //     $kriteria->kriteria = $request->kriteria;
-    //     $kriteria->butir = $request->butir;
-    //     $kriteria->save();
-    //     return redirect()->back()->with('success', 'Data Kriteria Berhasil Disimpan');
-    // }
 
     public function destroy($id)
     {

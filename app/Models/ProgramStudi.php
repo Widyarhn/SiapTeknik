@@ -9,27 +9,23 @@ class ProgramStudi extends Model
 {
     use HasFactory;
 
-    protected $table = 'program_studis';
+    protected $table = 'program_studies';
+
     protected $fillable = ['nama', 'jenjang_id'];
+
     public function jenjang()
     {
         return $this->belongsTo(Jenjang::class);
     }
+    
     public function data_dukung()
     {
         return $this->hasMany('App\Models\DataDukung');
     }
 
-
-
     public function matriks_penilaian()
     {
         return $this->hasMany('App\Models\MatriksPenilaian');
-    }
-
-    public function aspek_penilaian()
-    {
-        return $this->hasMany('App\Models\AspekPenilaian');
     }
 
     public function lkps()
@@ -57,18 +53,23 @@ class ProgramStudi extends Model
         return $this->hasMany('App\Models\Sertifikat');
     }
 
-    public function ba_asesmen_lapangan()
+    public function berita_acara()
     {
-        return $this->hasMany('App\Models\BaAsesmenLapangan');
+        return $this->hasMany('App\Models\BeritaAcara');
     }
 
     public function timeline()
     {
-        return $this->hasMany(Timeline::class);
+        return $this->hasMany('App\Models\Timeline');
     }
 
-    public function dokumen_ajuan()
+    public function tahun()
     {
-        return $this->hasMany(DokumenAjuan::class);
+        return $this->hasOne(Tahun::class);
+    }
+
+    public function pengajuan_dokumen()
+    {
+        return $this->hasMany(PengajuanDokumen::class);
     }
 }

@@ -60,7 +60,6 @@
                                                     class="fas fa-plus-circle"></i> Tambahkan</a>
                                             <h4>Tabel Matriks Penilaian  {{$jenjang->jenjang}}</h4>
                                         </div>
-
                                     </div>
                                     <div class="card-body">
                                         <div class="table-responsive">

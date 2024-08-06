@@ -33,14 +33,18 @@ class MatriksPenilaian extends Model
         return $this->belongsTo(Indikator::class, 'indikator_id');
     }
 
-    public function desk_evaluasi()
+    public function asesmen_kecukupan()
     {
-        return $this->hasOne(DeskEvaluasi::class);
+        return $this->hasOne(AsesmenKecukupan::class);
+    }
+
+    public function asesmen_lapangan()
+    {
+        return $this->hasOne(AsesmenLapangan::class);
     }
 
     public function data_dukung()
     {
         return $this->hasOne(DataDukung::class);
     }
-
 }

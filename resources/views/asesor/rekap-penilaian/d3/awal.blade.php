@@ -4,7 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta content="width=device-width, initial-scale=1, maximum-scale=1, shrink-to-fit=no" name="viewport">
-    <title>Asesor | Rekap Penilaian &rsaquo; Desk Evaluasi</title>
+    <title>Asesor | Rekap Penilaian AK &rsaquo; {{ $program_studi->jenjang->jenjang }} {{ $program_studi->nama }}</title>
+    
     @include('body')
 
 <body>
@@ -52,11 +53,11 @@
                             --}}
                         <h2 class="section-title">Rekapitulasi Penilaian Asesmen Kecukupan
                             {{ $program_studi->jenjang->jenjang }} {{ $program_studi->nama }}</h2>
-                        <p class="section-lead">Rekapitulasi penilaian asesmen kecukupan ini diambil berdasarkan matriks
-                            penilaian LAM Teknik</p>
+                        <p class="section-lead">Rekapitulasi penilaian Asesmen Kecukupan ini diambil berdasarkan
+                            instrumen penilaian LAM TEKNIK</p>
 
                         <!--Basic table-->
-                        @if ($user_asesor->tahun->is_active == 0)
+                        @if ($user_asesor->tahun->is_active == 1)
                             <div class="row">
                                 <div class="col-12">
                                     <div class="card">
@@ -66,20 +67,128 @@
                                         </div>
                                         <div class="card-body">
                                             <div class="table-responsive">
-                                                <table class="table table-striped" id="rekapTable">
+                                                <table class="table table-bordered" id="rekapTable">
                                                     <thead>
                                                         <tr>
                                                             <th width ="5%">No</th>
-                                                            {{-- <th>Butir</th> --}}
                                                             <th>Aspek Penilaian</th>
+                                                            <th>No. Butir</th>
                                                             <th>Deskripsi Hasil Asesmen</th>
-                                                            <th>Bobot</th>
                                                             <th>Nilai</th>
+                                                            <th>Bobot</th>
                                                             <th>Nilai Terbobot</th>
                                                         </tr>
                                                     </thead>
-                                                    <tbody></tbody>
+                                                    <tbody>
+                                                        @php
+                                                            $no = 0;
+                                                            $total_kes = 0;
+                                                        @endphp
+                                                        @foreach ($data as $subKriterias)
+                                                            @foreach ($subKriterias as $item)
+                                                                @php
+                                                                    $keys = array_keys($item);
+                                                                    $is_new_row = true;
+                                                                    $total = 0;
+                                                                    $no++;
+                                                                @endphp
+
+                                                                @foreach ($keys as $key)
+                                                                    @if ($is_new_row)
+                                                                        <tr>
+                                                                            <td rowspan="{{ count($item) }}">
+                                                                                {{ $no }}
+                                                                            </td>
+                                                                            <td rowspan="{{ count($item) }}">
+                                                                                @if ($item[$key]->sub_kriteria)
+                                                                                    {{ $item[$key]->sub_kriteria->sub_kriteria }}
+                                                                                @else
+                                                                                    {{ $item[$key]->matriks->kriteria->kriteria }}
+                                                                                @endif
+                                                                            </td>
+                                                                            <td>
+                                                                                {{ $item[$key]->no_butir }}
+                                                                            </td>
+                                                                            <td>
+                                                                                {{ $item[$key]->matriks->asesmen_kecukupan->deskripsi }}
+                                                                            </td>
+                                                                            <td>
+                                                                                {{ $item[$key]->matriks->asesmen_kecukupan->nilai }}
+                                                                            </td>
+                                                                            <td>
+                                                                                {{ $item[$key]->bobot }}
+                                                                            </td>
+                                                                            <td rowspan="{{ count($item) }}">
+                                                                                @php
+                                                                                    foreach ($item as $indicator) {
+                                                                                        $total +=
+                                                                                            $indicator->bobot *
+                                                                                            $item[$key]->matriks
+                                                                                                ->asesmen_kecukupan
+                                                                                                ->nilai;
+                                                                                    }
+                                                                                @endphp
+                                                                                <span class="badge badge-info">
+                                                                                    {{ $total }}
+                                                                                    @php
+                                                                                        $total_kes += $total;
+                                                                                    @endphp
+                                                                                </span>
+                                                                            </td>
+                                                                        </tr>
+                                                                    @else
+                                                                        <tr>
+                                                                            <td>
+                                                                                {{ $item[$key]->no_butir }}
+                                                                            </td>
+                                                                            <td>
+                                                                                {{ $item[$key]->matriks->asesmen_kecukupan->deskripsi }}
+                                                                            </td>
+                                                                            <td>
+                                                                                {{ $item[$key]->matriks->asesmen_kecukupan->nilai }}
+                                                                            </td>
+                                                                            <td>
+                                                                                {{ $item[$key]->bobot }}
+                                                                            </td>
+                                                                        </tr>
+                                                                    @endif
+                                                                    @php
+                                                                        $is_new_row = false;
+                                                                    @endphp
+                                                                @endforeach
+                                                            @endforeach
+                                                        @endforeach
+
+
+                                                    </tbody>
                                                 </table>
+                                                {{-- <tr>
+                                                                <td>{{ $loop->iteration }}</td>
+                                                                <td rowspan="2">
+                                                                    @php
+                                                                    $matriks;
+                                                                        $firstRow = $item->first();
+                                                                        if (
+                                                                            $firstRow->matriks_penilaian
+                                                                                ->sub_kriteria != null
+                                                                        ) {
+                                                                            $matriks = $firstRow->matriks_penilaian
+                                                                                ->sub_kriteria->sub_kriteria;
+                                                                        } else {
+                                                                            $matriks = $firstRow->matriks_penilaian
+                                                                                ->kriteria->kriteria;
+                                                                        }
+                                                                    @endphp
+                                                                    {{ $matriks }}
+                                                                </td>
+                                                                <td rowspan="3" class="text-center">
+                                                                    hfds
+                                                                </td>
+                                                                <td>coba</td>
+                                                                <td></td>
+                                                                <td></td>
+                                                                <td></td>
+                                                            </tr> --}}
                                             </div>
                                         </div>
                                     </div>
@@ -95,7 +204,7 @@
                                                     <th>Total Nilai Asesmen Kecukupan</th>
                                                     <th>:</th>
                                                     <td>
-                                                        {{ $total }}
+                                                        {{ $total_kes }}
                                                     </td>
                                                     <th>Hasil Akreditasi</th>
                                                     <th>:</th>
@@ -116,79 +225,103 @@
                                     </div>
                                 </div>
                             </div>
+                        @else
+                            <h1>Akreditasi tahun {{ $user_asesor->tahun->tahun }} program studi
+                                {{ $program_studi->jenjang->jenjang }} {{ $program_studi->nama }} telah selesai,
+                                silahkan
+                                lihat
+                                di history</h1>
+                        @endif
+
                     </div>
-                @else
-                    <h1>Akreditasi tahun {{ $user_asesor->tahun->tahun }} program studi
-                        {{ $program_studi->jenjang->jenjang }} {{ $program_studi->nama }} telah selesai, silahkan
-                        lihat
-                        di history</h1>
-                    @endif
-                    <!--Basic table-->
+                </section>
             </div>
-            </section>
+            <div class="modal fade" tabindex="-1" role="dialog" id="modalTambah">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Tambah Keterangan</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <form action="{{ route('rekap-nilaid3.store') }}" method="post" enctype="multipart/form-data"
+                            id="formActionTambah">
+                            @csrf
+                            @method('POST')
+                            <div class="modal-body" id="formTambah">
+                                <div class="card">
+                                    <form class="needs-validation" novalidate="">
+                                        <div class="card-body">
+                                            <div class="form-group">
+                                                <label class="form-label">Nama Asesor</label>
+                                                <input type="text" class="form-control" name="nama_asesor"
+                                                    required="">
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-6 mb-1">
+                                                    <label class="form-label">Tanggal Batas</label>
+                                                    <input type="date" name="tanggal_batas" class="form-control"
+                                                        id="category">
+                                                </div>
+                                                <div class="col-6 mb-1">
+                                                    <label class="form-label">Tanggal Penilaian</label>
+                                                    <input type="date" name="tanggal_penilaian" class="form-control"
+                                                        id="stock_item">
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label>Nama Perguruan Tinggi</label>
+                                                <input type="text" value="Politeknik Negeri Indramayu" readonly
+                                                    class="form-control" name="perguruan">
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="form-label">Nama Jurusan</label>
+                                                <input type="text" class="form-control" value="Teknik Informatika"
+                                                    readonly name="jurusan">
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-4 mb-1">
+                                                    <label class="form-label">Jenjang</label>
+                                                    <input type="text" class="form-control" placeholder="D3"
+                                                        readonly>
+                                                    </select>
+                                                </div>
+                                                <div class="col-8 mb-1">
+                                                    <label class="form-label">Prodi</label>
+                                                    <input type="text" class="form-control"
+                                                        placeholder="Teknik Informatika" readonly>
+                                                    <input type="hidden" class="form-control" value="1"
+                                                        name="program_studi_id">
+                                                </div>
+                                            </div>
+
+                                    </form>
+                                </div>
+
+                            </div>
+                            <div class="modal-footer bg-whitesmoke br">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
+                                <button type="submit" class="btn btn-primary">Simpan</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="modal fade" tabindex="-1" role="dialog" id="modalTambah">
+        <div class="modal fade" tabindex="-1" role="dialog" id="modalEdit">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title">Tambah Keterangan</h5>
+                        <h5 class="modal-title">Edit Keterangan</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
-                    <form action="{{ route('rekap-nilaid3.store') }}" method="post" enctype="multipart/form-data"
-                        id="formActionTambah">
+                    <form action="" method="post" enctype="multipart/form-data" id="formActionEdit">
                         @csrf
-                        @method('POST')
-                        <div class="modal-body" id="formTambah">
-                            <div class="card">
-                                <form class="needs-validation" novalidate="">
-                                    <div class="card-body">
-                                        <div class="form-group">
-                                            <label class="form-label">Nama Asesor</label>
-                                            <input type="text" class="form-control" name="nama_asesor"
-                                                required="">
-                                        </div>
-                                        <div class="row">
-                                            <div class="col-6 mb-1">
-                                                <label class="form-label">Tanggal Batas</label>
-                                                <input type="date" name="tanggal_batas" class="form-control"
-                                                    id="category">
-                                            </div>
-                                            <div class="col-6 mb-1">
-                                                <label class="form-label">Tanggal Penilaian</label>
-                                                <input type="date" name="tanggal_penilaian" class="form-control"
-                                                    id="stock_item">
-                                            </div>
-                                        </div>
-                                        <div class="form-group">
-                                            <label>Nama Perguruan Tinggi</label>
-                                            <input type="text" value="Politeknik Negeri Indramayu" readonly
-                                                class="form-control" name="perguruan">
-                                        </div>
-                                        <div class="form-group">
-                                            <label class="form-label">Nama Jurusan</label>
-                                            <input type="text" class="form-control" value="Teknik Informatika"
-                                                readonly name="jurusan">
-                                        </div>
-                                        <div class="row">
-                                            <div class="col-4 mb-1">
-                                                <label class="form-label">Jenjang</label>
-                                                <input type="text" class="form-control" placeholder="D3" readonly>
-                                                </select>
-                                            </div>
-                                            <div class="col-8 mb-1">
-                                                <label class="form-label">Prodi</label>
-                                                <input type="text" class="form-control"
-                                                    placeholder="Teknik Informatika" readonly>
-                                                <input type="hidden" class="form-control" value="1"
-                                                    name="program_studi_id">
-                                            </div>
-                                        </div>
-
-                                </form>
-                            </div>
-
+                        @method('PUT')
+                        <div class="modal-body" id="formEdit">
                         </div>
                         <div class="modal-footer bg-whitesmoke br">
                             <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
@@ -198,30 +331,7 @@
                 </div>
             </div>
         </div>
-    </div>
-    <div class="modal fade" tabindex="-1" role="dialog" id="modalEdit">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Edit Keterangan</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <form action="" method="post" enctype="multipart/form-data" id="formActionEdit">
-                    @csrf
-                    @method('PUT')
-                    <div class="modal-body" id="formEdit">
-                    </div>
-                    <div class="modal-footer bg-whitesmoke br">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
-                        <button type="submit" class="btn btn-primary">Simpan</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-    <script>
+        {{-- <script>
         $(function() {
             $('#rekapTable').dataTable({
                 processing: true,
@@ -231,13 +341,13 @@
                         data: 'DT_RowIndex',
                         name: 'DT_RowIndex',
                     },
-                    // {
-                    //     data: 'butir',
-                    //     name: 'butir'
-                    // },
                     {
                         data: 'sub_kriteria',
                         name: 'sub_kriteria'
+                    },
+                    {
+                        data: 'no_butir',
+                        name: 'np_butir'
                     },
                     {
                         data: 'deskripsi',
@@ -271,15 +381,12 @@
                 }
             })
         })
-    </script>
-    <footer class="main-footer">
-        @include('footer')
-        <div class="footer-right">
-        </div>
-    </footer>
+    </script> --}}
+        <footer class="main-footer">
+            @include('footer')
+            <div class="footer-right">
+            </div>
+        </footer>
     </div>
-    </div>
-
 </body>
-
 </html>

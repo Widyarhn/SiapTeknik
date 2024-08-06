@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Kriteria extends Model
 {
+    use HasFactory;
     protected $table = 'kriterias';
 
     protected $fillable = [
@@ -25,20 +26,8 @@ class Kriteria extends Model
         return $this->hasMany(SubKriteria::class);
     }
 
-    public function aspek_penilaian()
-    {
-        return $this->hasMany(AspekPenilaian::class);
-    }
-
-    public function data_dukung()
-    {
-        return $this->hasMany(DataDukung::class);
-    }
-
-    public function list_lkps()
-    {
-        return $this->hasMany(ListLkps::class);
-    }
-
-    use HasFactory;
+    // public function data_dukung()
+    // {
+    //     return $this->hasMany(DataDukung::class);
+    // }
 }

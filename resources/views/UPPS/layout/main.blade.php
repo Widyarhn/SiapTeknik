@@ -54,13 +54,13 @@
                                         <h4>Dokumen Ajuan</h4>
                                     </div>
                                     <div class="card-body">
-                                        @if (count($dokumen_ajuan) == 0)
+                                        @if (count($pengajuan_dokumen) == 0)
                                             -
                                         @else
-                                            {{ count($dokumen_ajuan) }}
+                                            {{ count($pengajuan_dokumen) }}
                                         @endif
                                         <div class="btn-group dropright">
-                                            @if (count($dokumen_ajuan) == 0)
+                                            @if (count($pengajuan_dokumen) == 0)
                                             @else
                                                 <a href="{{ route('akreditasi.index') }}"
                                                     class="btn btn-outline-warning btn-sm ml-2" aria-haspopup="true"
@@ -74,42 +74,65 @@
                             </div>
                         </div>
                         <div class="col-lg-4 col-md-4 col-sm-12">
-                            <a href="{{ route('akreditasi.asesmenKecukupan') }}">
-                                <div class="card card-statistic-2">
-                                    <div class="card-icon shadow-info bg-info"
+                            <div class="card card-statistic-2">
+                                <div class="card-icon shadow-info bg-info"
                                         style="margin-left: 16px;margin-top: 16px;margin-bottom: 16px;margin-right: 16px;">
                                         <i class="fas fa-clipboard-list"></i>
+                                </div>
+                                <div class="card-wrap">
+                                    <div class="card-header" style="padding-top: 16px;">
+                                        <h4>Tahap Asesmen Kecukupan</h4>
                                     </div>
-                                    <div class="card-wrap">
-                                        <div class="card-header" style="padding-top:16px;">
-                                            <h4>Tahap Asesmen</h4>
-                                        </div>
-                                        <div class="card-body" style="font-size: 24.5px;">
-                                            Kecukupan
+                                    <div class="card-body">
+                                        @if (count($asesmen_kecukupan) == 0)
+                                            -
+                                        @else
+                                            {{ count($asesmen_kecukupan) }}
+                                        @endif
+                                        <div class="btn-group dropright">
+                                            @if (count($asesmen_kecukupan) == 0)
+                                            @else
+                                                <a href="{{ route('akreditasi.asesmenKecukupan') }}"
+                                                    class="btn btn-outline-info btn-sm ml-2" aria-haspopup="true"
+                                                    aria-expanded="false" style="border-radius: 30px;">
+                                                    View AK
+                                                </a>
+                                            @endif
                                         </div>
                                     </div>
                                 </div>
-                            </a>
+                            </div>
                         </div>
                         <div class="col-lg-4 col-md-4 col-sm-12">
-                            <a href="{{ route('akreditasi.asesmenLapangan') }}">
-                                <div class="card card-statistic-2">
-                                    <div class="card-icon shadow-success bg-success"
+                            <div class="card card-statistic-2">
+                                <div class="card-icon shadow-success bg-success"
                                         style="margin-left: 16px;margin-top: 16px;margin-bottom: 16px;margin-right: 16px;">
                                         <i class="fas fa-clipboard-check"></i>
+                                </div>
+                                <div class="card-wrap">
+                                    <div class="card-header" style="padding-top: 16px;">
+                                        <h4>Tahap Asesmen Lapangan</h4>
                                     </div>
-                                    <div class="card-wrap">
-                                        <div class="card-header" style="padding-top:16px;">
-                                            <h4>Tahap Asesmen</h4>
-                                        </div>
-                                        <div class="card-body" style="font-size: 24.5px;">
-                                            Lapangan
+                                    <div class="card-body">
+                                        @if (count($asesmen_lapangan) == 0)
+                                            -
+                                        @else
+                                            {{ count($asesmen_lapangan) }}
+                                        @endif
+                                        <div class="btn-group dropright">
+                                            @if (count($asesmen_lapangan) == 0)
+                                            @else
+                                                <a href="{{ route('akreditasi.asesmenLapangan') }}"
+                                                    class="btn btn-outline-success btn-sm ml-2" aria-haspopup="true"
+                                                    aria-expanded="false" style="border-radius: 30px;">
+                                                    View AL
+                                                </a>
+                                            @endif
                                         </div>
                                     </div>
                                 </div>
-                            </a>
+                            </div>
                         </div>
-
                     </div>
                     <div class="row">
                         <div class="col-lg-6 col-md-6 col-sm-12">
@@ -190,19 +213,16 @@
                                         @endif
                                     </ul>
                                 </div>
-                                {{-- <div class="card-footer pt-3 d-flex justify-content-center">
-
-                                </div> --}}
                             </div>
                         </div>
                         <div class="col-lg-8 col-md-8 col-12">
                             <div class="card card-primary">
                                 <div class="card-header">
                                     <div class="buttons">
-                                        <a href="#" data-toggle="modal" data-target="#modalTambahJadwal"
+                                        {{-- <a href="#" data-toggle="modal" data-target="#modalTambahJadwal"
                                             class="btn btn-outline-primary btn-create mb-2"
                                             style="border-radius: 30px;"><i class="fas fa-plus-circle"></i>
-                                            Tambah Akreditasi</a>
+                                            Tambah</a> --}}
                                         <h4>Daftar Akreditasi Program Studi</h4>
                                     </div>
                                 </div>

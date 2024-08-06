@@ -1,12 +1,15 @@
 <?php
-use App\Models\Jenjang;
+
+use App\Models\User;
 use App\Models\ProgramStudi;
+use App\Models\Jenjang;
 use App\Models\Tahun;
+use App\Models\Timeline;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateBaAsesmenLapangansTable extends Migration
+class CreateUserProdiesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -15,12 +18,13 @@ class CreateBaAsesmenLapangansTable extends Migration
      */
     public function up()
     {
-        Schema::create('ba_asesmen_lapangans', function (Blueprint $table) {
+        Schema::create('user_prodies', function (Blueprint $table) {
             $table->id();
-            $table->foreignIdFor(ProgramStudi::class)->nullable();
+            $table->foreignIdFor(User::class);
             $table->foreignIdFor(Tahun::class)->nullable();
-            $table->string('file');
-            $table->boolean('status')->default(false);
+            $table->foreignIdFor(ProgramStudi::class)->nullable();
+            $table->foreignIdFor(Jenjang::class)->nullable();
+            // $table->foreignIdFor(Timeline::class)->nullable();
             $table->timestamps();
         });
     }
@@ -32,6 +36,6 @@ class CreateBaAsesmenLapangansTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('ba_asesmen_lapangans');
+        Schema::dropIfExists('user_prodies');
     }
 }

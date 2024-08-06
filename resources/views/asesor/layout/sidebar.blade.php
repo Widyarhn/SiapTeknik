@@ -1,3 +1,4 @@
+
 <div class="main-sidebar sidebar-style-2">
     <aside id="sidebar-wrapper">
         <div class="sidebar-brand">
@@ -122,13 +123,13 @@
                 </ul>
             </li>
         </ul>
-
-
-
+    
+    
+    
         <div class="mt-4 mb-4 p-3 hide-sidebar-mini">
-
-
-            
+    
+    
+    
         </div>
     </aside>
 </div>

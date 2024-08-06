@@ -5,7 +5,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateProgramStudisTable extends Migration
+class CreateProgramStudiesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -14,7 +14,7 @@ class CreateProgramStudisTable extends Migration
      */
     public function up()
     {
-        Schema::create('program_studis', function (Blueprint $table) {
+        Schema::create('program_studies', function (Blueprint $table) {
             $table->id();
             $table->foreignIdFor(Jenjang::class);
             $table->string('nama');
@@ -29,6 +29,6 @@ class CreateProgramStudisTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('program_studis');
+        Schema::dropIfExists('program_studies');
     }
 }

@@ -15,4 +15,14 @@ class Indikator extends Model
     {
         return $this->belongsTo(SubKriteria::class);
     }
+
+    public function matriks()
+    {
+        return $this->hasOne(MatriksPenilaian::class);
+    }
+
+    public function rumus()
+    {
+        return $this->hasOne(Rumus::class);
+    }
 }

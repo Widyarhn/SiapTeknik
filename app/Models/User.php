@@ -38,13 +38,13 @@ class User extends Authenticatable
 
     public function user_asesor()
     {
-        return $this->hasMany(UserAsesor::class);
+        return $this->hasOne(UserAsesor::class);
     }
 
-    public function prodi_user()
-    {
-        return $this->belongsTo(UserProdi::class);
-    }
+    // public function prodi_user()
+    // {
+    //     return $this->belongsTo(UserProdi::class);
+    // }
 
     /**
      * The attributes that should be hidden for serialization.

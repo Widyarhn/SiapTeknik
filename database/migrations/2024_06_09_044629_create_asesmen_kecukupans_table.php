@@ -1,15 +1,16 @@
 <?php
 
-use App\Models\User;
+use App\Models\AspekPenilaian;
+use App\Models\MatriksPenilaian;
 use App\Models\ProgramStudi;
-use App\Models\Jenjang;
 use App\Models\Tahun;
 use App\Models\Timeline;
+use App\Models\UserAsesor;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateUserProdisTable extends Migration
+class CreateAsesmenKecukupansTable extends Migration
 {
     /**
      * Run the migrations.
@@ -18,13 +19,14 @@ class CreateUserProdisTable extends Migration
      */
     public function up()
     {
-        Schema::create('user_prodis', function (Blueprint $table) {
+        Schema::create('asesmen_kecukupans', function (Blueprint $table) {
             $table->id();
-            $table->foreignIdFor(User::class);
-            $table->foreignIdFor(Tahun::class);
-            $table->foreignIdFor(ProgramStudi::class)->nullable();
-            $table->foreignIdFor(Jenjang::class)->nullable();
+            $table->foreignIdFor(MatriksPenilaian::class)->nullable();
+            $table->foreignIdFor(UserAsesor::class)->nullable();
             $table->foreignIdFor(Timeline::class)->nullable();
+            $table->float('nilai');
+            $table->float('upps_nilai')->nullable();
+            $table->text('deskripsi');
             $table->timestamps();
         });
     }
@@ -36,6 +38,6 @@ class CreateUserProdisTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('user_prodis');
+        Schema::dropIfExists('asesmen_kecukupans');
     }
 }

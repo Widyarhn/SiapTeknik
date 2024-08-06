@@ -91,8 +91,14 @@
                                                             <div class="col-md-12">
                                                                 <div class="form-group">
                                                                     <label>Sub Elemen</label>
+                                                                    @if (!@empty($matriks_penilaian->sub_kriteria->sub_kriteria))
+                                                                    
+                                                                        <textarea class="form-control" name="sub_kriteria" placeholder="contoh: C.1.4. Indikator Kinerja Utama"
+                                                                            >{{ $matriks_penilaian->sub_kriteria->sub_kriteria }}</textarea>
+                                                                    @else
                                                                     <textarea class="form-control" name="sub_kriteria" placeholder="contoh: C.1.4. Indikator Kinerja Utama"
-                                                                        >{{ $matriks_penilaian->sub_kriteria->sub_kriteria }}</textarea>
+                                                                    ></textarea>
+                                                                    @endif
                                                                 </div>
                                                             </div>
                                                         </div>

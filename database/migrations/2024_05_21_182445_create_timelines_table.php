@@ -6,6 +6,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use App\Models\Tahun;
+use App\Models\UserAsesor;
 
 class CreateTimelinesTable extends Migration
 {
@@ -18,14 +19,13 @@ class CreateTimelinesTable extends Migration
     {
         Schema::create('timelines', function (Blueprint $table) {
             $table->id();
-            $table->foreignIdFor(Tahun::class)->nullable();
-            $table->foreignIdFor(ProgramStudi::class)->nullable();
+            $table->foreignIdFor(UserAsesor::class)->nullable();
             $table->string('kegiatan');
             $table->date('tanggal_mulai');
-            $table->date('tanggal_akhir');
-            $table->boolean('status')->default(false);
+            $table->date('batas_waktu');
+            $table->enum('status', ['0', '1', '2'])->default('0');
             $table->boolean('selesai')->default(false);
-            $table->char('tahap')->default("1");
+            $table->text('keterangan')->nullable();
             $table->timestamps();
         });
     }

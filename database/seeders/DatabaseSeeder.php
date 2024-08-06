@@ -19,7 +19,6 @@ class DatabaseSeeder extends Seeder
         // $this->call(TimelineSeeder::class);
         $this->call(JenjangSeeder::class);
         $this->call(KriteriaSeeder::class);
-        $this->call(ListLkpsSeeder::class);
         $this->call(ProgramStudiSeeder::class);
         $this->call(RoleSeeder::class);
     }

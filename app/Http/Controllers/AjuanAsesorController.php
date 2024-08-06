@@ -17,11 +17,16 @@ class AjuanAsesorController extends Controller
 {
     public function prodi(Request $request, $id_prodi)
     {
-        $program_studi = ProgramStudi::findOrFail($id_prodi);
-        
-        $tahun = UserProdi::with('tahun')->where("program_studi_id", $id_prodi)->first();
-        
-        return view ('asesor.ajuan.index', ['tahun'=> $tahun, 'program_studi' => $program_studi]);
+        $data = [
+            'program_studi' => ProgramStudi::findOrFail($id_prodi),
+            'user_prodi' => UserProdi::with('tahun', 'pengajuan_dokumen')->where("program_studi_id", $id_prodi)
+            ->first(),
+        ];
+        // $program_studi = ProgramStudi::findOrFail($id_prodi);
+        // dd($data['user_prodi']);
+        // $tahun = UserProdi::with('tahun')->where("program_studi_id", $id_prodi)->first();
+
+        return view('asesor.ajuan.index', $data);
     }
 
     public function getLkps(Request $request, $id_prodi){

@@ -17,9 +17,8 @@ class UserProdiController extends Controller
     {
         $jenjang = Jenjang::findOrFail($id);
         $user = User::where('role_id', '2')->get();
-        $tahun = Tahun::where('is_active', 0)->get();
         $program_studi = ProgramStudi::where('jenjang_id', $id)->get();
-        return view('UPPS.user.user-prodi', ['user' => $user, 'program_studi' => $program_studi, 'jenjang'=>$jenjang, 'tahun'=> $tahun]);
+        return view('UPPS.user.user-prodi', ['user' => $user, 'program_studi' => $program_studi, 'jenjang'=>$jenjang]);
     }
 
     public function jsonProdi(Request $request, $id)
@@ -39,7 +38,11 @@ class UserProdiController extends Controller
                 return $row->jenjang->jenjang.' '.$row->program_studi->nama;
             })
             ->addColumn('tahun', function($row){
-                return $row->tahun->tahun;
+                if($row->tahun_id){
+                    return $row->tahun->tahun;
+                }else{
+                    return "-";
+                }
             })
             ->addColumn('action', function ($row) {
                 return '<div class="buttons">
@@ -56,20 +59,33 @@ class UserProdiController extends Controller
     {
         $validatedData = $request->validate([
             'user_id' => 'required',
-            'program_studi_id' => 'required'
+            'program_studi_id' => 'required',
+            'nama' => 'required_if:user_id,other|max:255', // Jika user_id adalah 'other', pastikan nama terisi
+            'email' => $request->user_id === 'other' ? 'required|email|unique:users,email' : '', // Jika user_id adalah 'other', validasi email, jika tidak abaikan
         ],
         [
             'user_id.required' => 'Nama User Harus Diisi',
             'program_studi_id.required' => 'Program Studi Harus Diisi'
-        ]
-    );
+        ]);
 
-        $user_prodi = new UserProdi;
-        $user_prodi->user_id = $request->user_id;
-        $user_prodi->jenjang_id = $request->jenjang_id;
-        $user_prodi->program_studi_id = $request->program_studi_id;
-        $user_prodi->tahun_id = $request->tahun_id;
-        $user_prodi->save();
+        if ($request->user_id === 'other') {
+            $user = new User();
+            $user->nama = $request->nama;
+            $user->email = $validatedData['email'];
+            $user->password = bcrypt('password'); 
+            $user->role_id = Role::where('role', 'Prodi')->first()->id; 
+            $user->save();
+        } else {
+            $user = User::findOrFail($request->user_id);
+        }
+
+        $userProdi = new UserProdi();
+        $userProdi->user_id = $user->id;
+        $userProdi->program_studi_id = $request->program_studi_id;
+        $userProdi->jenjang_id = $request->jenjang_id;
+        $userProdi->tahun_id = null;
+        $userProdi->save();
+
         return redirect()->back()->with('success', 'Data User Prodi Berhasil Ditambahkan');
     }
 
@@ -86,7 +102,8 @@ class UserProdiController extends Controller
     {
         $user_prodi = UserProdi::find($id);
         $user_prodi->user_id = $request->user_id;
-        $user_prodi->tahun_id = $request->tahun_id;
+        $user_prodi->program_studi_id = $request->program_studi_id;
+        $user_prodi->tahun_id = null;
         $user_prodi->save();
 
         return redirect()->back()->with('success', 'Data User Berhasil Disimpan');

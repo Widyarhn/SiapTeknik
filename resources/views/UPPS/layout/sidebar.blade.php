@@ -100,15 +100,22 @@
                 </ul>
             </li> --}}
             <li class="menu-header">Akreditasi</li>
+            {{-- <li class="{{ Request::segment('1') == 'setting-tahun' ? 'active' : '' }}"">
+                <a href="{{ route('setting-tahun.index') }}" class="nav-link">
+                    <i class="fas fa-calendar"></i>
+                    <span>Setting Tahun Akreditasi</span>
+                </a>
+            </li> --}}
             <li class="{{ Request::segment('1') == 'akreditasi' ? 'active' : '' }}">
                 <a href="{{ route('akreditasi.index') }}" class="nav-link">
                     <i class="fas fa-calendar-check"></i>
                     <span>Akreditasi Program Studi</span>
                 </a>
             </li>
+            
             <li class="dropdown {{ Request::segment('1') == 'upps-history-dokumenajuan' ? 'active' : '' }}">
                 <a href="#" class="nav-link has-dropdown"><i class="fas fa-database"
-                        aria-hidden="true"></i><span>History Dok. Ajuan</span></a>
+                        aria-hidden="true"></i><span>History Akreditasi</span></a>
                 <ul class="dropdown-menu">
                     @php
                         $prodi = App\Models\ProgramStudi::with('jenjang')->get();

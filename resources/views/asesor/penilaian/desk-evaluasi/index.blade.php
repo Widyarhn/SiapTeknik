@@ -4,7 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta content="width=device-width, initial-scale=1, maximum-scale=1, shrink-to-fit=no" name="viewport">
-    <title>Asesor {{$program_studi->jenjang->jenjang}} | Elemen Penilaian {{$program_studi->jenjang->jenjang}} {{$program_studi->nama}} </title>
+    {{-- <title>Asesor {{$program_studi->jenjang->jenjang}} | Elemen Penilaian {{$program_studi->jenjang->jenjang}} {{$program_studi->nama}} </title> --}}
+    <title>Asesor | Asesmen Kecukupan</title>
     @include('body')
 </head>
 <body>
@@ -27,7 +28,7 @@
                             <div class="breadcrumb-item">Asesmen Kecukupan</div>
                         </div>
                     </div>
-                    @if($user_asesor->tahun->is_active==0)
+                    @if($user_asesor->tahun->is_active==1)
                     <div class="section-body">
                         <h2 class="section-title">Data Elemen Penilaian {{$program_studi->jenjang->jenjang}} {{$program_studi->nama}} </h2>
                         <p class="section-lead">Informasi Elemen Penilaian Asesmen Kecukupan Jenjang {{$program_studi->jenjang->jenjang}} {{$program_studi->nama}}  Lingkup Teknik</p>

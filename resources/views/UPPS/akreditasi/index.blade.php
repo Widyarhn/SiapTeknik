@@ -11,7 +11,7 @@
 <head>
     <meta charset="UTF-8">
     <meta content="width=device-width, initial-scale=1, maximum-scale=1, shrink-to-fit=no" name="viewport">
-    <title>UPPS | Timeline Akreditasi</title>
+    <title>UPPS | Akreditasi Program Studi</title>
     @include('body')
 </head>
 
@@ -84,55 +84,72 @@
 
                         <div class="row ">
                             <div class="col-12">
-                                @if ($timeline && $timeline->count() > 0)
-                                    @foreach ($timeline as $t)
+                                @if ($pengajuan && $pengajuan->count() > 0)
+                                    @foreach ($pengajuan as $t)
                                         @php
-                                            $lkps = Lkps::where('program_studi_id', $t->program_studi_id)
-                                                ->where('tahun_id', $t->tahun_id)
+                                            $lkps = Lkps::where('program_studi_id', $t->user_prodi->program_studi_id)
+                                                ->where('tahun_id', $t->user_prodi->tahun_id)
                                                 ->first();
-                                            $led = Led::where('program_studi_id', $t->program_studi_id)
-                                                ->where('tahun_id', $t->tahun_id)
+                                            $led = Led::where('program_studi_id', $t->user_prodi->program_studi_id)
+                                                ->where('tahun_id', $t->user_prodi->tahun_id)
                                                 ->first();
                                             $surat_pengantar = SuratPengantar::where(
                                                 'program_studi_id',
-                                                $t->program_studi_id,
+                                                $t->user_prodi->program_studi_id,
                                             )
-                                                ->where('tahun_id', $t->tahun_id)
+                                                ->where('tahun_id', $t->user_prodi->tahun_id)
                                                 ->first();
                                             $asesor = UserAsesor::whereHas('timeline', function ($query) {
                                                 $query->where('kegiatan', 'Asesmen Kecukupan');
-                                            })-> where('program_studi_id', $t->program_studi_id)->first();
+                                            })
+                                                ->where('program_studi_id', $t->user_prodi->program_studi_id)
+                                                ->first();
                                         @endphp
 
                                         <div class="card">
-                                            @if ($surat_pengantar->status == 1 && $led->status == 1 && $lkps->status == 1)
+                                            @if ($surat_pengantar->status == '1' && $led->status == '1' && $lkps->status == '1')
                                                 <div class="card-header"
                                                     style="border-bottom-width: 0px;padding-bottom: 0px;">
                                                     @if (is_null($asesor))
                                                         <h4>
                                                             <a href="#" data-toggle="modal"
                                                                 data-target="#modalPenugasanAsesor"
-                                                                data-tahun-id="{{ $t->tahun_id }}"
-                                                                data-program-studi-id="{{ $t->program_studi_id }}"
-                                                                data-jenjang-id="{{ $t->program_studi->jenjang_id }}"
+                                                                data-tahun-id="{{ $t->user_prodi->tahun_id }}"
+                                                                data-program-studi-id="{{ $t->user_prodi->program_studi_id }}"
+                                                                data-jenjang-id="{{ $t->user_prodi->jenjang_id }}"
                                                                 class="btn btn-outline-primary btn-create"
                                                                 style="border-radius: 30px;">
                                                                 <i class="fas fa-user-plus"></i> Penugasan Asesor
                                                             </a>
                                                         </h4>
                                                     @else
-                                                        <h4>
-                                                            <a href="#" data-toggle="modal"
-                                                                data-target="#modalPenugasanAsesor2"
-                                                                data-timeline-ids="{{ $t_asesor->id }}"
-                                                                data-tahun-ids="{{ $t->tahun_id }}"
-                                                                data-program-studi-ids="{{ $t->program_studi_id }}"
-                                                                data-jenjang-ids="{{ $t->program_studi->jenjang_id }}"
-                                                                class="btn btn-outline-primary btn-tambah-user"
-                                                                style="border-radius: 30px;">
-                                                                <i class="fas fa-user-plus"></i> Penugasan Asesor
-                                                            </a>
-                                                        </h4>
+                                                        @php
+                                                            // Menghitung jumlah user asesor dalam program studi yang sama dan timeline yang sama
+                                                            $cAsesor = UserAsesor::where('program_studi_id', $t->user_prodi->program_studi_id)
+                                                                ->with(['timeline' => function($q){
+                                                                    $q->where('kegiatan', 'Asesmen Kecukupan');
+                                                                }])->get();
+                                                            $tmln = UserAsesor::where('program_studi_id', $t->user_prodi->program_studi_id)
+                                                                ->with(['timeline' => function($q){
+                                                                    $q->where('kegiatan', 'Asesmen Kecukupan');
+                                                                    $q->where('status', '0');
+                                                                    $q->where('selesai', '0');
+                                                                }])->first();
+                                                        @endphp
+                                                        @if ($cAsesor->count() < 2)
+                                                            <h4>
+                                                                <a href="#" data-toggle="modal"
+                                                                    data-target="#modalPenugasanAsesor2"
+                                                                    data-timeline-ids="{{ $tmln->timeline_id }}"
+                                                                    data-tahun-ids="{{ $t->user_prodi->tahun_id }}"
+                                                                    data-program-studi-ids="{{ $t->user_prodi->program_studi_id }}"
+                                                                    data-jenjang-ids="{{ $t->user_prodi->jenjang_id }}"
+                                                                    class="btn btn-outline-primary btn-tambah-user"
+                                                                    style="border-radius: 30px;">
+                                                                    <i class="fas fa-user-plus"></i> Penugasan Asesor
+                                                                </a>
+                                                            </h4>
+                                                        @endif
                                                         <div class="card-header-action">
                                                             <a href="javascript:void(0)" data-id="{{ $t->id }}"
                                                                 class="btn btn-info btn-selesai"
@@ -152,9 +169,9 @@
                                                         <thead>
                                                             <tr>
                                                                 <th class="text-center">
-                                                                    {{ $t->program_studi->jenjang->jenjang }}
-                                                                    {{ $t->program_studi->nama }} |
-                                                                    {{ $t->tahun->tahun }} </th>
+                                                                    {{ $t->user_prodi->program_studi->jenjang->jenjang }}
+                                                                    {{ $t->user_prodi->program_studi->nama }} |
+                                                                    {{ $t->user_prodi->tahun->tahun }} </th>
                                                                 <th class="text-center w-50">Nama File</th>
                                                                 <th class="text-center">Info</th>
                                                             </tr>
@@ -168,7 +185,7 @@
                                                                 </td>
                                                                 <td class="text-center">
 
-                                                                    @if ($surat_pengantar->status == 0 && $surat_pengantar->keterangan == null)
+                                                                    @if ($surat_pengantar->status == '0' && $surat_pengantar->keterangan == null)
                                                                         <div
                                                                             class="d-flex align-items-center text-center">
                                                                             <a href="javascript:void(0)"
@@ -208,7 +225,7 @@
                                                                         target="_blank">{{ basename($lkps->file) }}</a>
                                                                 </td>
                                                                 <td class="text-center">
-                                                                    @if ($lkps->status == 0 && $lkps->keterangan == null)
+                                                                    @if ($lkps->status == '0' && $lkps->keterangan == null)
                                                                         <div
                                                                             class="d-flex align-items-center text-center">
                                                                             <a href="javascript:void(0)"
@@ -248,7 +265,7 @@
                                                                         target="_blank">{{ basename($led->file) }}</a>
                                                                 </td>
                                                                 <td class="text-center">
-                                                                    @if ($led->status == 0 && $led->keterangan == null)
+                                                                    @if ($led->status == '0' && $led->keterangan == null)
                                                                         <div
                                                                             class="d-flex align-items-center text-center">
                                                                             <a href="javascript:void(0)"
@@ -311,7 +328,7 @@
                 <div class="modal-dialog" role="document">
                     <div class="modal-content">
                         <div class="modal-header">
-                            <h5 class="modal-title">Penugasan User Asesor</h5>
+                            <h5 class="modal-title">Penugasan Ketua Asesor</h5>
                             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                 <span aria-hidden="true">&times;</span>
                             </button>
@@ -341,7 +358,7 @@
                                         </div>
                                     </div>
                                     <div class="form-row">
-                                        <div class="form-group col-lg-6">
+                                        <div class="form-group col-lg-12">
                                             <label for="nama">Nama</label>
                                             <select id="user" class="form-control selectric" name="user_id">
                                                 <option value="">-- Pilih atau Ketik --</option>
@@ -351,11 +368,11 @@
                                                 <option value="other">Lainnya</option>
                                             </select>
                                         </div>
-                                        <div class="form-group col-6">
+                                        {{-- <div class="form-group col-6">
                                             <label for="jabatan">Jabatan</label>
                                             <input type="text" class="form-control" id="jabatan"
                                                 name="jabatan">
-                                        </div>
+                                        </div> --}}
                                     </div>
                                     <div class="form-row">
                                         <div class="form-group col-lg-6" id="namaInput" style="display: none;">
@@ -392,7 +409,7 @@
                 <div class="modal-dialog" role="document">
                     <div class="modal-content">
                         <div class="modal-header">
-                            <h5 class="modal-title">Penugasan User Asesor</h5>
+                            <h5 class="modal-title">Penugasan Asesor</h5>
                             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                 <span aria-hidden="true">&times;</span>
                             </button>
@@ -416,8 +433,8 @@
                                         </div>
                                         <div class="form-group col-6">
                                             <label for="jabatan">Jabatan</label>
-                                            <input type="text" class="form-control" id="jabatan"
-                                                name="jabatan">
+                                            <input type="text" class="form-control" id="jabatan" name="jabatan"
+                                                placeholder="Anggota" readonly>
                                         </div>
                                     </div>
                                     <div class="form-row">

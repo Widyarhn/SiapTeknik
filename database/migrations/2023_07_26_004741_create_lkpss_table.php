@@ -21,7 +21,7 @@ class CreateLkpssTable extends Migration
             $table->foreignIdFor(ProgramStudi::class)->nullable();
             $table->foreignIdFor(Tahun::class)->nullable();
             $table->string('file');
-            $table->boolean('status')->default(false);
+            $table->enum('status', ['0', '1', '2'])->default('0');
             $table->text('keterangan')->nullable();
             $table->timestamps();
         });

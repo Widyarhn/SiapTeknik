@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta content="width=device-width, initial-scale=1, maximum-scale=1, shrink-to-fit=no" name="viewport">
-    <title>UPPS | Timeline Akreditasi</title>
+    <title>UPPS | Akreditasi Program Studi</title>
     @include('body')
 </head>
 
@@ -41,17 +41,18 @@
                                                 Dokumen Ajuan</a>
                                         </li>
                                         <li class="nav-item">
-                                            <a class="nav-link"
-                                                href="{{ route('akreditasi.asesmenKecukupan') }}"><i
+                                            <a class="nav-link" href="{{ route('akreditasi.asesmenKecukupan') }}"><i
                                                     class="fas fa-regular fa-circle"></i>
                                                 Asesmen Kecukupan</a>
                                         </li>
                                         <li class="nav-item">
-                                            <a class="nav-link " href="{{ route('akreditasi.asesmenLapangan') }}"><i class="fas fa-circle"></i> Asesmen
+                                            <a class="nav-link " href="{{ route('akreditasi.asesmenLapangan') }}"><i
+                                                    class="fas fa-circle"></i> Asesmen
                                                 Lapangan</a>
                                         </li>
                                         <li class="nav-item">
-                                            <a class="nav-link active" href="{{ route('akreditasi.selesai') }}"><i class="fas  fa-solid fa-check"></i>
+                                            <a class="nav-link active" href="{{ route('akreditasi.selesai') }}"><i
+                                                    class="fas  fa-solid fa-check"></i>
                                                 Selesai</a>
                                         </li>
                                     </ul>
@@ -60,35 +61,33 @@
                         </div>
 
                         <div class="row">
-                            
                             <div class="col-md-12">
-                                
-
-                                    <div class="card" >
-                                        <div class="card-header">
-                                            {{-- <h4>Data Elemen Penilaian Asesmen Lapangan</h4> --}}
-                                        </div>
-                                        <div class="card-body">
-                                            <div class="table-responsive">
-                                                <table class="table table-striped" id="elemenTable">
-                                                    <thead>
-                                                        <tr>
-                                                            <th>No</th>
-                                                            <th>Butir</th>
-                                                            <th>Kriteria</th>
-                                                            <th>Aksi</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody></tbody>
-                                                </table>
-                                            </div>
-                                        </div>
-                                        <div class="card-footer bg-whitesmoke text-md-right">
-                                            <button class="btn btn-primary" id="save-btn">Save Changes</button>
-                                            <button class="btn btn-secondary" type="button">Reset</button>
+                                <div class="card" id="settings-card">
+                                    {{-- <div class="card-header">
+                                        <h4>Data Elemen Penilaian Desk Evaluasi</h4>
+                                    </div> --}}
+                                    <div class="card-body">
+                                        <div class="table-responsive">
+                                            <table class="table table-striped" id="asesmenKecukupanTable">
+                                                <thead>
+                                                    <tr>
+                                                        <th>No</th>
+                                                        <th>Tahun</th>
+                                                        <th>Program Studi</th>
+                                                        <th>Akreditasi</th>
+                                                        <th>Sertifikat</th>
+                                                        <th>Aksi</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody></tbody>
+                                            </table>
                                         </div>
                                     </div>
-                                
+                                    {{-- <div class="card-footer bg-whitesmoke text-md-right">
+                                        <button class="btn btn-primary" id="save-btn">Save Changes</button>
+                                        <button class="btn btn-secondary" type="button">Reset</button>
+                                    </div> --}}
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -102,25 +101,31 @@
         </div>
     </div>
 
-    {{-- <script>
-
+    <script>
         $(function() {
-            $('#elemenTable').dataTable({
+            $('#asesmenKecukupanTable').dataTable({
                 processing: true,
                 serverSide: true,
-                ajax: "{{ route('asesmen-kecukupan.json') }}",
-                // url: "/nilai-deskeval-d3/json/kriteria_id/program_studi_id",
+                ajax: "{{ route('Upps.asesmen-lapangan.json') }}",
                 columns: [{
                         data: 'DT_RowIndex',
                         name: 'DT_RowIndex',
                     },
                     {
-                        data: 'butir',
-                        name: 'butir'
+                        data: 'tahun',
+                        name: 'tahun'
                     },
                     {
-                        data: 'kriteria',
-                        name: 'kriteria'
+                        data: 'prodi',
+                        name: 'prodi'
+                    },
+                    {
+                        data: 'nilai_akhir',
+                        name: 'nilai_akhir'
+                    },
+                    {
+                        data: 'berita_acara',
+                        name: 'berita_acara'
                     },
                     {
                         data: 'action',
@@ -131,7 +136,7 @@
                 ],
             })
         })
-    </script> --}}
+    </script>
 
 </body>
 

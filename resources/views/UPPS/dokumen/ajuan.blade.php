@@ -8,7 +8,7 @@ use App\Models\Led;
 <head>
     <meta charset="UTF-8">
     <meta content="width=device-width, initial-scale=1, maximum-scale=1, shrink-to-fit=no" name="viewport">
-    <title>Dokumen Ajuan &rsaquo; {{ $program_studi->jenjang->jenjang }} {{ $program_studi->nama }}</title>
+    <title>History Akreditasi &rsaquo; {{ $program_studi->jenjang->jenjang }} {{ $program_studi->nama }}</title>
     @include('body')
     
     <body>
@@ -24,12 +24,11 @@ use App\Models\Led;
                 <div class="main-content">
                     <section class="section">
                         <div class="section-header">
-                            <h1>Dokumen Akreditasi {{ $program_studi->jenjang->jenjang }} {{ $program_studi->nama }}</h1>
+                            <h1>History Akreditasi {{ $program_studi->jenjang->jenjang }} {{ $program_studi->nama }}</h1>
                             <div class="section-header-breadcrumb">
                                 <div class="breadcrumb-item active"><a href="{{ url('dashboard-UPPS') }}">Dashboard</a>
                                 </div>
-                                <div class="breadcrumb-item"> {{ $program_studi->jenjang->jenjang }}
-                                    {{ $program_studi->nama }}</div>
+                                <div class="breadcrumb-item">History Akreditasi</div>
                                 </div>
                             </div>
                             @if ($errors->any())
@@ -51,10 +50,8 @@ use App\Models\Led;
                             </script>
                             @endif
                             <div class="section-body">
-                                <h2 class="section-title">Dokumen LKPS dan LED Program Pendidikan
-                                    {{ $program_studi->jenjang->jenjang }} {{ $program_studi->nama }}</h2>
-                                    <p class="section-lead">Dokumen Lembar Kerja Program Studi (LKPS) dan Lembar Evaluasi Diri (LED)
-                                        program studi D3 {{ $program_studi->nama }} POLINDRA</p>
+                                <h2 class="section-title">History Akreditasi {{ $program_studi->jenjang->jenjang }} {{ $program_studi->nama }}</h2>
+                                    <p class="section-lead">History akreditasi program studi {{ $program_studi->jenjang->jenjang }} {{ $program_studi->nama }} POLINDRA</p>
                                     </div>
                                 </p>
                                 @foreach ($user_prodi as $item_tahun)

@@ -11,13 +11,21 @@ class Timeline extends Model
 
     protected $table = 'timelines';
     protected $guarded = [];
-    public function program_studi()
-    {
-        return $this->belongsTo(ProgramStudi::class);
-    }
+
 
     public function tahun()
     {
         return $this->belongsTo(Tahun::class);
     }
+
+    public function program_studi()
+    {
+        return $this->belongsTo(ProgramStudi::class);
+    }
+
+    public function user_asesor()
+    {
+        return $this->hasMany(UserAsesor::class);
+    }
+    
 }

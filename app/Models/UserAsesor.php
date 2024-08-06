@@ -10,14 +10,7 @@ class UserAsesor extends Model
     use HasFactory;
 
     protected $table = 'user_asesors';
-    protected $fillable = [
-        'user_id',
-        'program_studi_id',
-        'tahun_id',
-        'jenjang_id',
-        'timeline_id',
-        'jabatan'
-    ];
+    protected $guarded =[];
 
     public function program_studi()
     {
@@ -43,5 +36,11 @@ class UserAsesor extends Model
     {
         return $this->belongsTo(Timeline::class);
     }
+
+    public function asesmen_kecukupan()
+    {
+        return $this->hasMany(AsesmenKecukupan::class);
+    }
+    
 
 }

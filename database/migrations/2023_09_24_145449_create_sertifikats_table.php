@@ -19,7 +19,6 @@ class CreateSertifikatsTable extends Migration
         Schema::create('sertifikats', function (Blueprint $table) {
             $table->id();
             $table->foreignIdFor(ProgramStudi::class)->nullable();
-            $table->foreignIdFor(Jenjang::class)->nullable();
             $table->foreignIdFor(Tahun::class)->nullable();
             $table->string('file');
             $table->timestamps();

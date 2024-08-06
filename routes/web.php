@@ -29,6 +29,7 @@ use App\Http\Controllers\AjuanAsesorController;
 use App\Http\Controllers\ProgramStudiController;
 use App\Http\Controllers\TimelineController;
 use App\Http\Controllers\AkreditasiController;
+use App\Http\Controllers\SettingTahunController;
 use App\Http\Controllers\ImportLkpsController;
 use Illuminate\Support\Facades\Route;
 
@@ -54,15 +55,25 @@ Route::group(['middleware' => ['guest']], function () {
 
 Route::group(["middleware" => ["autentikasi"]], function () {
     Route::group(["middleware" => ["can:UPPS"]], function () {
-        Route::get('timeline/json', [TimelineController::class, 'json'])->name('UPPS.timeline.json');
-        Route::post('timeline/store', [TimelineController::class, 'store'])->name('UPPS.timeline.store');
-        Route::resource('timeline', TimelineController::class);
+        Route::post('tahun-akreditasi/selesai/{id}', [DashboardUPPSController::class, 'selesai'])->name('tahun-akreditasi.selesai');
+        Route::get('tahun-akreditasi/json', [DashboardUPPSController::class, 'json'])->name('tahun-akreditasi.json');
+        Route::get('sertifikat/sertifTable', [DashboardUPPSController::class, 'sertifTable'])->name('sertifikat.sertifTable');
+        Route::get('berita-acara/deskEvalTable', [DashboardUPPSController::class, 'deskEvalTable'])->name('berita-acara.deskEvalTable');
+        Route::get('berita-acara/asesmenLapanganTable', [DashboardUPPSController::class, 'asesmenLapanganTable'])->name('berita-acara.asesmenLapanganTable');
+        Route::post('tahun-akreditasi/store', [DashboardUPPSController::class, 'store'])->name('tahun-akreditasi.store');
+        Route::resource('dashboard-UPPS', DashboardUPPSController::class);
 
+        Route::post('akreditasi/asesmen-kecukupan/{id}', [AkreditasiController::class, 'selesai_ak'])->name('ak.selesai');
+        Route::post('akreditasi/approve_ak/{id}', [AkreditasiController::class, 'approve_ak'])->name('ak.approve');
+        Route::post('akreditasi/disapprove_ak/{id}', [AkreditasiController::class, 'disapprove_ak'])->name('ak.disapprove');
         Route::post('akreditasi/dokumen_ajuan/{id}', [AkreditasiController::class, 'selesai'])->name('dokumen_selesai');
         Route::post('akreditasi/approve/{id}/{type?}', [AkreditasiController::class, 'approve'])->name('dokumen_approve');
         Route::post('akreditasi/disapprove/{id}', [AkreditasiController::class, 'disapprove'])->name('dokumen_disapprove');
-        Route::get('akreditasi/asesmen-kecukupan/show', [AkreditasiController::class, 'show'])->name('akreditasi.asesmenKecukupan.show');
+        Route::get('akreditasi/asesmen-kecukupan/show/rekap/{id}', [AkreditasiController::class, 'rekap'])->name('akreditasi.asesmenKecukupan.rekap');
+        Route::get('akreditasi/asesmen-kecukupan/show/{id}/{id_krit}', [AkreditasiController::class, 'detail'])->name('akreditasi.asesmenKecukupan.detail');
+        Route::get('akreditasi/asesmen-kecukupan/show/{id}', [AkreditasiController::class, 'show'])->name('akreditasi.asesmenKecukupan.show');
         Route::get('akreditasi/asesmen-kecukupan/json', [AkreditasiController::class, 'jsonAk'])->name('Upps.asesmen-kecukupan.json');
+        Route::get('akreditasi/asesmen-lapangan/json', [AkreditasiController::class, 'jsonAl'])->name('Upps.asesmen-lapangan.json');
         Route::get('akreditasi/asesmen-lapangan', [AkreditasiController::class, 'asesmenLapangan'])->name('akreditasi.asesmenLapangan');
         Route::get('akreditasi/asesmen-kecukupan', [AkreditasiController::class, 'asesmenKecukupan'])->name('akreditasi.asesmenKecukupan');
         Route::get('akreditasi/selesai', [AkreditasiController::class, 'finish'])->name('akreditasi.selesai');
@@ -73,22 +84,19 @@ Route::group(["middleware" => ["autentikasi"]], function () {
         Route::post('akreditasi/store', [AkreditasiController::class, 'store'])->name('UPPS.akreditasi.store');
         Route::resource('akreditasi', AkreditasiController::class);
 
-        Route::post('tahun-akreditasi/selesai/{id}', [DashboardUPPSController::class, 'selesai'])->name('tahun-akreditasi.selesai');
-        Route::get('tahun-akreditasi/json', [DashboardUPPSController::class, 'json'])->name('tahun-akreditasi.json');
-        Route::get('sertifikat/sertifTable', [DashboardUPPSController::class, 'sertifTable'])->name('sertifikat.sertifTable');
-        Route::get('berita-acara/deskEvalTable', [DashboardUPPSController::class, 'deskEvalTable'])->name('berita-acara.deskEvalTable');
-        Route::get('berita-acara/asesmenLapanganTable', [DashboardUPPSController::class, 'asesmenLapanganTable'])->name('berita-acara.asesmenLapanganTable');
-        Route::post('tahun-akreditasi/store', [DashboardUPPSController::class, 'store'])->name('tahun-akreditasi.store');
-        Route::resource('dashboard-UPPS', DashboardUPPSController::class);
+        Route::get('timeline/json', [TimelineController::class, 'json'])->name('UPPS.timeline.json');
+        Route::post('timeline/store', [TimelineController::class, 'store'])->name('UPPS.timeline.store');
+        Route::resource('timeline', TimelineController::class);
+
+        Route::post('user/update/{id}', [UserController::class, 'update'])->name('UPPS.user.update');
+        Route::get('user/json', [UserController::class, 'json'])->name('UPPS.user.json');
+        Route::post('user/store', [UserController::class, 'store'])->name('UPPS.user.create');
+        Route::resource('user', UserController::class);
 
         Route::post('user-asesor/store', [UserAsesorController::class, 'store'])->name('UPPS.user.store');
         Route::get('user-asesor/jsonAsesor/{id}', [UserAsesorController::class, 'jsonAsesor'])->name('UPPS.user.jsonAsesor');
         Route::get('user-asesor/asesor/{id}', [UserAsesorController::class, 'asesor'])->name('UPPS.user-asesor.asesor');
         Route::resource('user-asesor', UserAsesorController::class);
-
-        Route::get('user/json', [UserController::class, 'json'])->name('UPPS.user.json');
-        Route::post('user/store', [UserController::class, 'store'])->name('UPPS.user.create');
-        Route::resource('user', UserController::class);
 
         Route::post('user-prodi/store', [UserProdiController::class, 'store'])->name('UPPS.user-prodi.store');
         Route::get('user-prodi/jsonProdi{id}', [UserProdiController::class, 'jsonProdi'])->name('UPPS.user-prodi.jsonProdi');
@@ -98,20 +106,6 @@ Route::group(["middleware" => ["autentikasi"]], function () {
         Route::post('prodi/store', [ProgramStudiController::class, 'store'])->name('UPPS.prodi.store');
         Route::get('prodi/json', [ProgramStudiController::class, 'json'])->name('UPPS.prodi.json');
         Route::resource('prodi', ProgramStudiController::class);
-
-        Route::post('upps-datadukung/update/{id_prodi}', [DataDukungUppsController::class, 'update'])->name('Upps.data-dukung.update');
-        Route::get('upps-datakung/data/{id_prodi}', [DataDukungUppsController::class, 'data'])->name('Upps.data-dukung.data');
-        Route::get('upps-datadukung/elemen/{id_prodi}', [DataDukungUppsController::class, 'elemen'])->name('Upps.data-dukung.elemen');
-        Route::get('upps-datadukung/download/{id}', [DataDukungUppsController::class, 'download'])->name('Upps.data-dukung.download');
-        Route::resource('upps-datadukung', DataDukungUppsController::class);
-
-        Route::post('upps-dokumenajuan/tugasLed', [AjuanUppsController::class, 'tugasLed'])->name('upps.dokumenajuan.tugasLed');
-        Route::post('upps-dokumenajuan/approveLed/{id}', [AjuanUppsController::class, 'approveLed'])->name('upps.dokumenajuan.approveLed');
-        Route::get('upps-dokumenajuan/assignLed/{id}/{id_prodi}', [AjuanUppsController::class, 'assignLed'])->name('upps.dokumenajuan.assignLed');
-        Route::post('upps-dokumenajuan/approveLkps/{id}', [AjuanUppsController::class, 'approveLkps'])->name('upps.dokumenajuan.approveLkps');
-        Route::get('upps-dokumenajuan/assignLkps/{id}/{id_prodi}', [AjuanUppsController::class, 'assignLkps'])->name('upps.dokumenajuan.assignLkps');
-        Route::post('upps-dokumenajuan/tugasLkps', [AjuanUppsController::class, 'tugasLkps'])->name('upps.dokumenajuan.tugasLkps');
-        Route::get('upps-dokumenajuan/prodi/{id_prodi}', [AjuanUppsController::class, 'prodi'])->name('upps.dokumenajuan.prodi');
 
         Route::post('instrumen/store', [InstrumenController::class, 'store'])->name('UPPS.instrumen.store');
         Route::get('instrumen/json/{id}', [InstrumenController::class, 'json'])->name('UPPS.instrumen.json');
@@ -124,14 +118,6 @@ Route::group(["middleware" => ["autentikasi"]], function () {
         Route::put('/kriteria/{id}', [KriteriaController::class, 'update'])->name('kriteria.update');
         Route::resource('kriteria', KriteriaController::class);
 
-        Route::post('golongan/store', [GolonganController::class, 'store'])->name('UPPS.matriks-penilaian.golongan.store');
-        Route::get('golongan/tableGolongan', [GolonganController::class, 'tableGolongan'])->name('UPPS.matriks-penilaian.golongan.tableGolongan');
-        Route::resource('golongan', GolonganController::class);
-
-        Route::post('jenis/store', [JenisController::class, 'store'])->name('UPPS.matriks-penilaian.jenis.store');
-        Route::get('jenis/tableJenis', [JenisController::class, 'tableJenis'])->name('UPPS.matriks-penilaian.jenis.tableJenis');
-        Route::resource('jenis', JenisController::class);
-
         Route::get('matriks-penilaian/json{id_jenjang}', [MatriksPenilaianController::class, 'json'])->name('UPPS.matriks-penilaian.json');
         Route::post('matriks-penilaian/store', [MatriksPenilaianController::class, 'store'])->name('UPPS.matriks-penilaian.store');
         Route::get('matriks-penilaian/create/{id}', [MatriksPenilaianController::class, 'create'])->name('UPPS.matriks-penilaian.create');
@@ -140,14 +126,21 @@ Route::group(["middleware" => ["autentikasi"]], function () {
         Route::get('matriks-penilaian/jenjang/{id}', [MatriksPenilaianController::class, 'jenjang'])->name('UPPS.matriks-penilaian.jenjang');
         Route::resource('matriks-penilaian', MatriksPenilaianController::class);
 
-        Route::post('suplemen-d3/update/{id}/{id_prodi}', [SuplemenController::class, 'update'])->name('UPPS.suplemen-d3.update');
-        Route::get('suplemen-d3/edit/{id}/{id_prodi}', [SuplemenController::class, 'edit'])->name('UPPS.suplemen-d3.edit');
-        Route::get('suplemen-d3/create/{id_prodi}', [SuplemenController::class, 'create'])->name('UPPS.suplemen-d3.create');
-        Route::post('suplemen-d3/store', [SuplemenController::class, 'store'])->name('UPPS.suplemen-d3.store');
-        Route::get('suplemen-d3/suplemen/{id_prodi}', [SuplemenController::class, 'suplemen'])->name('UPPS.suplemen-d3.suplemen');
-        Route::get('suplemen-d3/json/{id_prodi}', [SuplemenController::class, 'json'])->name('UPPS.suplemen-d3.json');
-        Route::resource('suplemen-d3', SuplemenController::class);
+        // Route::post('upps-datadukung/update/{id_prodi}', [DataDukungUppsController::class, 'update'])->name('Upps.data-dukung.update');
+        // Route::get('upps-datakung/data/{id_prodi}', [DataDukungUppsController::class, 'data'])->name('Upps.data-dukung.data');
+        // Route::get('upps-datadukung/elemen/{id_prodi}', [DataDukungUppsController::class, 'elemen'])->name('Upps.data-dukung.elemen');
+        // Route::get('upps-datadukung/download/{id}', [DataDukungUppsController::class, 'download'])->name('Upps.data-dukung.download');
+        // Route::resource('upps-datadukung', DataDukungUppsController::class);
+
+        Route::post('history-akreditasi/tugasLed', [AjuanUppsController::class, 'tugasLed'])->name('upps.dokumenajuan.tugasLed');
+        Route::post('history-akreditasi/approveLed/{id}', [AjuanUppsController::class, 'approveLed'])->name('upps.dokumenajuan.approveLed');
+        Route::get('history-akreditasi/assignLed/{id}/{id_prodi}', [AjuanUppsController::class, 'assignLed'])->name('upps.dokumenajuan.assignLed');
+        Route::post('history-akreditasi/approveLkps/{id}', [AjuanUppsController::class, 'approveLkps'])->name('upps.dokumenajuan.approveLkps');
+        Route::get('history-akreditasi/assignLkps/{id}/{id_prodi}', [AjuanUppsController::class, 'assignLkps'])->name('upps.dokumenajuan.assignLkps');
+        Route::post('history-akreditasi/tugasLkps', [AjuanUppsController::class, 'tugasLkps'])->name('upps.dokumenajuan.tugasLkps');
+        Route::get('history-akreditasi/prodi/{id_prodi}', [AjuanUppsController::class, 'prodi'])->name('upps.dokumenajuan.prodi');
     });
+
     Route::group(["middleware" => ["can:Asesor"]], function () {
         Route::get('dashboard-asesor/berita-acara/pdf', [DashboardAsesorController::class, 'pdf'])->name('dashboard-asesor.pdf');
         Route::get('dashboard-asesor/berita-acara/show', [DashboardAsesorController::class, 'show'])->name('dashboard-asesor.pdf.show');
@@ -177,6 +170,7 @@ Route::group(["middleware" => ["autentikasi"]], function () {
         Route::resource('rekap-nilai', RekapPenilaianController::class);
         
         Route::post('nilai-asesmen-kecukupan/store', [NilaiDeskEvalController::class, 'store'])->name('asesmen-kecukupan.store');
+        Route::post('nilai-asesmen-kecukupan/calculate/{id}', [NilaiDeskEvalController::class, 'calculateItem'])->name('asesmen-kecukupan.calculate');
         Route::get('nilai-asesmen-kecukupan/json/{id}', [NilaiDeskEvalController::class, 'json'])->name('asesmen-kecukupan.json');
         Route::get('nilai-asesmen-kecukupan/show/{id}/{id_prodi}', [NilaiDeskEvalController::class, 'show'])->name('asesor.penilaian.asesmen-kecukupan.show');
         Route::post('nilai-asesmen-kecukupan/update/{id}', [NilaiDeskEvalController::class, 'update'])->name('asesor.penilaian.asesmen-kecukupan.update');
@@ -199,12 +193,14 @@ Route::group(["middleware" => ["autentikasi"]], function () {
     });
     Route::group(["middleware" => ["can:Prodi"]], function () {
         Route::resource('dashboard-prodi', DashboardProdiController::class);
+
         /**instrumen prodi */
         Route::get('instrumen-prodi/instrumen/{id}', [InstrumenProdiController::class, 'instrumen'])->name('prodi.instrumen');
         Route::get('instrumen-prodi/dashboard', [InstrumenProdiController::class, 'dashboard'])->name('prodi.instrumen.dashboard');
         Route::get('instrumen-prodi/json/{id_jenjang}', [InstrumenProdiController::class, 'json'])->name('prodi.instrumen.json');
         Route::get('instrumen-prodi/download/{id}', [InstrumenProdiController::class, 'download'])->name('prodi.instrumen.download');
         Route::resource('instrumen-prodi', InstrumenProdiController::class);
+        
         /** Dokumen Ajuan Prodi */
         Route::get('ajuan-prodi/downloadlkps/{id}', [AjuanProdiController::class, 'downloadlkps'])->name('ajuan-prodi.downloadlkps');
         Route::post('ajuan-prodi/import-lkps/{id_prodi}', [AjuanProdiController::class, 'importLkps'])->name('ajuan-prodi.importLkps');
@@ -215,7 +211,9 @@ Route::group(["middleware" => ["autentikasi"]], function () {
         Route::post('ajuan-prodi/storeled', [AjuanProdiController::class, 'storeled'])->name('ajuan-prodi.storeled');
         Route::post('ajuan-prodi/storeSp', [AjuanProdiController::class, 'storeSp'])->name('ajuan-prodi.storeSp');
         Route::get('ajuan-prodi/prodi/{id_prodi}', [AjuanProdiController::class, 'prodi'])->name('ajuan-prodi.prodi');
+        Route::post('ajuan-prodi/prodi/ajukan', [AjuanProdiController::class, 'ajukan'])->name('ajuan-prodi.ajukan');
         Route::get('ajuan-prodi/history/{id_prodi}', [AjuanProdiController::class, 'history'])->name('ajuan-prodi.history');
+        
         // Route::resource('ajuan-prodi', AjuanProdiController::class);
         /**data dukung prodi */
         Route::get('data-dukung/dataHistory/{id}/{id_prodi}', [DataDukungProdiController::class, 'dataHistory'])->name('prodi.data-dukung.dataHistory');

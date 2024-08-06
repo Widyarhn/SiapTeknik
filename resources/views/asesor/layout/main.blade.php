@@ -92,7 +92,7 @@
                                             target="_blank">
                                             Asesmen Lapangan
                                         </a>
-                                        @if (count($user_asesor->program_studi->ba_asesmen_lapangan) == 0)
+                                        @if (count($user_asesor->program_studi->berita_acara) == 0)
                                             <a href="#" data-toggle="modal" data-target="#TambahBaAsesmenLapangan"
                                                 class="btn btn-outline-primary btn-create"><i
                                                     class="fas fa-upload"></i></a>

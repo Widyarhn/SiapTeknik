@@ -4,12 +4,14 @@ namespace App\Http\Controllers;
 
 use App\Models\BaAsesmenLapangan;
 use App\Models\BaDeskEval;
+use App\Models\BeritaAcara;
 use App\Models\DokumenAjuan;
 use App\Models\Timeline;
 use Yajra\DataTables\DataTables;
 use Illuminate\Support\Facades\DB;
 use App\Models\Instrumen;
 use App\Models\MatriksPenilaian;
+use App\Models\PengajuanDokumen;
 use App\Models\Sertifikat;
 use App\Models\User;
 use App\Models\ProgramStudi;
@@ -23,35 +25,36 @@ class DashboardUPPSController extends Controller
     {
         $data = [
             "roles" => Role::all(),
-            "timeline" => Timeline::with(['tahun', 'program_studi.jenjang'])->get(),
+            "timeline" => Timeline::with(['user_asesor'])->get(),
             "tahun" => Tahun::all(),
             "program_studi" => ProgramStudi::with('jenjang')->get(),
-            "dokumen_ajuan" => Timeline::where('kegiatan', 'Pengajuan Dokumen')
-            ->where('status', 1)
-            ->where('selesai', 0)
-            ->whereHas('tahun', function ($query) {
-                $query->where('is_active', 0);
-            })
-            ->get(),
+            "pengajuan_dokumen" => PengajuanDokumen::with(['user_prodi.tahun' => function ($q) {
+                $q->where('is_active', 1);
+            }, 'lkps', 'led', 'surat_pengantar'])
+                ->where('status', '1')
+                ->where('tanggal_selesai', null)
+                ->get(),
 
-            "asesmen_kecukupan" => Timeline::where('kegiatan', 'Asesmen Kecukupan')
-            ->where('status', 1)
-            ->where('selesai', 0)
-            ->whereHas('tahun', function ($query) {
-                $query->where('is_active', 0);
-            })
-            ->get(),
+            'asesmen_kecukupan' => Timeline::where('kegiatan', 'Asesmen Kecukupan')
+                ->where('status', '1')
+                ->where('selesai', 0)
+                ->with(['user_asesor' => function ($query) {
+                    $query->with(['tahun' => function ($q) {
+                        $q->where('is_active', 1);
+                    }]);
+                }])->get(),
 
-            "asesmen_lapangan" => Timeline::where('kegiatan', 'Asesmen Lapangan')
-            ->where('status', 1)
-            ->where('selesai', 0)
-            ->whereHas('tahun', function ($query) {
-                $query->where('is_active', 0);
-            })
-            ->get(),
+            'asesmen_lapangan' => Timeline::where('kegiatan', 'Asesmen Lapangan')
+                ->where('status', '1')
+                ->where('selesai', 0)
+                ->with(['user_asesor' => function ($query) {
+                    $query->with(['tahun' => function ($q) {
+                        $q->where('is_active', 1);
+                    }]);
+                }])->get(),
 
-            "status_1" => DokumenAjuan::where('pengajuan_ulang', 1)
-                ->with(['program_studi.jenjang'])
+            "status_1" => PengajuanDokumen::where('status', '1')
+                ->with(['user_prodi.program_studi.jenjang'])
                 ->get(),
             "user" => User::where('role_id', '2')->get(),
         ];
@@ -134,7 +137,7 @@ class DashboardUPPSController extends Controller
 
     public function asesmenLapanganTable()
     {
-        $data = BaAsesmenLapangan::orderBy('tahun_id', 'ASC')->get();
+        $data = BeritaAcara::orderBy('tahun_id', 'ASC')->get();
         return DataTables::of($data)
             ->addIndexColumn()
             ->addColumn('file', function ($row) {
