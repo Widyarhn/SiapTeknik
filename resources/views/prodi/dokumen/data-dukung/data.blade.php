@@ -52,8 +52,7 @@
                     <div class="section-body">
                         <h2 class="section-title">{{ $kriteria->butir }} {{ $kriteria->kriteria }}</h2>
                         <p class="section-lead">
-                            Dokumen Data Dukung {{ $kriteria->kriteria }} jenjang D3 lingkup INFOKOM di bawah ini
-                            diambil berdasarkan borang
+                            Dokumen Data Dukung {{ $kriteria->kriteria }} jenjang D3 lingkup Teknik
                         </p>
                         <div class="card">
                             <div class="card-header d-block pb-0">
@@ -66,7 +65,7 @@
                                     </div>
                                     <div class="col-md-6">
                                         <h4>
-                                            {{ $kriteria->butir }}. {{ $kriteria->kriteria }}
+                                            {{ $kriteria->butir }} {{ $kriteria->kriteria }}
                                         </h4>
                                     </div>
                                 </div>
@@ -77,178 +76,65 @@
                                     <table class="table table-striped table-bordered">
                                         <thead>
                                             <tr>
-                                                <th colspan="1" class="text-center">Sub kriteria</th>
+                                                <th class="text-center">Sub kriteria</th>
                                                 <th></th>
                                                 <th class="text-center">Nama file</th>
                                             </tr>
                                         </thead>
-                                        {{-- <tbody>
-                                                @if (count($kriteria->suplemen) > 0)
-                                                @foreach ($suplemen as $item)
-                                                    <tr>
-                                                        <td>{{ $item->sub_kriteria }}</td>
-                                                        <td class="text-center">
-                                                            @if ($item->data)
-                                                            <form action="{{ route('prodi.data-dukung.update', $item->data->id) }}" method="post" enctype="multipart/form-data" id="formActionStore">
-                                                            @else
-                                                            <form action="{{ route('prodi.data-dukung.store') }}" method="post" enctype="multipart/form-data" id="formActionStore">
-                                                            @endif
-                                                                @csrf
-                                                                @method('POST')
-                                                                <input type="hidden" name="suplemen_id" value="{{ $item->id }}">
-                                                                <input type="hidden" value="{{ $user_prodi->jenjang->id }}" name="jenjang_id" />
-                                                                <input type="hidden" value="{{ $user_prodi->program_studi->id }}" name="program_studi_id" />
-                                                                <input type="hidden" value="{{ $user_prodi->tahun->id }}" name="tahun_id" />
-                                                                <input type="file" name="file" required>
-                                                                @if ($item->data)
-                                                                <button type="submit" class="btn btn-outline-warning">Update</button>
-                                                                @else
-                                                                <button type="submit" class="btn btn-outline-primary">Upload</button>
-                                                                @endif
-                                                            </form>
-                                                            @if ($item->data)
-                                                            <td><a href="{{url('storage/data_dukung/', $item->data->file)}}" target="_blank">{{$item->data->file}}</a></td>
-                                                            @else
-                                                            <td></td>
-                                                            @endif
-                                                        </td>
-                                                    </tr>
-                                                    @endforeach
-                                                @elseif(count($kriteria->matriks_penilaian) > 0)
-                                                    @foreach ($matriks_penilaian as $item)
-                                                    <tr>
-                                                        <td>{{ $item->sub_kriteria }}</td>
-                                                        <td class="text-center">
-                                                            @if ($item->data_dukung)
-                                                            <form action="{{ route('prodi.data-dukung.update', $item->data->id) }}" method="post" enctype="multipart/form-data" id="formActionStore">
-                                                            @else
-                                                            <form action="{{ route('prodi.data-dukung.store') }}" method="post" enctype="multipart/form-data" id="formActionStore">
-                                                            @endif
-                                                                @csrf
-                                                                @method('POST')
-                                                                <input type="hidden" name="matriks_penilaian_id" value="{{ $item->id }}">
-                                                                <input type="hidden" value="{{ $user_prodi->jenjang->id }}" name="jenjang_id" />
-                                                                <input type="hidden" value="{{ $user_prodi->program_studi->id }}" name="program_studi_id" />
-                                                                <input type="hidden" value="{{ $user_prodi->tahun->id }}" name="tahun_id" />
-                                                                <input type="file" name="file" required>
-                                                                @if ($item->data_dukung &&
-    $item->whereHas('data_dukung.tahun', function ($query) use ($year) {
-            $query->where('tahun', $year);
-        })->first())
-                                                                <button type="submit" class="btn btn-outline-warning">Update</button>
-                                                                @else
-                                                                <button type="submit" class="btn btn-outline-primary">Upload</button>
-                                                                @endif
-                                                            </form>
-                                                            @if ($item->data_dukung && $item->data_dukung->tahun->tahun == $year)
-                                                            <td><a href="{{url('storage/data_dukung/', $item->data->file)}}" target="_blank">{{$item->data->file}}</a></td>
-                                                            @else
-                                                            <td></td>
-                                                            @endif
-                                                        </td>
-                                                    </tr>
-                                                    @endforeach
-                                                @endif
-                                                
-                                            </tbody> --}}
                                         <tbody>
-                                            @foreach ($kriteria->matriks_penilaian as $item)
+                                            @foreach ($matriks as $item)
                                                 <tr>
-                                                    <td>{{ $item->sub_kriteria }}</td>
-                                                    <td class="text-center">
-                                                        @if ($item->data_dukung)
-                                                            <form
-                                                                action="{{ route('prodi.data-dukung.update', $item->data->id) }}"
-                                                                method="post" enctype="multipart/form-data"
-                                                                id="formActionStore">
-                                                            @else
-                                                                <form action="{{ route('prodi.data-dukung.store') }}"
-                                                                    method="post" enctype="multipart/form-data"
-                                                                    id="formActionStore">
-                                                        @endif
-                                                        @csrf
-                                                        @method('POST')
-                                                        <input type="hidden" name="matriks_penilaian_id"
-                                                            value="{{ $item->id }}">
-                                                        <input type="hidden" value="{{ $user_prodi->jenjang->id }}"
-                                                            name="jenjang_id" />
-                                                        <input type="hidden"
-                                                            value="{{ $user_prodi->program_studi->id }}"
-                                                            name="program_studi_id" />
-                                                        <input type="hidden" value="{{ $user_prodi->tahun->id }}"
-                                                            name="tahun_id" />
-                                                        <input type="file" name="file" required>
-                                                        @if (
-                                                            $item->data_dukung &&
-                                                                $item->whereHas('data_dukung.tahun', function ($query) use ($year) {
-                                                                        $query->where('tahun', $year);
-                                                                    })->first())
-                                                            <button type="submit"
-                                                                class="btn btn-outline-warning">Update</button>
+                                                    <td>
+                                                        @if (!empty($item->sub_kriteria->sub_kriteria))
+                                                            {{ $item->sub_kriteria->sub_kriteria }}
                                                         @else
-                                                            <button type="submit"
-                                                                class="btn btn-outline-primary">Upload</button>
+                                                            {{ $item->kriteria->kriteria }}
                                                         @endif
+                                                    </td>
+                                                    <td class="text-center">
+                                                        <form action="{{ route('prodi.data-dukung.store') }}"
+                                                            method="post" enctype="multipart/form-data"
+                                                            id="formActionStore">
+                                                            @csrf
+                                                            @method('POST')
+                                                            <input type="hidden" name="matriks_penilaian_id"
+                                                                value="{{ $item->id }}">
+                                                            <input type="hidden" name="sub_kriteria_id"
+                                                                value="{{ $item->sub_kriteria_id }}">
+                                                            <input type="hidden" name="kriteria_id"
+                                                                value="{{ $item->kriteria_id }}">
+                                                            <input type="hidden" name="program_studi_id"
+                                                                value="{{ $user_prodi->program_studi_id }}">
+                                                            <input type="hidden" name="tahun_id"
+                                                                value="{{ $user_prodi->tahun_id }}">
+
+                                                            <div class="d-flex align-items-center">
+                                                                <input type="file" name="file" required
+                                                                    class="form-control-file"
+                                                                    accept=".pdf">
+                                                                <button type="submit"
+                                                                    class="btn btn-sm btn-outline-primary ml-2">
+                                                                    Upload
+                                                                </button>
+                                                            </div>
                                                         </form>
-                                                        @if ($item->data_dukung && $item->data_dukung->tahun->tahun == $year)
-                                                    <td><a href="{{ url('storage/data_dukung/', $item->data->file) }}"
-                                                            target="_blank">{{ $item->data->file }}</a></td>
-                                                @else
-                                                    <td></td>
-                                            @endif
-                                            </td>
-                                            </tr>
+                                                    </td>
+                                                    <td>
+                                                        @if ($item->data_dukung->isEmpty())
+                                                            Belum ada
+                                                        @else
+                                                            <a href="{{ Storage::url($item->data_dukung->first()->file) }}"
+                                                                target="_blank">{{ basename($item->data_dukung->first()->nama) }}</a>
+                                                        @endif
+                                                    </td>
+                                                </tr>
                                             @endforeach
-
-
                                         </tbody>
-                                        {{-- <tbody>
-                                            <tr>
-                                                <td>Kondisi Eksternal</td>
-                                                <td class="text-center">
-                                                    <form action="https://www.siapinfokom.com/data-dukung/store"
-                                                        method="post" enctype="multipart/form-data"
-                                                        id="formActionStore">
-                                                        <input type="hidden" name="_token"
-                                                            value="bkCFzu8qP6Vr6L2zF3ZLJ0CbGAniXP6xzfX0pNHu"> <input
-                                                            type="hidden" name="_method" value="POST"> <input
-                                                            type="hidden" name="matriks_penilaian_id" value="1">
-                                                        <input type="hidden" value="1" name="jenjang_id" />
-                                                        <input type="hidden" value="1" name="program_studi_id" />
-                                                        <input type="hidden" value="5" name="tahun_id" />
-                                                        <input type="file" name="file" required>
-                                                        <button type="submit"
-                                                            class="btn btn-outline-primary">Upload</button>
-                                                    </form>
-                                                <td></td>
-                                                </td>
-                                            </tr>
-
-                                        </tbody> --}}
                                     </table>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    {{-- <div class="section-body">
-                            <h2 class="section-title">{{$kriteria->butir}} {{ $kriteria->kriteria }}</h2>
-                            <p class="section-lead">Dokumen Data Dukung {{ $kriteria->kriteria }} jenjang D3 lingkup INFOKOM di bawah ini diambil berdasarkan borang
-                            </p>
-                            <!--Basic table-->
-                            <div class="card">
-                                <div class="card-header d-block pb-0">
-                                    <div class="row">
-                                        <div class="col-md-2">
-                                            <a href="{{route('prodi.data-dukung.elemen', $program_studi->id)}}" class="btn btn-outline-secondary"><i
-                                                class="fa fa-chevron-left"></i> Kembali</a>
-                                            </div>
-                                            <div class="col-md-6"> <h4>{{$kriteria->butir}}. {{ $kriteria->kriteria }}</h4>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div> --}}
                 </section>
             </div>
             <footer class="main-footer">
@@ -263,3 +149,11 @@
 </body>
 
 </html>
+{{-- @if ($item->data_dukung)
+                                                            <form
+                                                                action="{{ route('prodi.data-dukung.update', $item->data_dukung->id) }}"
+                                                                method="post" enctype="multipart/form-data"
+                                                                id="formActionStore">
+                                                            @else
+                                                                
+                                                        @endif --}}

@@ -220,7 +220,7 @@ Route::group(["middleware" => ["autentikasi"]], function () {
         Route::get('data-dukung/elemenHistory/{id}', [DataDukungProdiController::class, 'elemenHistory'])->name('prodi.data-dukung.elemenHistory');
         Route::get('data-dukung/jsonHistory/{id_prodi}', [DataDukungProdiController::class, 'jsonHistory'])->name('prodi.data-dukung.jsonHistory');
         Route::get('data-dukung/history/{id_prodi}', [DataDukungProdiController::class, 'history'])->name('prodi.data-dukung.history');
-        Route::post('data-dukung/update/{id}', [DataDukungProdiController::class, 'update'])->name('prodi.data-dukung.update');
+        Route::put('data-dukung/update/{id}', [DataDukungProdiController::class, 'update'])->name('prodi.data-dukung.update');
         Route::post('data-dukung/store', [DataDukungProdiController::class, 'store'])->name('prodi.data-dukung.store');
         Route::get('data-dukung/data/{id}/{id_prodi}/{tahun}', [DataDukungProdiController::class, 'data'])->name('prodi.data-dukung.data');
         Route::get('data-dukung/json/{id_prodi}', [DataDukungProdiController::class, 'json'])->name('prodi.data-dukung.json');

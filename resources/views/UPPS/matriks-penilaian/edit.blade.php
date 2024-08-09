@@ -69,7 +69,7 @@
                                                         <input type="hidden" class="form-control"
                                                             value="{{ $jenjang->id }}" name="jenjang_id">
                                                         <div class="row">
-                                                            <div class="col-md-12">
+                                                            <div class="col-md-8">
                                                                 <div class="form-group">
                                                                     <label>Elemen Penilaian</label>
                                                                     <select id="kriteria_id"
@@ -86,9 +86,14 @@
                                                                     </select>
                                                                 </div>
                                                             </div>
+                                                            <div class="form-group col-lg-4">
+                                                                <label>Bobot Butir<span class="text-danger">*</span></label>
+                                                                <input type="text" class="form-control" id="bobot" value="{{ $matriks_penilaian->indikator->bobot }}"
+                                                                    name="indikator[0][bobot]" placeholder="contoh: 0.5">
+                                                            </div>
                                                         </div>
                                                         <div class="row">
-                                                            <div class="col-md-12">
+                                                            <div class="col-md-8">
                                                                 <div class="form-group">
                                                                     <label>Sub Elemen</label>
                                                                     @if (!@empty($matriks_penilaian->sub_kriteria->sub_kriteria))
@@ -101,10 +106,31 @@
                                                                     @endif
                                                                 </div>
                                                             </div>
+                                                            <div class="col-lg-4">
+                                                                {{-- <div class="form-group">
+                                                                    <label>Rumus</label>
+                                                                    @if (!@empty($matriks_penilaian->rumus->rumus))
+                                                                        <input type="text" class="form-control" id="rumus"
+                                                                        name="rumus">
+                                                                    @else
+                                                                    <input type="text" class="form-control" id="rumus"
+                                                                        name="rumus" value="{{ $matriks_penilaian->indikator->rumus->rumus }}">
+                                                                    @endif
+                                                                </div> --}}
+                                                            </div>
                                                         </div>
                                                         <div id="indikator-wrapper">
                                                             <div class="indikator-item">
                                                                 <hr>
+                                                                <div class="form-row"  style="item-aligns: end;">
+                                                                    <div class="custom-control custom-checkbox my-4">
+                                                                        <input type="checkbox" class="custom-control-input" id="check"
+                                                                            name="indikator[0][check]">
+                                                                        <label class="custom-control-label"
+                                                                            for="check">Centang jika indikator
+                                                                            menggunakan rumus</label>
+                                                                    </div>
+                                                                </div>
                                                                 <div class="form-row">
                                                                     <div class="form-group col-lg-9">
                                                                         <label>Deskripsi</label>

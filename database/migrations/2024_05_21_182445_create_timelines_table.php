@@ -20,6 +20,8 @@ class CreateTimelinesTable extends Migration
         Schema::create('timelines', function (Blueprint $table) {
             $table->id();
             $table->foreignIdFor(UserAsesor::class)->nullable();
+            $table->foreignIdFor(Tahun::class)->nullable();
+            $table->foreignIdFor(ProgramStudi::class)->nullable();
             $table->string('kegiatan');
             $table->date('tanggal_mulai');
             $table->date('batas_waktu');

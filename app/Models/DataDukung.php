@@ -29,6 +29,10 @@ class DataDukung extends Model
     {
         return $this->belongsTo(MatriksPenilaian::class);
     }
+    public function sub_kriteria()
+    {
+        return $this->belongsTo(SubKriteria::class);
+    }
 
     public function timeline()
     {

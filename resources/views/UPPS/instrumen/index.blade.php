@@ -47,7 +47,7 @@
                 @endif
                     <div class="section-body">
                         <h2 class="section-title">Data Instrumen Akreditasi {{$jenjang->jenjang}}</h2>
-                        <p class="section-lead">Instrumen Akreditasi Lingkup INFOKOM</p>
+                        <p class="section-lead">Instrumen Akreditasi Lingkup Teknik</p>
                         <!--Basic table-->
                         <div class="row">
                             <div class="col-12">

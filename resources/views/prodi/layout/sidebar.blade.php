@@ -46,7 +46,7 @@
                 @endphp
                 @foreach ($prodi as $p)
                     <li>
-                        <a class="nav-link" value="{{ $p->id }}"
+                        <a class="nav-link mt-1 mb-3" value="{{ $p->id }}"
                             href="{{ route('prodi.data-dukung.elemen', $p->id) }}">
                             {{ $p->jenjang->jenjang }} {{ $p->nama }}
                         </a>

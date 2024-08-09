@@ -45,6 +45,6 @@ class MatriksPenilaian extends Model
 
     public function data_dukung()
     {
-        return $this->hasOne(DataDukung::class);
+        return $this->hasMany(DataDukung::class);
     }
 }

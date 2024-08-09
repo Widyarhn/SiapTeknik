@@ -29,8 +29,8 @@
                     </div>
 
                     <div class="section-body">
-                        <h2 class="section-title">Instrumen D3 dan D4 Lingkup INFOKOM</h2>
-                        <p class="section-lead">Instrumen Akreditasi Lingkup INFOKOM</p>
+                        <h2 class="section-title">Instrumen D3 dan D4 Lingkup Teknik</h2>
+                        <p class="section-lead">Instrumen Akreditasi Lingkup Teknik</p>
                         <!--Basic table-->
                         <div class="row">
                             <div class="col-12">

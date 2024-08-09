@@ -3,6 +3,7 @@
 namespace App\Imports;
 
 use App\Models\ImportLkps;
+use App\Models\ProgramStudi;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class CustomImportLkps
@@ -11,6 +12,17 @@ class CustomImportLkps
     {
         // dd($file);
         try {
+            $programStudi = ProgramStudi::with('jenjang')->find($id_prodi);
+            $jenjangName = $programStudi->jenjang->jenjang;
+
+            if($jenjangName == "D3"){
+                $fileName = $file->getClientOriginalName();
+                $filePath = $file->store('dok-import/d3', 'public');
+            }else{
+                $fileName = $file->getClientOriginalName();
+                $filePath = $file->store('dok-import/d4', 'public');
+            }
+            
             $spreadSheet = IOFactory::load($file);
             $sheetNames = $spreadSheet->getSheetNames();
 
@@ -73,6 +85,8 @@ class CustomImportLkps
                                 'program_studi_id' => $id_prodi,
                                 'sheet_name' => $sheetName,
                                 'json' => $json,
+                                'file' => $filePath,
+                                'display_name' => $fileName,
                             ]);
                 }
             }

@@ -48,7 +48,7 @@
                 @endif
                     <div class="section-body">
                         <h2 class="section-title">Data Matriks Penilaian  {{$jenjang->jenjang}}</h2>
-                        <p class="section-lead">Informasi matriks penilaian jenjang {{$jenjang->jenjang}} lingkup INFOKOM</p>
+                        <p class="section-lead">Informasi matriks penilaian jenjang {{$jenjang->jenjang}} lingkup Teknik</p>
                         <!--Basic table-->
                         <div class="row">
                             <div class="col-12">

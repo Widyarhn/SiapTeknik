@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Imports\CustomImportLkps;
 use App\Models\Lkps;
 use App\Models\DokumenAjuan;
+use App\Models\ImportLkps;
 use App\Models\Kriteria;
 use App\Models\Led;
 use App\Models\ListDocument;
@@ -30,7 +31,7 @@ class AjuanProdiController extends Controller
 
         $program_studi = ProgramStudi::findOrFail($id_prodi);
 
-        $user_prodi = UserProdi::with('tahun', 'pengajuan_dokumen')->where("user_id", Auth::user()->id)
+        $user_prodi = UserProdi::with('tahun', 'pengajuan_dokumen', 'surat_pengantar', 'lkps', 'led')->where("user_id", Auth::user()->id)
             ->where("program_studi_id", $id_prodi)
             ->get();
         $tahunSaatIni = Carbon::now()->year;
@@ -41,13 +42,15 @@ class AjuanProdiController extends Controller
             });
         }])->where('status',1 )->first();
         $kriteria = Kriteria::get();
+        $importLkps = ImportLkps::with('kriteria')->get();
 
         return view('prodi.dokumen.ajuan.index', [
             'pengajuan' => $pengajuan,
             'program_studi' => $program_studi,
             'user_prodi' => $user_prodi,
             'now' => $tahunSaatIni,
-            'kriteria' => $kriteria
+            'kriteria' => $kriteria,
+            'importLkps' => $importLkps,
         ]);
     }
 
@@ -291,27 +294,28 @@ class AjuanProdiController extends Controller
             'id_kriteria' => 'required|exists:kriterias,id',
         ]);
         // dd($request);
-        DB::beginTransaction();
         
         try {
-            $file = $request->file('file');
-            $fileName = $file->getClientOriginalName();
-            $filePath = $file->storeAs('dok-import/d3', $fileName, 'public');
-            // dd(Storage::disk('public')->path($filePath));
+            if($request->file('file')){
+                $file = $request->file('file');
+                // $fileName = $file->getClientOriginalName();
+                // $filePath = $file->storeAs('dok-import/d3', $fileName, 'public');
+                // dd(Storage::disk('public')->path($filePath));
 
-            // // Pastikan Storage telah diimpor dengan benar
-            // $fullPath = Storage::disk('public')->path($filePath);
-            $fileContent = Storage::disk('public')->get($filePath);
+                // // Pastikan Storage telah diimpor dengan benar
+                // $fullPath = Storage::disk('public')->path($filePath);
+                // $fileContent = Storage::disk('public')->get($filePath);
 
-            // Buat instance dari CustomImportLkps dan panggil metode import
-            $importer = new CustomImportLkps();
-            $importer->import($request->file('file'), $request->id_prodi, $request->id_kriteria);
+                // Buat instance dari CustomImportLkps dan panggil metode import
+                $importer = new CustomImportLkps();
+                $importer->import($file, $request->id_prodi, $request->id_kriteria);
 
-            DB::commit();
 
-            return back()->with('success', 'Data imported and file saved successfully.');
+                return back()->with('success', 'Data imported and file saved successfully.');
+            }
+            return back()->with('error', 'Terjadi kesalahan');
+            
         } catch (\Exception $e) {
-            DB::rollBack();
             return back()->with('error', 'Terjadi kesalahan saat mengimpor data: ' . $e->getMessage());
         }
     }
@@ -339,6 +343,7 @@ class AjuanProdiController extends Controller
             'tanggal_hari_ini' => 'required|date',
         ]);
 
+
         // Cek apakah sudah ada pengajuan dokumen dengan ID yang sama
         $existingPengajuan = PengajuanDokumen::where('user_prodi_id', $request->user_prodi_id)
             ->where('led_id', $request->led_id)
@@ -350,7 +355,7 @@ class AjuanProdiController extends Controller
         if ($existingPengajuan) {
             $existingPengajuan->tanggal_ajuan = $request->tanggal_hari_ini;
             $existingPengajuan->status = '1';
-            $existingPengajuan->keterangan = 'Update Dokumen Ajuan';
+            $existingPengajuan->keterangan = 'Pengajuan Ulang Selesai';
             $existingPengajuan->update();
 
             $tahun = Tahun::where('id', $existingPengajuan->user_prodi->tahun->id)->firstOrFail();
@@ -362,6 +367,7 @@ class AjuanProdiController extends Controller
             $tahun->is_active = true;
             $tahun->mulai_akreditasi = $request->tanggal_hari_ini;
             $tahun->save();
+
     
             // Membuat entri baru di tabel PengajuanDokumen
             $pengajuan = new PengajuanDokumen;
@@ -372,6 +378,7 @@ class AjuanProdiController extends Controller
             $pengajuan->tanggal_ajuan = $request->tanggal_hari_ini;
             $pengajuan->status = '1';
             $pengajuan->save();
+
         }
         // Mengupdate kolom tahun_id di tabel UserProdi
         $user_prodi = UserProdi::findOrFail($request->user_prodi_id);

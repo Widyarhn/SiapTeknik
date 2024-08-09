@@ -808,7 +808,7 @@ class AkreditasiController extends Controller
             $r->where('status', '1');
             $r->whereNotNull('tanggal_selesai');
         }, 'program_studi', 'jenjang', 'tahun'])
-            ->orderBy('id', 'ASC')->get();
+            ->orderBy('id', 'ASC')->whereNotNull('tahun_id')->get();
         return DataTables::of($data)
             ->addIndexColumn()
             ->addColumn('prodi', function ($row) {

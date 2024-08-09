@@ -98,7 +98,6 @@ class NilaiDeskEvalController extends Controller
 
     public function store(Request $request)
     {
-        dd($request);
         $validatedData = $request->validate(
             [
                 'nilai' => ['required', 'numeric', 'min:1', 'max:4'],

@@ -25,16 +25,39 @@ class RekapPenilaianController extends Controller
         $indicatorsId = $matrixs->pluck('indikator_id');
         $indicators = Indikator::with(['matriks.kriteria', 'matriks.asesmen_kecukupan', 'sub_kriteria.kriteria'])->whereIn('id', $indicatorsId)->get();
 
+        $data = []; // Inisialisasi array untuk menyimpan data yang akan ditampilkan
+
+        // Mengelompokkan data indikator berdasarkan kriteria dan sub kriteria
         try {
             foreach ($indicators as $ind) {
-                if ($ind->sub_kriteria)
-                    $data[$matrixs->where('indikator_id', $ind->id)->first()->kriteria_id][$ind->sub_kriteria->id][$ind->id] = $ind;
-                else
-                    $data[$matrixs->where('indikator_id', $ind->id)->first()->kriteria_id]['x'][$ind->id] = $ind;
+                $kriteriaId = $matrixs->where('indikator_id', $ind->id)->first()->kriteria_id;
+                if ($ind->sub_kriteria) {
+                    $data[$kriteriaId][$ind->sub_kriteria->id][$ind->id] = $ind;
+                } else {
+                    $data[$kriteriaId]['x'][$ind->id] = $ind;
+                }
             }
         } catch (\Exception $e) {
+            // Debugging jika terjadi error
             dd($e->getMessage(), $ind, $matrixs);
         }
+
+        // Menggabungkan data yang akan dikirim ke view
+        $d = [
+            'data' => $data,
+        ];
+
+
+        // try {
+        //     foreach ($indicators as $ind) {
+        //         if ($ind->sub_kriteria)
+        //             $data[$matrixs->where('indikator_id', $ind->id)->first()->kriteria_id][$ind->sub_kriteria->id][$ind->id] = $ind;
+        //         else
+        //             $data[$matrixs->where('indikator_id', $ind->id)->first()->kriteria_id]['x'][$ind->id] = $ind;
+        //     }
+        // } catch (\Exception $e) {
+        //     dd($e->getMessage(), $ind, $matrixs);
+        // }
         $program_studi = ProgramStudi::findOrFail($id_prodi);
 
         // dd($data);
@@ -68,7 +91,7 @@ class RekapPenilaianController extends Controller
 
         // dd($total);
 
-        return view('asesor.rekap-penilaian.d3.awal', ['data' => $data, 'program_studi' => $program_studi, 'user_asesor' => Auth::user()->user_asesor]);
+        return view('asesor.rekap-penilaian.d3.awal', $d, [ 'program_studi' => $program_studi, 'user_asesor' => Auth::user()->user_asesor]);
     }
 
     public function prodiasesmen($id_prodi)
