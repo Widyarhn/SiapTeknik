@@ -1,4 +1,6 @@
 <?php
+
+use App\Models\Rumus;
 use App\Models\SubKriteria;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
@@ -16,6 +18,8 @@ class CreateIndikatorsTable extends Migration
         Schema::create('indikators', function (Blueprint $table) {
             $table->id();
             $table->foreignIdFor(SubKriteria::class)->nullable();
+            $table->foreignIdFor(Rumus::class)->nullable();
+            $table->string('no_butir')->nullable();
             $table->text('deskriptor');
             $table->float('bobot');
             $table->text('sangat_baik');

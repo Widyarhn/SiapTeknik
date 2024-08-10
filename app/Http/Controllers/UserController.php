@@ -18,7 +18,8 @@ class UserController extends Controller
     public function index(Request $request)
     {
         $data = [
-            "roles" => Role::all()
+            "roles" => Role::all(),
+            "user" => User::get()
         ];
         return view('UPPS.user.index', $data);
     }
@@ -27,21 +28,21 @@ class UserController extends Controller
     public function json(Request $request)
     {
         $data = User::with(['role'])->orderBy('nama', 'ASC')
-        ->get();
+            ->get();
 
         return DataTables::of($data)
             ->addIndexColumn()
-            ->addColumn('role', function($row){
+            ->addColumn('role', function ($row) {
                 return $row->role->role;
             })
             ->addColumn('action', function ($row) {
                 return '<div class="buttons">
-                <a href="#" data-toggle="modal" data-target="#modalEdit" data-url="'.route('user.show', $row->id).'" id="edit" class="btn btn-icon icon-left btn-warning btn-edit"><i class="far fa-edit"></i></a>
+                <a href="#" data-toggle="modal" data-target="#modalEdit" data-url="' . route('user.show', $row->id) . '" id="edit" class="btn btn-icon icon-left btn-warning btn-edit"><i class="far fa-edit"></i></a>
 
-                <a href="javascript:void(0)" data-route="'.route('user.destroy', $row->id).'"
+                <a href="javascript:void(0)" data-route="' . route('user.destroy', $row->id) . '"
                 id="delete" class="btn btn-danger btn-md"><i class="fa fa-trash"></i></a>
             </div>';
-        })
+            })
             ->make(true);
     }
 
@@ -56,21 +57,29 @@ class UserController extends Controller
         ]);
 
         $validatedData['password'] = bcrypt($validatedData['password']);
-        DB::transaction(function () use($validatedData){
+        DB::transaction(function () use ($validatedData) {
             User::create($validatedData);
         });
 
         return redirect()->back()->with('success', 'Data User Berhasil Ditambahkan');
     }
 
+    // public function edit($id)
+    // {
+    //     $data = [
+    //         "roles" => Role::all()
+    //     ];
+    //     $user = User::find($id);
+
+    //     return view('UPPS.user.edit',$data, compact('user'));
+    // }
     public function edit($id)
     {
+        $user = User::find($id);
         $data = [
             "roles" => Role::all()
         ];
-        $user = User::find($id);
-
-        return view('UPPS.user.edit',$data, compact('user'));
+        return view('UPPS.user.edit', $data, compact('user'));
     }
 
 
@@ -96,5 +105,4 @@ class UserController extends Controller
         $user = User::find($id);
         $user->delete();
     }
-
 }

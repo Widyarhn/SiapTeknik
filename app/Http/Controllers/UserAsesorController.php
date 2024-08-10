@@ -58,20 +58,38 @@ class USerAsesorController extends Controller
     {
         $validatedData = $request->validate([
             'user_id' => 'required',
-            'program_studi_id' => 'required'
-        ],
-        [
-            'user_id.required' => 'Nama User Harus Diisi',
-            'program_studi_id.required' => 'Program Studi Harus Diisi'
-        ]
-    );
-        $user_asesor = new UserAsesor();
-        $user_asesor->user_id = $request->user_id;
-        $user_asesor->jenjang_id = $request->jenjang_id;
-        $user_asesor->program_studi_id = $request->program_studi_id;
-        $user_asesor->tahun_id = $request->tahun_id;
-        $user_asesor->save();
-        return redirect()->back()->with('success', 'Data User Asesor Berhasil Ditambahkan');
+            'tahun_ids' => 'required|exists:tahuns,id',
+            'program_studi_ids' => 'required|exists:program_studies,id',
+            'jenjang_ids' => 'required|exists:jenjangs,id',
+            'timeline_ids' => 'required|exists:timelines,id',
+            'nama' => 'required_if:user_id,other|max:255', // Jika user_id adalah 'other', pastikan nama terisi
+            'email' => $request->user_id === 'other' ? 'required|email|unique:users,email' : '', // Jika user_id adalah 'other', validasi email, jika tidak abaikan
+        ]);
+        // Jika pengguna memilih opsi "Lainnya", buat atau dapatkan user baru
+        if ($request->user_id === 'other') {
+            // Buat user baru
+            $user = new User();
+            $user->nama = $request->nama;
+            $user->email = $request->email;
+            $user->password = bcrypt('password'); // Default password, sebaiknya diatur dengan cara yang lebih aman
+            $user->role_id = Role::where('role', 'Asesor')->first()->id; // Atur role sesuai dengan kebutuhan
+            $user->save();
+        } else {
+            // Jika pengguna memilih opsi yang sudah ada, dapatkan user yang sesuai dengan ID
+            $user = User::findOrFail($request->user_id);
+        }
+
+        // Buat entry user_prodi
+        $userAsesor = new UserAsesor();
+        $userAsesor->user_id = $user->id;
+        $userAsesor->tahun_id = $request->tahun_ids;
+        $userAsesor->program_studi_id = $request->program_studi_ids;
+        $userAsesor->jenjang_id = $request->jenjang_ids;
+        $userAsesor->timeline_id = $request->timeline_ids;
+        $userAsesor->jabatan = 'Anggota';
+        $userAsesor->save();
+
+        return redirect()->back()->with('success', 'User Asesor Berhasil Ditugaskan');
     }
 
     public function edit($id)
@@ -85,8 +103,9 @@ class USerAsesorController extends Controller
 
     public function update(Request $request, $id)
     {
-        $user_asesor = USerAsesor::find($id);
+        $user_asesor = UserAsesor::find($id);
         $user_asesor->user_id = $request->user_id;
+        $user_asesor->jabatan = $request->jabatan;
         $user_asesor->tahun_id = $request->tahun_id;
         $user_asesor->save();
 

@@ -2,6 +2,7 @@
     use App\Models\Lkps;
     use App\Models\Led;
     use App\Models\SuratPengantar;
+    use App\Models\UserProdi;
 @endphp
 
 <!DOCTYPE html>
@@ -26,12 +27,12 @@
             <div class="main-content">
                 <section class="section">
                     <div class="section-header">
-                        <h1>Dokumen Ajuan Akreditasi {{ $program_studi->jenjang->jenjang }} {{ $program_studi->nama }}
+                        <h1>Dokumen Ajuan Akreditasi
                         </h1>
                         <div class="section-header-breadcrumb">
                             <div class="breadcrumb-item active"><a href="{{ url('dashboard-prodi') }}">Dashboard</a>
                             </div>
-                            <div class="breadcrumb-item"> {{ $program_studi->jenjang->jenjang }}
+                            <div class="breadcrumb-item">{{ $program_studi->jenjang->jenjang }}
                                 {{ $program_studi->nama }}</div>
                         </div>
                     </div>
@@ -54,218 +55,213 @@
                         </script>
                     @endif
                     <div class="section-body">
-                        <h2 class="section-title">Pengajuan Dokumen Akreditasi Program Pendidikan
+                        <h2 class="section-title">Dokumen Ajuan Akreditasi Program Studi
                             {{ $program_studi->jenjang->jenjang }} {{ $program_studi->nama }}</h2>
-                        <p class="section-lead">Berupa dokumen Lembar Kerja Program Studi (LKPS), Lembar Evaluasi Diri
-                            (LED), dan Surat Pengantar
-                            dari program studi D3 {{ $program_studi->nama }} POLINDRA</p>
+                        <p class="section-lead">Pengajuan berupa dokumen Lembar Kerja Program Studi (LKPS), Lembar
+                            Evaluasi Diri
+                            (LED), Surat Pengantar, serta Import File Excel</p>
                     </div>
-                    <div class="row">
-                        <div class="col-12">
-                            @foreach ($user_prodi as $item_tahun)
-                                @if ($item_tahun->tahun->is_active == 0)
+
+                    @foreach ($user_prodi as $up)
+                        @php
+                            $existingUP = $user_prodi->whereNull('tahun_id')->first();
+                        @endphp
+                        @if ($existingUP || $up->tahun->is_active == 1)
+                            {{-- @if ($existingUP&&$up->pengajuan_dokumen->status == 2)
+                                <div class="alert alert-warning alert-dismissible show fade alert-has-icon">
+                                    <div class="alert-icon"><i class="far fa-lightbulb"></i></div>
+                                    <div class="alert-body">
+                                        <button class="close" data-dismiss="alert">
+                                            <span>&times;</span>
+                                        </button>
+                                        <div class="alert-title">Dokumen Akreditasi telah ditolak</div>
+                                        Catatan UPPS: {{ $up->pengajuan_dokumen->keterangan }}
+                                    </div>
+                                </div>
+                            @endif --}}
+                            <div class="row">
+                                <div class="col-12">
                                     <div class="card">
                                         <div class="card-body">
                                             <div class="table-responsive">
-                                                <table class="table table-striped table-bordered">
+                                                <table class="table table-striped">
                                                     <thead>
                                                         <tr>
-                                                            <th class="text-center">Tahun
-                                                                {{ $item_tahun->tahun->tahun }}</th>
-                                                            <th class="text-center"> </th>
+                                                            {{-- @dd($up) --}}
+                                                            <th class="text-center">Tahun {{ $now }}</th>
+                                                            @if ($existingUP || $up->pengajuan_dokumen->status != 1)
+                                                                <th class="text-center"> </th>
+                                                            @endif
                                                             <th>Nama File</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody>
-                                                        @php
-                                                            $lkps = Lkps::where(
-                                                                'program_studi_id',
-                                                                $item_tahun->program_studi_id,
-                                                            )
-                                                                ->where('tahun_id', $item_tahun->tahun_id)
-                                                                ->first();
-                                                            $led = Led::where(
-                                                                'program_studi_id',
-                                                                $item_tahun->program_studi_id,
-                                                            )
-                                                                ->where('tahun_id', $item_tahun->tahun_id)
-                                                                ->first();
-                                                            $surat_pengantar = SuratPengantar::where(
-                                                                'program_studi_id',
-                                                                $item_tahun->program_studi_id,
-                                                            )
-                                                                ->where('tahun_id', $item_tahun->tahun_id)
-                                                                ->first();
-                                                        @endphp
                                                         <tr>
                                                             <td class="text-center">Surat Pengantar</td>
-                                                            <td class="text-center">
-                                                                @if (empty($surat_pengantar))
-                                                                    <form action="{{ route('ajuan-prodi.storeSp') }}"
-                                                                        method="post" enctype="multipart/form-data"
-                                                                        id="formActionStore">
-                                                                        @csrf
-                                                                        <div class="d-flex align-items-center"
-                                                                            style="width: 270px;">
-                                                                            <input type="hidden"
-                                                                                value="{{ $item_tahun->program_studi_id }}"
-                                                                                name="program_studi_id" />
-                                                                            <input type="hidden"
-                                                                                value="{{ $item_tahun->tahun->id }}"
-                                                                                name="tahun_id" />
-                                                                            <input type="file" name="file"
-                                                                                accept=".pdf" required>
-                                                                            <button type="submit"
-                                                                                class="btn btn-outline-primary">Upload</button>
-                                                                        </div>
-                                                                    </form>
-                                                                @else
-                                                                    <form
-                                                                        action="{{ route('ajuan-prodi.updateSp', $item_tahun->tahun->surat_pengantar[0]->id) }}"
-                                                                        method="post" enctype="multipart/form-data"
-                                                                        id="formActionStore">
-                                                                        @csrf
-                                                                        @method('POST')
-                                                                        <!-- Menggunakan POST untuk update -->
-                                                                        <div class="d-flex align-items-left"
-                                                                            style="width: 270px;">
-                                                                            <input type="hidden"
-                                                                                value="{{ $item_tahun->program_studi_id }}"
-                                                                                name="program_studi_id" />
-                                                                            <input type="hidden"
-                                                                                value="{{ $item_tahun->tahun->id }}"
-                                                                                name="tahun_id" />
-                                                                            <input type="file" name="file"
-                                                                                accept=".pdf">
-                                                                            <button type="submit"
-                                                                                class="btn btn-outline-warning">Update</button>
-                                                                        </div>
-                                                                    </form>
-                                                                @endif
-                                                            </td>
-
+                                                            @if ($existingUP || $up->pengajuan_dokumen->status != 1)
+                                                                <td class="text-center">
+                                                                    @if (empty($up->surat_pengantar))
+                                                                        <form
+                                                                            action="{{ route('ajuan-prodi.storeSp') }}"
+                                                                            method="post" enctype="multipart/form-data"
+                                                                            id="formActionStore">
+                                                                            @csrf
+                                                                            <div class="d-flex align-items-center">
+                                                                                <input type="hidden"
+                                                                                    value="{{ $up->program_studi_id }}"
+                                                                                    name="program_studi_id" />
+                                                                                <input type="file" name="file"
+                                                                                    accept=".pdf" required>
+                                                                                <button type="submit"
+                                                                                    class="btn btn-outline-primary">Upload</button>
+                                                                            </div>
+                                                                        </form>
+                                                                    @elseif($up->surat_pengantar->status != 1)
+                                                                        <form
+                                                                            action="{{ route('ajuan-prodi.updateSp', $up->surat_pengantar->id) }}"
+                                                                            method="post" enctype="multipart/form-data"
+                                                                            id="formActionStore">
+                                                                            @csrf
+                                                                            @method('POST')
+                                                                            <div class="d-flex align-items-left">
+                                                                                <input type="hidden"
+                                                                                    value="{{ $up->program_studi_id }}"
+                                                                                    name="program_studi_id" />
+                                                                                <input type="file" name="file"
+                                                                                    accept=".pdf">
+                                                                                <button type="submit"
+                                                                                    class="btn btn-outline-warning">Update</button>
+                                                                            </div>
+                                                                        </form>
+                                                                    @endif
+                                                                </td>
+                                                            @endif
                                                             <td>
-                                                                @if (empty($surat_pengantar))
-                                                                    Belum ada
+                                                                @if ($existingUP || $up->pengajuan_dokumen->status != 1)
+                                                                    @if (empty($up->surat_pengantar))
+                                                                        Belum ada
+                                                                    @else
+                                                                        <a href="{{ Storage::url($up->surat_pengantar->file) }}"
+                                                                            target="_blank">{{ basename($up->surat_pengantar->file) }}</a>
+                                                                    @endif
                                                                 @else
-                                                                <a href="{{ Storage::url($surat_pengantar->file) }}"
-                                                                        target="_blank">{{ basename($surat_pengantar->file) }}</a> 
-                                                                    
+                                                                    <a href="{{ Storage::url($up->surat_pengantar->file) }}"
+                                                                        target="_blank">{{ basename($up->surat_pengantar->file) }}</a>
                                                                 @endif
                                                             </td>
                                                         </tr>
                                                         <tr>
                                                             <td class="text-center">Dokumen LKPS</td>
-                                                            <td class="text-center">
-                                                                @if (empty($lkps))
-                                                                    <form action="{{ route('ajuan-prodi.storelkps') }}"
-                                                                        method="post" enctype="multipart/form-data"
-                                                                        id="formActionStore">
-                                                                        @csrf
-                                                                        @method('POST')
+                                                            @if ($existingUP || $up->pengajuan_dokumen->status != 1)
+                                                                <td class="text-center">
+                                                                    @if (empty($up->lkps))
+                                                                        <form
+                                                                            action="{{ route('ajuan-prodi.storelkps') }}"
+                                                                            method="post" enctype="multipart/form-data"
+                                                                            id="formActionStore">
+                                                                            @csrf
+                                                                            @method('POST')
 
-                                                                        <div class="d-flex align-items-center"
-                                                                            style="width: 270px;">
-                                                                            <input type="hidden"
-                                                                                value="{{ $item_tahun->program_studi_id }}"
-                                                                                name="program_studi_id" />
-                                                                            <input type="hidden"
-                                                                                value="{{ $item_tahun->tahun->id }}"
-                                                                                name="tahun_id" />
-                                                                            <input type="file" name="file"
-                                                                                accept=".pdf" required>
-                                                                            <button type="submit"
-                                                                                class="btn btn-outline-primary">Upload</button>
-                                                                        </div>
-                                                                    </form>
-                                                                @else
-                                                                    <form
-                                                                        action="{{ route('ajuan-prodi.updatelkps', $item_tahun->tahun->lkps[0]->id) }}"
-                                                                        method="post" enctype="multipart/form-data"
-                                                                        id="formActionStore">
-                                                                        @csrf
-                                                                        @method('POST')
-                                                                        <div class="d-flex align-items-left"
-                                                                            style="width: 270px;">
-                                                                            <input type="hidden"
-                                                                                value="{{ $item_tahun->program_studi_id }}"
-                                                                                name="program_studi_id" />
-                                                                            <input type="hidden"
-                                                                                value="{{ $item_tahun->tahun->id }}"
-                                                                                name="tahun_id" />
-                                                                            <input type="file" name="file"
-                                                                                accept=".pdf" required="">
+                                                                            <div class="d-flex align-items-center">
+                                                                                <input type="hidden"
+                                                                                    value="{{ $up->program_studi_id }}"
+                                                                                    name="program_studi_id" />
+                                                                                <input type="file" name="file"
+                                                                                    accept=".pdf" required>
+                                                                                <button type="submit"
+                                                                                    class="btn btn-outline-primary">Upload</button>
+                                                                            </div>
+                                                                        </form>
+                                                                    @elseif($up->lkps->status != 1)
+                                                                        <form
+                                                                            action="{{ route('ajuan-prodi.updatelkps', $up->lkps->id) }}"
+                                                                            method="post" enctype="multipart/form-data"
+                                                                            id="formActionStore">
+                                                                            @csrf
+                                                                            @method('POST')
+                                                                            <div class="d-flex align-items-left">
+                                                                                <input type="hidden"
+                                                                                    value="{{ $up->program_studi_id }}"
+                                                                                    name="program_studi_id" />
+                                                                                <input type="file" name="file"
+                                                                                    accept=".pdf" required="">
 
-                                                                            <button type="submit"
-                                                                                class="btn btn-outline-warning">Update</button>
-                                                                        </div>
-                                                                    </form>
-                                                                @endif
-                                                            </td>
+                                                                                <button type="submit"
+                                                                                    class="btn btn-outline-warning">Update</button>
+                                                                            </div>
+                                                                        </form>
+                                                                    @endif
+                                                                </td>
+                                                            @endif
                                                             <td>
-                                                                @if (empty($lkps))
-                                                                    Belum ada
+                                                                @if ($existingUP || $up->pengajuan_dokumen->status != 1)
+                                                                    @if (empty($up->lkps))
+                                                                        Belum ada
+                                                                    @else
+                                                                        <a href="{{ Storage::url($up->lkps->file) }}"
+                                                                            target="_blank">{{ basename($up->lkps->file) }}</a>
+                                                                    @endif
                                                                 @else
-                                                                    <a href="{{ Storage::url($lkps->file) }}"
-                                                                        target="_blank">{{ basename($lkps->file) }}</a>
+                                                                    <a href="{{ Storage::url($up->lkps->file) }}"
+                                                                        target="_blank">{{ basename($up->lkps->file) }}</a>
                                                                 @endif
                                                             </td>
                                                         </tr>
                                                         <tr>
                                                             <td class="text-center">Dokumen LED</td>
-                                                            <td>
-                                                                @if (empty($led))
-                                                                    <form action="{{ route('ajuan-prodi.storeled') }}"
-                                                                        method="post" enctype="multipart/form-data"
-                                                                        id="formActionStore">
-                                                                        @csrf
-                                                                        @method('POST')
-                                                                        <div class="d-flex align-items-center"
-                                                                            style="width: 270px;">
+                                                            @if ($existingUP || $up->pengajuan_dokumen->status != 1)
+                                                                <td>
+                                                                    @if (empty($up->led))
+                                                                        <form
+                                                                            action="{{ route('ajuan-prodi.storeled') }}"
+                                                                            method="post"
+                                                                            enctype="multipart/form-data"
+                                                                            id="formActionStore">
+                                                                            @csrf
+                                                                            @method('POST')
+                                                                            <div class="d-flex align-items-center">
+                                                                                <input type="hidden"
+                                                                                    value="{{ $up->program_studi_id }}"
+                                                                                    name="program_studi_id" />
+                                                                                <input type="file" name="file"
+                                                                                    accept=".pdf" required>
+                                                                                <button type="submit"
+                                                                                    class="btn btn-outline-primary">Upload</button>
+                                                                            </div>
+                                                                        </form>
+                                                                    @elseif($up->led->status != 1)
+                                                                        <form
+                                                                            action="{{ route('ajuan-prodi.updateled', $up->led->id) }}"
+                                                                            method="post"
+                                                                            enctype="multipart/form-data"
+                                                                            id="formActionStore">
+                                                                            @csrf
+                                                                            @method('POST')
                                                                             <input type="hidden"
-                                                                                value="{{ $item_tahun->program_studi_id }}"
+                                                                                value="{{ $up->program_studi_id }}"
                                                                                 name="program_studi_id" />
-                                                                            <input type="hidden"
-                                                                                value="{{ $item_tahun->tahun->id }}"
-                                                                                name="tahun_id" />
+                                                                            <div class="d-flex align-items-left">
+                                                                                <input type="file" name="file"
+                                                                                    required="" accept=".pdf">
 
-                                                                            <input type="file" name="file"
-                                                                                accept=".pdf" required>
-                                                                            <button type="submit"
-                                                                                class="btn btn-outline-primary">Upload</button>
-                                                                        </div>
-                                                                    </form>
-                                                                @else
-                                                                    <form
-                                                                        action="{{ route('ajuan-prodi.updateled', $item_tahun->tahun->led[0]->id) }}"
-                                                                        method="post" enctype="multipart/form-data"
-                                                                        id="formActionStore">
-                                                                        @csrf
-                                                                        @method('POST')
-                                                                        <input type="hidden"
-                                                                            value="{{ $item_tahun->program_studi_id }}"
-                                                                            name="program_studi_id" />
-                                                                        <input type="hidden"
-                                                                            value="{{ $item_tahun->tahun->id }}"
-                                                                            name="tahun_id" />
-
-                                                                        <div class="d-flex align-items-left"
-                                                                            style="width: 270px;">
-                                                                            <input type="file" name="file"
-                                                                                required="" accept=".pdf">
-
-                                                                            <button type="submit"
-                                                                                class="btn btn-outline-warning">Update</button>
-                                                                        </div>
-                                                                    </form>
-                                                                @endif
-                                                            </td>
+                                                                                <button type="submit"
+                                                                                    class="btn btn-outline-warning">Update</button>
+                                                                            </div>
+                                                                        </form>
+                                                                    @endif
+                                                                </td>
+                                                            @endif
                                                             <td>
-                                                                @if (empty($led))
-                                                                    Belum ada
+                                                                @if ($existingUP || $up->pengajuan_dokumen->status != 1)
+                                                                    @if (empty($up->led))
+                                                                        Belum ada
+                                                                    @else
+                                                                        <a href="{{ Storage::url($up->led->file) }}"
+                                                                            target="_blank">{{ basename($up->led->file) }}</a>
+                                                                    @endif
                                                                 @else
-                                                                    <a href="{{ Storage::url($led->file) }}"
-                                                                        target="_blank">{{ basename($led->file) }}</a>
+                                                                    <a href="{{ Storage::url($up->led->file) }}"
+                                                                        target="_blank">{{ basename($up->led->file) }}</a>
                                                                 @endif
                                                             </td>
                                                         </tr>
@@ -274,337 +270,132 @@
                                             </div>
                                         </div>
                                     </div>
-                                @else
-                                    <h1>Akreditasi pada tahun {{ $item_tahun->tahun->tahun }} telah selesai, silahkan
-                                        lihat history akreditasi</h1>
-                                @endif
-                            @endforeach
-                        </div>
-                        <div class="col-12 col-md-9 col-lg-9">
-                            <div class="card">
-                                <div class="card-body mt-3">
-                                    <ul class="nav nav-tabs" id="myTab" role="tablist">
-                                        <li class="nav-item">
-                                            <a class="nav-link active" id="kriteria1-tab" data-toggle="tab"
-                                                href="#kriteria1" role="tab" aria-controls="home"
-                                                aria-selected="true">1</a>
-                                        </li>
-                                        <li class="nav-item">
-                                            <a class="nav-link" id="kriteria2-tab" data-toggle="tab"
-                                                href="#kriteria2" role="tab" aria-controls="kriteria2"
-                                                aria-selected="false">2</a>
-                                        </li>
-                                        <li class="nav-item">
-                                            <a class="nav-link" id="kriteria3-tab" data-toggle="tab"
-                                                href="#kriteria3" role="tab" aria-controls="kriteria3"
-                                                aria-selected="false">3</a>
-                                        </li>
-                                        <li class="nav-item">
-                                            <a class="nav-link" id="kriteria4-tab" data-toggle="tab"
-                                                href="#kriteria4" role="tab" aria-controls="kriteria4"
-                                                aria-selected="false">4</a>
-                                        </li>
-                                        <li class="nav-item">
-                                            <a class="nav-link" id="kriteria5-tab" data-toggle="tab"
-                                                href="#kriteria5" role="tab" aria-controls="kriteria5"
-                                                aria-selected="false">5</a>
-                                        </li>
-                                        <li class="nav-item">
-                                            <a class="nav-link" id="kriteria6-tab" data-toggle="tab"
-                                                href="#kriteria6" role="tab" aria-controls="kriteria6"
-                                                aria-selected="false">6</a>
-                                        </li>
-                                        <li class="nav-item">
-                                            <a class="nav-link" id="kriteria7-tab" data-toggle="tab"
-                                                href="#kriteria7" role="tab" aria-controls="kriteria7"
-                                                aria-selected="false">7</a>
-                                        </li>
-                                        <li class="nav-item">
-                                            <a class="nav-link" id="kriteria8-tab" data-toggle="tab"
-                                                href="#kriteria8" role="tab" aria-controls="kriteria8"
-                                                aria-selected="false">8</a>
-                                        </li>
-                                    </ul>
-                                    <div class="tab-content" id="myTabContent">
-                                        <div class="tab-pane fade show active" id="kriteria1" role="tabpanel"
-                                            aria-labelledby="kriteria1-tab">
-                                            <div class="form-group row align-items-center d-flex ml-2 mt-4 text-center"
-                                                style="width: 100%;">
-                                                <div class="col-12">
-                                                    <p
-                                                        style="font-weight:600; font-size: 20px; color: black; margin: 0;">
-                                                        Import Tabel LKPS Kriteria</p>
-                                                    <p style="font-weight:600; color: royalblue; margin: 0;">Tata
-                                                        Pamong, Tata Kelola, dan Kerjasama</p>
-                                                </div>
-                                            </div>
-
-                                            @foreach ($list_d3 as $d3)
-                                                @if ($d3->kriteria_id == 4)
-                                                    <div class="form-group row align-items-center">
-                                                        <label
-                                                            class="col-md-4 text-md-right text-left">{{ $d3->nama }}</label>
-                                                        <div class="col-lg-6">
-                                                            <form
-                                                                action="{{ route('ajuan-prodi.importLkps', ['id_prodi' => $program_studi->id]) }}"
-                                                                method="POST" enctype="multipart/form-data">
-                                                                @csrf
-                                                                <input type="hidden" name="program_studi_id"
-                                                                    value="{{ $program_studi->id }}">
-                                                                <input type="hidden" name="list_lkps_id"
-                                                                    value="{{ $d3->id }}">
-
-                                                                <div class="d-flex align-items-center">
-                                                                    <input type="file" name="file" required
-                                                                        class="form-control-file">
-                                                                    <button type="submit"
-                                                                        class="btn btn-sm btn-outline-primary ml-2"><i
-                                                                            class="fa fa-file"></i> Import</button>
-                                                                </div>
-                                                            </form>
-                                                        </div>
-                                                        {{-- if data ada muncul ini kalo gada ga tampil --}}
-                                                        {{-- <div class="col-lg-2">
-                                                            <a href="" target="_blank"
-                                                                class="btn btn-md btn-info btn-edit">
-                                                                <i class="fas fa-file" aria-hidden="true">&nbsp
-                                                                    View</i>
-                                                            </a>
-                                                        </div> --}}
-                                                    </div>
-                                                @endif
-                                            @endforeach
+                                </div>
+                                <div class="col-12 col-md-9 col-lg-9">
+                                    <div class="card">
+                                        <div class="card-header">
+                                            <h4>Import Tabel LKPS &rsaquo; </h4>Import file LKPS per kriteria
                                         </div>
-
-                                        <div class="tab-pane fade" id="kriteria2" role="tabpanel"
-                                            aria-labelledby="kriteria2-tab">
-                                            <div class="form-group row align-items-center d-flex ml-2 mt-4 text-center"
-                                                style="width: 100%;">
-                                                <div class="col-12">
-                                                    <p
-                                                        style="font-weight:600; font-size: 20px; color: black; margin: 0;">
-                                                        Import Tabel LKPS Kriteria</p>
-                                                    <p style="font-weight:600; color: royalblue; margin: 0;">Mahasiswa
-                                                    </p>
-                                                </div>
-                                            </div>
-
-                                            @foreach ($list_d3 as $d3)
-                                                @if ($d3->kriteria_id == 5)
-                                                    <div class="form-group row align-items-center">
-                                                        <label
-                                                            class="col-md-4 text-md-right text-left">{{ $d3->nama }}</label>
-                                                        <div class="col-lg-6">
-                                                            <div class="d-flex align-items-center">
-                                                                <input type="file" name="file" required
-                                                                    class="form-control-file">
-                                                                <button type="submit"
-                                                                    class="btn btn-sm btn-outline-primary ml-2">Import</button>
+                                        <div class="card-body">
+                                            @foreach ($kriteria as $kriteriaItem)
+                                                <div class="form-group row align-items-center">
+                                                    <label
+                                                        class="col-md-4 text-md-right text-left">{{ $kriteriaItem->kriteria }}</label>
+                                                    @php
+                                                        $existingLkps = $importLkps
+                                                            ->where('kriteria_id', $kriteriaItem->id)
+                                                            ->where('program_studi_id', $up->program_studi_id)
+                                                            ->first();
+                                                    @endphp
+                                                    @if ($existingUP || $up->pengajuan_dokumen->status != 1)
+                                                        @if (is_null($existingLkps))
+                                                            <div class="col-lg-6">
+                                                                <form
+                                                                    action="{{ route('ajuan-prodi.importLkps', ['id_prodi' => $up->program_studi_id]) }}"
+                                                                    method="POST" enctype="multipart/form-data">
+                                                                    @csrf
+                                                                    <input type="hidden" name="id_prodi"
+                                                                        value="{{ $up->program_studi_id }}">
+                                                                    <input type="hidden" name="id_kriteria"
+                                                                        value="{{ $kriteriaItem->id }}">
+                                                                    <div class="d-flex align-items-center">
+                                                                        <input type="file" name="file" required
+                                                                            class="form-control-file kriteria-input"
+                                                                            accept=".xlsx"
+                                                                            data-kriteria-id="{{ $kriteriaItem->id }}">
+                                                                        <button type="submit"
+                                                                            class="btn btn-sm btn-outline-primary ml-2">
+                                                                            Import
+                                                                        </button>
+                                                                    </div>
+                                                                </form>
                                                             </div>
-                                                        </div>
-                                                    </div>
-                                                @endif
-                                            @endforeach
-                                        </div>
-
-                                        <div class="tab-pane fade" id="kriteria3" role="tabpanel"
-                                            aria-labelledby="kriteria3-tab">
-                                            <div class="form-group row align-items-center d-flex ml-2 mt-4 text-center"
-                                                style="width: 100%;">
-                                                <div class="col-12">
-                                                    <p
-                                                        style="font-weight:600; font-size: 20px; color: black; margin: 0;">
-                                                        Import Tabel LKPS Kriteria</p>
-                                                    <p style="font-weight:600; color: royalblue; margin: 0;">Sumber
-                                                        Daya Manusia</p>
-                                                </div>
-                                            </div>
-
-                                            @foreach ($list_d3 as $d3)
-                                                @if ($d3->kriteria_id == 6)
-                                                    <div class="form-group row align-items-center">
-                                                        <label
-                                                            class="col-md-4 text-md-right text-left">{{ $d3->nama }}</label>
-                                                        <div class="col-lg-6">
-                                                            <div class="d-flex align-items-center">
-                                                                <input type="file" name="file" required
-                                                                    class="form-control-file">
-                                                                <button type="submit"
-                                                                    class="btn btn-sm btn-outline-primary ml-2">Import</button>
+                                                        @else
+                                                            <div class="col-lg-5">
+                                                                <form
+                                                                    action="{{ route('ajuan-prodi.importLkps', ['id_prodi' => $up->program_studi_id]) }}"
+                                                                    method="POST" enctype="multipart/form-data">
+                                                                    @csrf
+                                                                    <input type="hidden" name="id_prodi"
+                                                                        value="{{ $up->program_studi_id }}">
+                                                                    <input type="hidden" name="id_kriteria"
+                                                                        value="{{ $kriteriaItem->id }}">
+                                                                    <div class="d-flex align-items-center">
+                                                                        <input type="file" name="file" required
+                                                                            class="form-control-file kriteria-input"
+                                                                            accept=".xlsx"
+                                                                            data-kriteria-id="{{ $kriteriaItem->id }}">
+                                                                        <button type="submit"
+                                                                            class="btn btn-sm btn-outline-warning ml-2">
+                                                                            Update
+                                                                        </button>
+                                                                    </div>
+                                                                </form>
                                                             </div>
-                                                        </div>
-                                                    </div>
-                                                @endif
-                                            @endforeach
-                                        </div>
-
-                                        <div class="tab-pane fade" id="kriteria4" role="tabpanel"
-                                            aria-labelledby="kriteria4-tab">
-                                            <div class="form-group row align-items-center d-flex ml-2 mt-4 text-center"
-                                                style="width: 100%;">
-                                                <div class="col-12">
-                                                    <p
-                                                        style="font-weight:600; font-size: 20px; color: black; margin: 0;">
-                                                        Import Tabel LKPS Kriteria</p>
-                                                    <p style="font-weight:600; color: royalblue; margin: 0;">Keuangan,
-                                                        Sarana dan Prasarana</p>
-                                                </div>
-                                            </div>
-
-                                            @foreach ($list_d3 as $d3)
-                                                @if ($d3->kriteria_id == 7)
-                                                    <div class="form-group row align-items-center">
-                                                        <label
-                                                            class="col-md-4 text-md-right text-left">{{ $d3->nama }}</label>
-                                                        <div class="col-lg-6">
-                                                            <div class="d-flex align-items-center">
-                                                                <input type="file" name="file" required
-                                                                    class="form-control-file">
-                                                                <button type="submit"
-                                                                    class="btn btn-sm btn-outline-primary ml-2">Import</button>
+                                                            <div class="col-lg-3">
+                                                                <a href="{{ asset('storage/' . $existingLkps->file) }}"
+                                                                    target="_blank" class="btn btn-md btn-info"
+                                                                    download>
+                                                                    <i class="fas fa-file" aria-hidden="true">&nbsp;
+                                                                        Download</i>
+                                                                </a>
                                                             </div>
-                                                        </div>
-                                                    </div>
-                                                @endif
-                                            @endforeach
-                                        </div>
-
-                                        <div class="tab-pane fade" id="kriteria5" role="tabpanel"
-                                            aria-labelledby="kriteria5-tab">
-                                            <div class="form-group row align-items-center d-flex ml-2 mt-4 text-center"
-                                                style="width: 100%;">
-                                                <div class="col-12">
-                                                    <p
-                                                        style="font-weight:600; font-size: 20px; color: black; margin: 0;">
-                                                        Import Tabel LKPS Kriteria</p>
-                                                    <p style="font-weight:600; color: royalblue; margin: 0;">Pendidikan
-                                                    </p>
-                                                </div>
-                                            </div>
-
-                                            @foreach ($list_d3 as $d3)
-                                                @if ($d3->kriteria_id == 8)
-                                                    <div class="form-group row align-items-center">
-                                                        <label
-                                                            class="col-md-4 text-md-right text-left">{{ $d3->nama }}</label>
-                                                        <div class="col-lg-6">
-                                                            <div class="d-flex align-items-center">
-                                                                <input type="file" name="file" required
-                                                                    class="form-control-file">
-                                                                <button type="submit"
-                                                                    class="btn btn-sm btn-outline-primary ml-2">Import</button>
+                                                        @endif
+                                                    @else
+                                                        @if ($existingLkps)
+                                                            <div class="col-lg-6">
+                                                                <a href="{{ asset('storage/' . $existingLkps->file) }}"
+                                                                    target="_blank" class="btn btn-md btn-info"
+                                                                    download>
+                                                                    <i class="fas fa-file" aria-hidden="true">&nbsp;
+                                                                        Download</i>
+                                                                </a>
                                                             </div>
-                                                        </div>
-                                                    </div>
-                                                @endif
-                                            @endforeach
-                                        </div>
-
-                                        <div class="tab-pane fade" id="kriteria6" role="tabpanel"
-                                            aria-labelledby="kriteria6-tab">
-                                            <div class="form-group row align-items-center d-flex ml-2 mt-4 text-center"
-                                                style="width: 100%;">
-                                                <div class="col-12">
-                                                    <p
-                                                        style="font-weight:600; font-size: 20px; color: black; margin: 0;">
-                                                        Import Tabel LKPS Kriteria</p>
-                                                    <p style="font-weight:600; color: royalblue; margin: 0;">Pengabdian
-                                                        Kepada Masyarakat</p>
-                                                </div>
-                                            </div>
-
-                                            @foreach ($list_d3 as $d3)
-                                                @if ($d3->kriteria_id == 10)
-                                                    <div class="form-group row align-items-center">
-                                                        <label
-                                                            class="col-md-4 text-md-right text-left">{{ $d3->nama }}</label>
-                                                        <div class="col-lg-6">
-                                                            <div class="d-flex align-items-center">
-                                                                <input type="file" name="file" required
-                                                                    class="form-control-file">
-                                                                <button type="submit"
-                                                                    class="btn btn-sm btn-outline-primary ml-2">Import</button>
+                                                        @else
+                                                            <div class="col-lg-6">
+                                                                <span class="text-danger">Tidak dapat mengimpor atau
+                                                                    memperbarui karena dokumen telah diajukan.</span>
                                                             </div>
-                                                        </div>
-                                                    </div>
-                                                @endif
-                                            @endforeach
-                                        </div>
-
-                                        <div class="tab-pane fade" id="kriteria7" role="tabpanel"
-                                            aria-labelledby="kriteria7-tab">
-                                            <div class="form-group row align-items-center d-flex ml-2 mt-4 text-center"
-                                                style="width: 100%;">
-                                                <div class="col-12">
-                                                    <p
-                                                        style="font-weight:600; font-size: 20px; color: black; margin: 0;">
-                                                        Import Tabel LKPS Kriteria</p>
-                                                    <p style="font-weight:600; color: royalblue; margin: 0;">Luaran dan
-                                                        Capaian Tridharma</p>
+                                                        @endif
+                                                    @endif
                                                 </div>
-                                            </div>
-
-                                            @foreach ($list_d3 as $d3)
-                                                @if ($d3->kriteria_id == 11)
-                                                    <div class="form-group row align-items-center">
-                                                        <label
-                                                            class="col-md-4 text-md-right text-left">{{ $d3->nama }}</label>
-                                                        <div class="col-lg-6">
-                                                            <div class="d-flex align-items-center">
-                                                                <input type="file" name="file" required
-                                                                    class="form-control-file">
-                                                                <button type="submit"
-                                                                    class="btn btn-sm btn-outline-primary ml-2">Import</button>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                @endif
-                                            @endforeach
-                                        </div>
-
-                                        <div class="tab-pane fade" id="kriteria8" role="tabpanel"
-                                            aria-labelledby="kriteria8-tab">
-                                            <div class="form-group row align-items-center d-flex ml-2 mt-4 text-center"
-                                                style="width: 100%;">
-                                                <div class="col-12">
-                                                    <p
-                                                        style="font-weight:600; font-size: 20px; color: black; margin: 0;">
-                                                        Import Tabel LKPS Kriteria</p>
-                                                    <p style="font-weight:600; color: royalblue; margin: 0;">Penjaminan
-                                                        Mutu</p>
-                                                </div>
-                                            </div>
-
-                                            @foreach ($list_d3 as $d3)
-                                                @if ($d3->kriteria_id == 12)
-                                                    <div class="form-group row align-items-center">
-                                                        <label
-                                                            class="col-md-4 text-md-right text-left">{{ $d3->nama }}</label>
-                                                        <div class="col-lg-6">
-                                                            <div class="d-flex align-items-center">
-                                                                <input type="file" name="file" required
-                                                                    class="form-control-file">
-                                                                <button type="submit"
-                                                                    class="btn btn-sm btn-outline-primary ml-2">Import</button>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                @endif
                                             @endforeach
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                        </div>
-                        <div class="col-12 col-md-3 col-lg-3">
-                            <a href="" class="text-center text-white">
-                                <div class="card p-3"
-                                    style="background-color: rgba(70, 231, 61, 0.801); box-shadow: 0 4px 8px rgba(0, 0, 0, 0.11);">
-                                    <h6 class="m-0">Ajukan Akreditasi Prodi</h6>
+                                <div class="col-12 col-md-3 col-lg-3">
+                                    @if ($up->led != null)
+                                    @if (
+                                        !empty($up->led) &&
+                                            !empty($up->lkps) &&
+                                            !empty($up->surat_pengantar) &&
+                                            $up->led->status != 2 &&
+                                            $up->lkps->status != 2 &&
+                                            $up->surat_pengantar->status != 2 &&
+                                            $up->pengajuan_dokumen->status != 1)
+                                        <a href="javascript:void(0)" data-id="{{ $up->id }}"
+                                            data-lkps="{{ $up->lkps->id }}"
+                                            data-surat_pengantar="{{ $up->surat_pengantar->id }}"
+                                            data-led="{{ $up->led->id }}" data-tahun="{{ now()->year }}"
+                                            data-route="{{ route('ajuan-prodi.ajukan') }}"
+                                            class="text-center text-white btn-sm ajukan-btn">
+                                            <div class="card p-3"
+                                                style="background-color: rgba(20, 49, 239, 0.801); box-shadow: 0 4px 8px rgba(0, 0, 0, 0.11);">
+                                                <h6 class="m-0">Ajukan Akreditasi Prodi</h6>
+                                            </div>
+                                        </a>
+                                    @endif 
+                                    @endif
+                                    
                                 </div>
-                            </a>
-                        </div>
-                    </div>
+                            </div>
+                        @else
+                            <div class="row">
+                                <h1 class="p-4 m-4">Akreditasi pada tahun {{ $up->tahun->tahun }} telah
+                                    selesai, silahkan lihat history akreditasi</h1>
+                            </div>
+                        @endif
+                    @endforeach
                 </section>
             </div>
         </div>
@@ -613,6 +404,60 @@
             <div class="footer-right">
             </div>
         </footer>
+        <script>
+            $(document).ready(function() {
+                $("body").on('click', '.ajukan-btn', function() {
+                    let id = $(this).data('id');
+                    let led_id = $(this).data('led');
+                    let lkps_id = $(this).data('lkps');
+                    let surat_pengantar_id = $(this).data('surat_pengantar');
+                    let tahun = $(this).data('tahun'); // Mengambil tahun dari data-attributes
+                    let route = $(this).data('route');
+                    let tanggal_hari_ini = new Date().toISOString().slice(0, 10);
+
+                    swal({
+                        title: 'Ajukan Akreditasi?',
+                        html: 'Apakah Anda yakin ingin mengajukan akreditasi prodi ini?',
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonText: 'Setujui',
+                        cancelButtonText: 'Batal',
+                        buttons: true,
+                        dangerMode: true,
+                    }).then((willajukan) => {
+                        if (willajukan) {
+                            $.ajax({
+                                url: route,
+                                method: 'POST',
+                                data: {
+                                    _token: "{{ csrf_token() }}",
+                                    user_prodi_id: id,
+                                    led_id: led_id,
+                                    lkps_id: lkps_id,
+                                    surat_pengantar_id: surat_pengantar_id,
+                                    tahun: tahun, // Menambahkan tahun
+                                    tanggal_hari_ini: tanggal_hari_ini
+                                }
+                            }).done(function(response) {
+                                swal({
+                                    title: 'Berhasil!',
+                                    text: "Pengajuan Akreditasi Program Studi Berhasil! Tunggu info selanjutnya.",
+                                    icon: 'success',
+                                }).then(() => {
+                                    window.location.reload();
+                                });
+                            }).fail(function() {
+                                swal({
+                                    title: 'Terjadi kesalahan!',
+                                    text: 'Server Error',
+                                    icon: 'error'
+                                });
+                            });
+                        }
+                    });
+                });
+            });
+        </script>
     </div>
 </body>
 

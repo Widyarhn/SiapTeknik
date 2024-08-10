@@ -4,7 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta content="width=device-width, initial-scale=1, maximum-scale=1, shrink-to-fit=no" name="viewport">
-    <title>Asesor D3 | Elemen Penilaian D3 </title>
+    <title>Asesor | Asesmen Lapangan </title>
+    {{-- <title>Asesor D3 | Elemen Penilaian D3 </title> --}}
     @include('body')
 </head>
 <body>
@@ -21,15 +22,20 @@
             <div class="main-content">
                 <section class="section">
                     <div class="section-header">
-                        <h1>Data Elemen Penilaian D3</h1>
+                        {{-- <h1>Data Elemen Penilaian D3</h1>
                         <div class="section-header-breadcrumb">
                             <div class="breadcrumb-item active"><a href="{{ url('dashboard-asesor') }}">Dashboard</a></div>
                             <div class="breadcrumb-item">Elemen Penilaian D3</div>
+                        </div> --}}
+                        <h1>Asesmen Lapangan {{$program_studi->jenjang->jenjang}} {{$program_studi->nama}}</h1>
+                        <div class="section-header-breadcrumb">
+                            <div class="breadcrumb-item active"><a href="{{ url('dashboard-asesor') }}">Dashboard</a></div>
+                            <div class="breadcrumb-item">Asesmen Lapangan</div>
                         </div>
                     </div>
                     <div class="section-body">
-                        <h2 class="section-title">Data Elemen Penilaian D3</h2>
-                        <p class="section-lead">Informasi Elemen Penilaian Asesmen Lapangan jenjang D3 lingkup INFOKOM</p>
+                        <h2 class="section-title">Data Elemen Penilaian {{$program_studi->jenjang->jenjang}} {{$program_studi->nama}}</h2>
+                        <p class="section-lead">Informasi Elemen Penilaian Asesmen Lapangan Jenjang {{$program_studi->jenjang->jenjang}} {{$program_studi->nama}}  Lingkup Teknik</p>
                         <!--Basic table-->
                         <div class="row">
                             <div class="col-12">

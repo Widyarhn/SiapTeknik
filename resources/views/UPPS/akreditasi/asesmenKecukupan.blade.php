@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta content="width=device-width, initial-scale=1, maximum-scale=1, shrink-to-fit=no" name="viewport">
-    <title>UPPS | Timeline Akreditasi</title>
+    <title>UPPS | Akreditasi Program Studi</title>
     @include('body')
 </head>
 
@@ -30,25 +30,47 @@
                             <div class="breadcrumb-item">Akreditasi</div>
                         </div>
                     </div>
+                    @if ($errors->any())
+                        <div class="alert alert-danger">
+                            <ul>
+                                @foreach ($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
+                    @if (session('success'))
+                        <script>
+                            const success = swal({
+                                icon: 'success',
+                                title: 'Berhasil!',
+                                text: '{{ session('success') }}'
+                            })
+                        </script>
+                    @endif
                     <div class="section-body">
                         <div class="row">
                             <div class="col-12">
                                 <div class="card p-2">
                                     <ul class="nav nav-pills">
                                         <li class="nav-item">
-                                            <a class="nav-link " href="{{ route('akreditasi.index') }}"><i class="fas fa-circle"></i>
+                                            <a class="nav-link " href="{{ route('akreditasi.index') }}"><i
+                                                    class="fas fa-circle"></i>
                                                 Dokumen Ajuan</a>
                                         </li>
                                         <li class="nav-item">
-                                            <a class="nav-link active" href="{{ route('akreditasi.asesmenKecukupan') }}"><i class="fas fa-regular fa-circle"></i>
+                                            <a class="nav-link active"
+                                                href="{{ route('akreditasi.asesmenKecukupan') }}"><i
+                                                    class="fas fa-regular fa-circle"></i>
                                                 Asesmen Kecukupan</a>
                                         </li>
                                         <li class="nav-item">
-                                            <a class="nav-link" href="#"><i class="fas fa-circle"></i> Asesmen
-                                                Lapangan</a>
+                                            <a class="nav-link" href="{{ route('akreditasi.asesmenLapangan') }}"><i
+                                                    class="fas fa-circle"></i> Asesmen Lapangan</a>
                                         </li>
                                         <li class="nav-item">
-                                            <a class="nav-link" href="#"><i class="fas  fa-solid fa-check"></i>
+                                            <a class="nav-link" href="{{ route('akreditasi.selesai') }}"><i
+                                                    class="fas  fa-solid fa-check"></i>
                                                 Selesai</a>
                                         </li>
                                     </ul>
@@ -56,216 +78,35 @@
                             </div>
                         </div>
 
-                        {{-- selesai (perprodi) --}}
-                        {{-- <div class="row ">
-                            <div class="col-md-4">
-                                <div class="card">
-                                    <div class="card-header">
-                                        <h4>Jump To</h4>
-                                    </div>
-                                    <div class="card-body">
-                                        <ul class="nav nav-pills flex-column">
-                                            <li class="nav-item"><a href="#" class="nav-link active">All
-                                                    Progress</a>
-                                            </li>
-                                            <li class="nav-item"><a href="#" class="nav-link">Pengajuan
-                                                    Dokumen</a></li>
-                                            <li class="nav-item"><a href="#" class="nav-link">Asesmen
-                                                    Kecukupan</a></li>
-                                            <li class="nav-item"><a href="#" class="nav-link">Asesmen Lapangan</a>
-                                            </li>
-                                            <li class="nav-item"><a href="#" class="nav-link">Berita Acara</a>
-                                            </li>
-                                            <li class="nav-item"><a href="#" class="nav-link">Sertifikat</a></li>
-                                            <li class="nav-item"><a href="#" class="nav-link">Selesai</a></li>
-                                        </ul>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-8">
-                                <form id="setting-form">
-                                    <div class="card" id="settings-card">
-                                        <div class="card-header">
-                                            <h4>General Settings</h4>
-                                        </div>
-                                        <div class="card-body">
-                                            <p class="text-muted">General settings such as, site title, site
-                                                description, address and so on.</p>
-                                            <div class="form-group row align-items-center">
-                                                <label for="site-title"
-                                                    class="form-control-label col-sm-3 text-md-right">Site Title</label>
-                                                <div class="col-sm-6 col-md-9">
-                                                    <input type="text" name="site_title" class="form-control"
-                                                        id="site-title">
-                                                </div>
-                                            </div>
-                                            <div class="form-group row align-items-center">
-                                                <label for="site-description"
-                                                    class="form-control-label col-sm-3 text-md-right">Site
-                                                    Description</label>
-                                                <div class="col-sm-6 col-md-9">
-                                                    <textarea class="form-control" name="site_description" id="site-description"></textarea>
-                                                </div>
-                                            </div>
-                                            <div class="form-group row align-items-center">
-                                                <label class="form-control-label col-sm-3 text-md-right">Site
-                                                    Logo</label>
-                                                <div class="col-sm-6 col-md-9">
-                                                    <div class="custom-file">
-                                                        <input type="file" name="site_logo" class="custom-file-input"
-                                                            id="site-logo">
-                                                        <label class="custom-file-label">Choose File</label>
-                                                    </div>
-                                                    <div class="form-text text-muted">The image must have a maximum size
-                                                        of 1MB</div>
-                                                </div>
-                                            </div>
-                                            <div class="form-group row align-items-center">
-                                                <label class="form-control-label col-sm-3 text-md-right">Favicon</label>
-                                                <div class="col-sm-6 col-md-9">
-                                                    <div class="custom-file">
-                                                        <input type="file" name="site_favicon"
-                                                            class="custom-file-input" id="site-favicon">
-                                                        <label class="custom-file-label">Choose File</label>
-                                                    </div>
-                                                    <div class="form-text text-muted">The image must have a maximum
-                                                        size
-                                                        of 1MB</div>
-                                                </div>
-                                            </div>
-                                            <div class="form-group row">
-                                                <label class="form-control-label col-sm-3 mt-3 text-md-right">Google
-                                                    Analytics Code</label>
-                                                <div class="col-sm-6 col-md-9">
-                                                    <textarea class="form-control codeeditor" name="google_analytics_code"></textarea>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="card-footer bg-whitesmoke text-md-right">
-                                            <button class="btn btn-primary" id="save-btn">Save Changes</button>
-                                            <button class="btn btn-secondary" type="button">Reset</button>
-                                        </div>
-                                    </div>
-                                </form>
-                            </div>
-                        </div> --}}
-
-                        <div class="row ">
-                            <div class="col-12">
-                                <form id="setting-form">
-                                    {{-- <div class="card" id="settings-card">
-                                        <div class="card-header">
-                                            <h4>General Settings</h4>
-                                        </div>
-                                        <div class="card-body">
-                                            <p class="text-muted">General settings such as, site title, site
-                                                description, address and so on.</p>
-                                            <div class="form-group row align-items-center">
-                                                <label for="site-title"
-                                                    class="form-control-label col-sm-3 text-md-right">Site Title</label>
-                                                <div class="col-sm-6 col-md-9">
-                                                    <input type="text" name="site_title" class="form-control"
-                                                        id="site-title">
-                                                </div>
-                                            </div>
-                                            <div class="form-group row align-items-center">
-                                                <label for="site-description"
-                                                    class="form-control-label col-sm-3 text-md-right">Site
-                                                    Description</label>
-                                                <div class="col-sm-6 col-md-9">
-                                                    <textarea class="form-control" name="site_description" id="site-description"></textarea>
-                                                </div>
-                                            </div>
-                                            <div class="form-group row align-items-center">
-                                                <label class="form-control-label col-sm-3 text-md-right">Site
-                                                    Logo</label>
-                                                <div class="col-sm-6 col-md-9">
-                                                    <div class="custom-file">
-                                                        <input type="file" name="site_logo" class="custom-file-input"
-                                                            id="site-logo">
-                                                        <label class="custom-file-label">Choose File</label>
-                                                    </div>
-                                                    <div class="form-text text-muted">The image must have a maximum size
-                                                        of 1MB</div>
-                                                </div>
-                                            </div>
-                                            <div class="form-group row align-items-center">
-                                                <label class="form-control-label col-sm-3 text-md-right">Favicon</label>
-                                                <div class="col-sm-6 col-md-9">
-                                                    <div class="custom-file">
-                                                        <input type="file" name="site_favicon"
-                                                            class="custom-file-input" id="site-favicon">
-                                                        <label class="custom-file-label">Choose File</label>
-                                                    </div>
-                                                    <div class="form-text text-muted">The image must have a maximum
-                                                        size
-                                                        of 1MB</div>
-                                                </div>
-                                            </div>
-                                            <div class="form-group row">
-                                                <label class="form-control-label col-sm-3 mt-3 text-md-right">Google
-                                                    Analytics Code</label>
-                                                <div class="col-sm-6 col-md-9">
-                                                    <textarea class="form-control codeeditor" name="google_analytics_code"></textarea>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="card-footer bg-whitesmoke text-md-right">
-                                            <button class="btn btn-primary" id="save-btn">Save Changes</button>
-                                            <button class="btn btn-secondary" type="button">Reset</button>
-                                        </div>
-
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="card" id="settings-card">
+                                    {{-- <div class="card-header">
+                                        <h4>Data Elemen Penilaian Desk Evaluasi</h4>
                                     </div> --}}
-                                    {{-- @foreach ($user_prodi as $item_tahun) --}}
-                                    <div class="card">
-                                        <div class="card-header" style="border-bottom-width: 0px;padding-bottom: 0px;">
-                                            <h4></h4>
-                                            <div class="card-header-action">
-                                                <a href="#" data-toggle="modal" data-target="#modalTambahJadwal"
-                                                    class="btn btn-outline-primary btn-create mb-2"
-                                                    style="border-radius: 30px;"><i class="fas fa-user-plus"></i>
-                                                    Tambah Akreditasi</a>
-                                            </div>
-                                        </div>
-                                        <div class="card-body" style="padding-top: 0px;">
-                                            <div class="table-responsive">
-                                                <table class="table table-striped table-bordered">
-                                                    <thead>
-                                                        <tr>
-                                                            <th class="text-center">D3 Teknik Mesin | 2024 </th>
-                                                            <th class="text-center">Nama File</th>
-                                                            <th class="text-center">
-                                                            </th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                        <tr>
-                                                            <td class="text-center">Dokumen LKPS</td>
-                                                            <td class="text-center">
-                                                                Belum ada file yang diupload
-                                                            </td>
-                                                            <td class="text-center">
-                                                                <button type="submit"
-                                                                    class="btn btn-secondary">Approve</button>
-                                                            </td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td class="text-center">Dokumen LED</td>
-                                                            <td class="text-center">
-                                                                Belum ada file yang diupload
-                                                            </td>
-                                                            <td class="text-center">
-                                                                <button type="submit"
-                                                                    class="btn btn-secondary">Approve</button>
-                                                            </td>
-                                                        </tr>
-                                                    </tbody>
-                                                </table>
-                                            </div>
+                                    <div class="card-body">
+                                        <div class="table-responsive">
+                                            <table class="table table-striped" id="asesmenKecukupanTable">
+                                                <thead>
+                                                    <tr>
+                                                        <th>No</th>
+                                                        <th>Tahun</th>
+                                                        <th>Program Studi</th>
+                                                        <th>Nilai Asesor 1</th>
+                                                        <th>Nilai Asesor 2</th>
+                                                        <th>Validator</th>
+                                                        <th>Aksi</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody></tbody>
+                                            </table>
                                         </div>
                                     </div>
-                                    {{-- @endforeach --}}
-                                </form>
+                                    {{-- <div class="card-footer bg-whitesmoke text-md-right">
+                                        <button class="btn btn-primary" id="save-btn">Save Changes</button>
+                                        <button class="btn btn-secondary" type="button">Reset</button>
+                                    </div> --}}
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -278,71 +119,71 @@
             </footer>
         </div>
     </div>
-
-    <div class="modal fade" tabindex="-1" role="dialog" id="modalTambah">
+    <div class="modal fade" id="approveModal" tabindex="-1" role="dialog" aria-labelledby="approveModalLabel"
+        aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Tambah Tahun Akreditasi</h5>
+                    <h5 class="modal-title" id="approveModalLabel">Approve dan Buatkan Jadwal</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-
                 <div class="modal-body">
-                    <div class="card">
-                        <form action="{{ route('UPPS.timeline.store') }}" method="post" enctype="multipart/form-data"
-                            id="formTambah">
-                            @csrf
-                            @method('POST')
-                            <div class="card">
-                                <div class="card-body">
-                                    <div class="form-group">
-                                        <label>Nama Kegiatan</label>
-                                        <input type="text" class="form-control" name="nama_kegiatan" required="">
-                                    </div>
-                                    <div class="row">
-                                        <div class="form-group col-lg-6">
-                                            <label>Program Studi</label>
-                                            <select id="program_studi" class="form-control selectric"
-                                                name="program_studi_id">
-                                                <option value="">-- Pilih --</option>
-                                                @foreach ($program_studi as $prodi)
-                                                    <option value="{{ $prodi->id }}"> {{ $prodi->jenjang->jenjang }}
-                                                        {{ $prodi->nama }}
-                                                    </option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                        <div class="form-group col-lg-6">
-                                            <label>Tahun</label>
-                                            <select id="tahun" class="form-control selectric" name="tahun_id">
-                                                <option value="">-- Pilih --</option>
-                                                @foreach ($tahun as $tahun)
-                                                    <option value="{{ $tahun->id }}">{{ $tahun->tahun }}
-                                                    </option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="form-group">
-                                        <label>Tanggal Mulai</label>
-                                        <input type="date" class="form-control" name="jadwal_awal"
-                                            required="">
-                                    </div>
-                                    <div class="form-group">
-                                        <label>Tanggal Berakhir</label>
-                                        <input type="date" class="form-control" name="jadwal_akhir"
-                                            required="">
-                                    </div>
-                                </div>
+                    <form id="approveForm" action="" method="POST">
+                        @csrf
+                        <input type="hidden" id="docId" name="id" value="">
+                        <input type="hidden" id="docProdi" name="prodi" value="">
+                        <input type="hidden" id="docThn" name="thn" value="">
+                        <div class="form-group">
+                            <label for="kegiatan">Tahap Kegiatan Selanjutnya</label>
+                            <input type="text" class="form-control" id="kegiatan" placeholder="Asesmen Lapangan"
+                                name="kegiatan" required="" disabled="">
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group col-md-6">
+                                <label for="tanggalMulai">Tanggal Mulai</label>
+                                <input type="date" class="form-control" id="tanggalMulai" name="tanggal_mulai"
+                                    required="">
                             </div>
-                            <div class="modal-footer bg-whitesmoke br">
-                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
-                                <button type="submit" class="btn btn-primary">Simpan</button>
+                            <div class="form-group col-md-6">
+                                <label for="tanggalAkhir">Batas Waktu</label>
+                                <input type="date" class="form-control" id="tanggalAkhir" name="tanggal_akhir"
+                                    required="">
                             </div>
-                        </form>
-                    </div>
+                        </div>
+                        <div class="text-right mt-3 mb-4" style="background-color:rgba(0, 0, 0, 0); border-top:none;">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
+                            <button type="submit" class="btn btn-primary ml-2">Simpan</button>
+                        </div>
+                        {{-- <button type="submit" class="btn btn-primary">Approve</button> --}}
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="disapproveModal" tabindex="-1" role="dialog"
+        aria-labelledby="disapproveModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="disapproveModalLabel">Disapprove Dokumen</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="disapproveForm" action="" method="POST">
+                        @csrf
+                        <input type="hidden" id="docId" name="id" value="">
+                        <input type="hidden" id="docType" name="type" value="">
+                        <div class="form-group">
+                            <label for="keterangan">Keterangan Disapprove</label>
+                            <textarea class="form-control" id="keterangan" name="keterangan" rows="3" required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-danger">Submit Disapprove</button>
+                    </form>
                 </div>
             </div>
         </div>
@@ -350,111 +191,84 @@
 
     <script>
         $(function() {
-            $('#timelineTable').dataTable({
+            $('#asesmenKecukupanTable').dataTable({
                 processing: true,
                 serverSide: true,
-                ajax: "{{ route('UPPS.timeline.json') }}",
+                ajax: "{{ route('Upps.asesmen-kecukupan.json') }}",
                 columns: [{
                         data: 'DT_RowIndex',
-                        name: 'DT_RowIndex'
-                    },
-                    {
-                        data: 'prodi',
-                        name: 'prodi'
+                        name: 'DT_RowIndex',
                     },
                     {
                         data: 'tahun',
                         name: 'tahun'
                     },
                     {
-                        data: 'nama',
-                        name: 'nama'
+                        data: 'prodi',
+                        name: 'prodi'
                     },
                     {
-                        data: 'tanggal',
-                        name: 'tanggal'
+                        data: 'nilai_asesor1',
+                        name: 'nilai_asesor1'
                     },
                     {
-                        data: 'proses',
-                        name: 'proses'
+                        data: 'nilai_asesor2',
+                        name: 'nilai_asesor2'
+                    },
+                    {
+                        data: 'nilai_asesor3',
+                        name: 'nilai_asesor3'
                     },
                     {
                         data: 'action',
-                        name: 'action'
+                        name: 'action',
+                        orderable: false,
+                        searchable: false
                     }
                 ],
+            })
+        })
+
+        $(document).ready(function() {
+            // Event handler untuk tombol disapprove
+            $('body').on('click', '.approve-btn', function() {
+                let id = $(this).data('id');
+                let prodi = $(this).data('prodi');
+                let thn = $(this).data('thn');
+                let route = $(this).data('route');
+
+                // Atur form action dan input values
+                $('#approveForm').attr('action', route);
+                $('#docId').val(id);
+                $('#docProdi').val(prodi);
+                $('#docThn').val(thn);
+
+                // Tampilkan modal
+                $('#approveModal').modal('show');
             });
         });
 
-        $("body").on('click', ".btn-lihat", function() {
-            let url = $(this).data("url") + "/edit"
-            $("#formActionEdit").attr("action", $(this).data("url"))
-            $.ajax({
-                url: url,
-                type: "get",
-                success: function(data) {
-                    $("#formEdit").html(data)
-                }
-            })
-        })
+        $(document).ready(function() {
+            // Event handler untuk tombol disapprove
+            $('body').on('click', '.disapprove-btn', function() {
+                let id = $(this).data('id');
+                let route = $(this).data('route');
 
-        $("body").on('click', ".btn-edit", function() {
-            let url = $(this).data("url") + "/edit"
-            $("#formActionEdit").attr("action", $(this).data("url"))
-            $.ajax({
-                url: url,
-                type: "get",
-                success: function(data) {
-                    $("#formEdit").html(data)
-                }
-            })
-        })
+                // Atur form action dan input values
+                $('#disapproveForm').attr('action', route);
+                $('#docId').val(id);
 
-        $("body").on('click', '.selesai-btn', function(e) {
-            let id = $(this).data('id');
-            let route = $(this).data('route')
-            swal({
-                title: 'Selesaikan Akreditasi?',
-                html: `Akreditasi akan selesai, pastikan semua proses telah dilakukan!`,
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonText: 'Selesai!',
-                buttons: true,
-                dangerMode: true,
-            }).then((willEdit) => {
-                let is_active = '1';
-                if (willEdit) {
-                    const response = $.ajax({
-                        url: route,
-                        method: 'POST',
-                        data: {
-                            _token: "{{ csrf_token() }}",
-                            id: id,
-                            is_active: is_active,
-                        }
-                    }).catch(() => {
-                        swal({
-                            title: 'Terjadi kesalahan!',
-                            text: 'Server Error',
-                            icon: 'error'
-                        })
-                    })
-                    if (!response) return;
-
-                    const success = swal({
-                        title: 'Berhasil!',
-                        text: "Akreditasi telah selesai",
-                        icon: 'success',
-                    }).then((response) => {
-
-                        window.location.reload()
-                    })
-                }
-
-            })
-        })
+                // Tampilkan modal
+                $('#disapproveModal').modal('show');
+            });
+        });
     </script>
 
 </body>
 
 </html>
+
+
+
+{{-- <li class="nav-item"><a href="#" class="nav-link">D4 Perancangan
+                                                    Manufaktur</a></li> --}}

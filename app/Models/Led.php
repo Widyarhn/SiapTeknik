@@ -10,7 +10,6 @@ class Led extends Model
     use HasFactory;
 
     protected $table = 'leds';
-    // protected $fillable = ['tahun_id', 'file', 'id'];
     protected $guarded = [];
 
     public function program_studi()
@@ -22,14 +21,4 @@ class Led extends Model
     {
         return $this->belongsTo(Tahun::class);
     } 
-
-    public function user()
-    {
-        return $this->belongsTo(User::class);
-    } 
-
-    public function dokumen_ajuan()
-    {
-        return $this->hasMany('App\Models\DokumenAjuan');
-    }
 }

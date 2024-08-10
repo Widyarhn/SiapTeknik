@@ -1,12 +1,15 @@
 <?php
 
+use App\Models\User;
 use App\Models\ProgramStudi;
+use App\Models\Jenjang;
+use App\Models\Tahun;
 use App\Models\Timeline;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateDokumenAjuansTable extends Migration
+class CreateUserProdiesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -15,14 +18,13 @@ class CreateDokumenAjuansTable extends Migration
      */
     public function up()
     {
-        Schema::create('dokumen_ajuans', function (Blueprint $table) {
+        Schema::create('user_prodies', function (Blueprint $table) {
             $table->id();
+            $table->foreignIdFor(User::class);
+            $table->foreignIdFor(Tahun::class)->nullable();
             $table->foreignIdFor(ProgramStudi::class)->nullable();
-            $table->unsignedInteger('step_id')->nullable();
-            $table->foreignIdFor(Timeline::class)->nullable();
-            $table->string('kategori');
-            $table->boolean('status')->default(false);
-            $table->text('keterangan');
+            $table->foreignIdFor(Jenjang::class)->nullable();
+            // $table->foreignIdFor(Timeline::class)->nullable();
             $table->timestamps();
         });
     }
@@ -34,6 +36,6 @@ class CreateDokumenAjuansTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('dokumen_ajuans');
+        Schema::dropIfExists('user_prodies');
     }
 }

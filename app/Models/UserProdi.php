@@ -9,14 +9,8 @@ class UserProdi extends Model
 {
     use HasFactory;
 
-    protected $table = 'user_prodis';
-    protected $fillable = [
-        'user_id',
-        'program_studi_id',
-        'tahun_id',
-        'jenjang_id',
-        'timeline_id',
-    ];
+    protected $table = 'user_prodies';
+    protected $guarded = [];
 
     public function program_studi()
     {
@@ -35,21 +29,29 @@ class UserProdi extends Model
 
     public function tahun()
     {
-        return $this->belongsTo(Tahun::class, 'tahun_id'); // Ganti 'Tahun' dengan nama model yang sesuai
+        return $this->belongsTo(Tahun::class, 'tahun_id');
     }
 
-    public function timeline()
+    public function pengajuan_dokumen()
     {
-        return $this->belongsTo(Timeline::class, 'timeline_id'); // Ganti 'Tahun' dengan nama model yang sesuai
+        return $this->belongsTo(PengajuanDokumen::class, 'id');
     }
 
     public function lkps()
     {
-        return $this->belongsTo("App\Models\Lkps", "program_studi_id", "program_studi_id");
+        return $this->hasOne("App\Models\Lkps", "program_studi_id", "program_studi_id");
     }
 
     public function led()
     {
-        return $this->belongsTo("App\Models\Led", "program_studi_id", "program_studi_id");
+        return $this->hasOne("App\Models\Led", "program_studi_id", "program_studi_id");
+    }
+    public function surat_pengantar()
+    {
+        return $this->hasOne("App\Models\SuratPengantar", "program_studi_id", "program_studi_id");
+    }
+    public function data_dukung()
+    {
+        return $this->hasMany("App\Models\DataDukung", "program_studi_id", "program_studi_id");
     }
 }

@@ -12,18 +12,12 @@ class AsesmenLapangan extends Model
 
     protected $table ='asesmen_lapangans';
 
-    protected $fillable = [
-        'aspek_penilaian_id',
-        'user_asesor_id',
-        'timeline_id',
-        'nilai',
-        'upps_nilai',
-        'deskripsi',
-    ];
+    
+    protected $guarded = [];
 
-    public function aspek_penilaian()
+    public function matriks_penilaian()
     {
-        return $this->belongsTo(AspekPenilaian::class);
+        return $this->belongsTo(MatriksPenilaian::class);
     }
 
     public function user_asesor()

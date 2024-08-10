@@ -10,9 +10,7 @@ class SubKriteria extends Model
     use HasFactory;
 
     protected $table = 'sub_kriterias';
-    protected $fillable = [
-        'kriteria_id',
-    ];
+    protected $guarded = [];
 
     public function kriteria()
     {

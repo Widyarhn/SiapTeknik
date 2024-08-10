@@ -48,7 +48,7 @@
                 @endif
                     <div class="section-body">
                         <h2 class="section-title">Data Matriks Penilaian  {{$jenjang->jenjang}}</h2>
-                        <p class="section-lead">Informasi matriks penilaian jenjang {{$jenjang->jenjang}} lingkup INFOKOM</p>
+                        <p class="section-lead">Informasi matriks penilaian jenjang {{$jenjang->jenjang}} lingkup Teknik</p>
                         <!--Basic table-->
                         <div class="row">
                             <div class="col-12">
@@ -60,7 +60,6 @@
                                                     class="fas fa-plus-circle"></i> Tambahkan</a>
                                             <h4>Tabel Matriks Penilaian  {{$jenjang->jenjang}}</h4>
                                         </div>
-
                                     </div>
                                     <div class="card-body">
                                         <div class="table-responsive">
@@ -68,9 +67,10 @@
                                                 <thead>
                                                     <tr>
                                                         <th>No</th>
-                                                        <th width="35%">Informasi</th>
-                                                        <th width="50%">Deskripsi Nilai</th>
-                                                        <th width="15%">Aksi</th>
+                                                        <th >Informasi</th>
+                                                        <th >Indikator</th>
+                                                        <th >Deskripsi Nilai</th>
+                                                        <th >Aksi</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody></tbody>
@@ -99,6 +99,10 @@
                     {
                         data: 'informasi',
                         name: 'informasi'
+                    },
+                    {
+                        data: 'indikator',
+                        name: 'indikator'
                     },
                     {
                         data: 'nilai',

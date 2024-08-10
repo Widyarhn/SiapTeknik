@@ -7,6 +7,7 @@
     <title>UPPS | User </title>
     @include('body')
 </head>
+
 <body>
     <div id="app">
         <div class="main-wrapper main-wrapper-1">
@@ -23,38 +24,41 @@
                     <div class="section-header">
                         <h1>Data User</h1>
                         <div class="section-header-breadcrumb">
-                            <div class="breadcrumb-item active"><a href="{{ url('dashboard-UPPS') }}">Dashboard</a></div>
+                            <div class="breadcrumb-item active"><a href="{{ url('dashboard-UPPS') }}">Dashboard</a>
+                            </div>
                             <div class="breadcrumb-item">User</div>
                         </div>
                     </div>
                     @if ($errors->any())
-                    <div class="alert alert-danger">
-                        <ul>
-                            @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                            @endforeach
-                        </ul>
-                    </div>
+                        <div class="alert alert-danger">
+                            <ul>
+                                @foreach ($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
                     @endif
-                    @if(session('success'))
-                    <script>
-                        const success = swal({
-                            icon: 'success',
-                            title: 'Berhasil!',
-                            text: '{{ session('success') }}'
-                        })
-                    </script>
-                @endif
+                    @if (session('success'))
+                        <script>
+                            const success = swal({
+                                icon: 'success',
+                                title: 'Berhasil!',
+                                text: '{{ session('success') }}'
+                            })
+                        </script>
+                    @endif
                     <div class="section-body">
                         <h2 class="section-title">Data User</h2>
-                        <p class="section-lead">Informasi user atau pengguna aplikasi Lingkup INFOKOM</p>
+                        <p class="section-lead">Informasi user atau pengguna aplikasi Lingkup Teknik</p>
                         <!--Basic table-->
                         <div class="row">
                             <div class="col-12">
                                 <div class="card">
                                     <div class="card-header">
                                         <div class="buttons">
-                                            <a href="#" data-toggle="modal" data-target="#modalTambah" class="btn btn-outline-secondary btn-create"><i class="fas fa-plus-circle"></i> Tambahkan</a>
+                                            <a href="#" data-toggle="modal" data-target="#modalTambah"
+                                                class="btn btn-outline-secondary btn-create"><i
+                                                    class="fas fa-plus-circle"></i> Tambahkan</a>
                                             <h4>Tabel User</h4>
                                         </div>
 
@@ -79,9 +83,8 @@
                             </div>
                         </div>
                     </div>
-                    <!--Basic table-->
+                </section>
             </div>
-            </section>
         </div>
         <div class="modal fade" tabindex="-1" role="dialog" id="modalTambah">
             <div class="modal-dialog" role="document">
@@ -92,7 +95,8 @@
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
-                    <form action="{{ route('UPPS.user.create') }}" method="post" enctype="multipart/form-data" id="formActionTambah">
+                    <form action="{{ route('UPPS.user.create') }}" method="post" enctype="multipart/form-data"
+                        id="formActionTambah">
                         @csrf
                         @method('POST')
                         <div class="modal-body" id="formTambah">
@@ -111,8 +115,8 @@
                                             <label>Level</label>
                                             <select id="role" class="form-control selectric" name="role_id">
                                                 <option value="">-- Pilih --</option>
-                                                @foreach ($roles as $role )
-                                                <option value="{{ $role->id }}">{{ $role->role }}</option>
+                                                @foreach ($roles as $role)
+                                                    <option value="{{ $role->id }}">{{ $role->role }}</option>
                                                 @endforeach
                                             </select>
                                         </div>
@@ -155,37 +159,35 @@
             </div>
         </div>
     </div>
+
     <script>
         $(function() {
             const table = $('#instrumenTable').dataTable({
-                processing: true
-                , serverSide: true
-                , ajax: "{{ route('UPPS.user.json') }}"
-                , columns: [{
-                        data: 'DT_RowIndex'
-                        , name: 'DT_RowIndex'
-                    , }
-                    , {
-                        data: 'nama'
-                        , name: 'nama'
-                    }
-                    , {
-                        data: 'email'
-                        , name: 'email'
-                    }
-                    ,
-                    {
-                        data: 'role'
-                        , name: 'role.role'
+                processing: true,
+                serverSide: true,
+                ajax: "{{ route('UPPS.user.json') }}",
+                columns: [{
+                        data: 'DT_RowIndex',
+                        name: 'DT_RowIndex',
+                    }, {
+                        data: 'nama',
+                        name: 'nama'
+                    }, {
+                        data: 'email',
+                        name: 'email'
                     },
                     {
-                        data: 'action'
-                        , name: 'action'
-                        , orderable: false
-                        , searchable: false
+                        data: 'role',
+                        name: 'role.role'
+                    },
+                    {
+                        data: 'action',
+                        name: 'action',
+                        orderable: false,
+                        searchable: false
                     }
-                ]
-            , })
+                ],
+            })
         })
 
         $("body").on('click', ".btn-edit", function() {
@@ -193,7 +195,7 @@
             $("#formActionEdit").attr("action", $(this).data("url"))
             $.ajax({
                 url: url
-                , type: "post"
+                , type: "get"
                 , success: function(data) {
                     $("#formEdit").html(data)
                 }
@@ -204,52 +206,50 @@
             let id = $(this).data('id')
             let route = $(this).data('route')
             swal({
-                title: 'Konfirmasi hapus data  User?'
-                , html: `Data User akan dihapus!`
-                , icon: 'warning'
-                , showCancelButton: true
-                , confirmButtonText: 'Hapus!'
-                , buttons: true
-                , dangerMode: true,
+                title: 'Konfirmasi hapus data  User?',
+                html: `Data User akan dihapus!`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Hapus!',
+                buttons: true,
+                dangerMode: true,
             }).then((willDelete) => {
                 console.log(willDelete);
                 if (willDelete) {
                     const response = $.ajax({
-                    url: route
-                    , method: 'DELETE'
-                    , data: {
-                        _token: "{{ csrf_token() }}"
-                        , id: id
-                    , }
-                }).catch(() => {
-                    swal({
-                        title: 'Terjadi kesalahan!'
-                        , text: 'Server Error'
-                        , icon: 'error'
+                        url: route,
+                        method: 'DELETE',
+                        data: {
+                            _token: "{{ csrf_token() }}",
+                            id: id,
+                        }
+                    }).catch(() => {
+                        swal({
+                            title: 'Terjadi kesalahan!',
+                            text: 'Server Error',
+                            icon: 'error'
+                        })
                     })
-                })
-                if (!response) return;
+                    if (!response) return;
 
-                const success = swal({
-                    title: 'Berhasil!'
-                    , text: "User berhasil dihapus"
-                    , icon: 'success'
-                , }).then((response) => {
+                    const success = swal({
+                        title: 'Berhasil!',
+                        text: "User berhasil dihapus",
+                        icon: 'success',
+                    }).then((response) => {
 
-                    window.location.reload()
-                })
+                        window.location.reload()
+                    })
                 }
 
             })
         })
-
     </script>
     <footer class="main-footer">
         @include('footer')
         <div class="footer-right">
         </div>
     </footer>
-    </div>
 
 </body>
 

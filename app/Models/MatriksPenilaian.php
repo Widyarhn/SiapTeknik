@@ -20,27 +20,31 @@ class MatriksPenilaian extends Model
 
     public function kriteria()
     {
-        return $this->belongsTo(Kriteria::class);
+        return $this->belongsTo(Kriteria::class, 'kriteria_id');
     }
     
     public function sub_kriteria()
     {
-        return $this->belongsTo(SubKriteria::class);
+        return $this->belongsTo(SubKriteria::class, 'sub_kriteria_id');
     }
 
     public function indikator()
     {
-        return $this->belongsTo(Indikator::class);
+        return $this->belongsTo(Indikator::class, 'indikator_id');
     }
 
-    public function aspek_penilaian()
+    public function asesmen_kecukupan()
     {
-        return $this->hasMany(AspekPenilaian::class);
+        return $this->hasOne(AsesmenKecukupan::class);
+    }
+
+    public function asesmen_lapangan()
+    {
+        return $this->hasOne(AsesmenLapangan::class);
     }
 
     public function data_dukung()
     {
-        return $this->hasOne(DataDukung::class);
+        return $this->hasMany(DataDukung::class);
     }
-
 }

@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta content="width=device-width, initial-scale=1, maximum-scale=1, shrink-to-fit=no" name="viewport">
-    <title>Program Studi | Elemen Data Dukung {{$program_studi->jenjang->jenjang}} {{$program_studi->jenjang->jenjang}} {{$program_studi->nama}} </title>
+    <title>Program Studi | Elemen Data Dukung {{$program_studi->jenjang->jenjang}} {{$program_studi->nama}} </title>
     @include('body')
 </head>
 <body>
@@ -24,7 +24,7 @@
                         <h1>Elemen Data Dukung {{$program_studi->jenjang->jenjang}} {{$program_studi->nama}} </h1>
                         <div class="section-header-breadcrumb">
                             <div class="breadcrumb-item active"><a href="{{ url('dashboard-prodi') }}">Dashboard</a></div>
-                            <div class="breadcrumb-item">Elemen Data Dukung {{$program_studi->jenjang->jenjang}} {{$program_studi->nama}} </div>
+                            <div class="breadcrumb-item">Elemen Data Dukung</div>
                         </div>
                     </div>
                     <div class="section-body">

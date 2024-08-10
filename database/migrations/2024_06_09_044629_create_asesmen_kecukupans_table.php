@@ -1,13 +1,16 @@
 <?php
 
 use App\Models\AspekPenilaian;
+use App\Models\MatriksPenilaian;
+use App\Models\ProgramStudi;
+use App\Models\Tahun;
 use App\Models\Timeline;
 use App\Models\UserAsesor;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateDeskEvaluasisTable extends Migration
+class CreateAsesmenKecukupansTable extends Migration
 {
     /**
      * Run the migrations.
@@ -16,9 +19,9 @@ class CreateDeskEvaluasisTable extends Migration
      */
     public function up()
     {
-        Schema::create('desk_evaluasis', function (Blueprint $table) {
+        Schema::create('asesmen_kecukupans', function (Blueprint $table) {
             $table->id();
-            $table->foreignIdFor(AspekPenilaian::class)->nullable();
+            $table->foreignIdFor(MatriksPenilaian::class)->nullable();
             $table->foreignIdFor(UserAsesor::class)->nullable();
             $table->foreignIdFor(Timeline::class)->nullable();
             $table->float('nilai');
@@ -35,6 +38,6 @@ class CreateDeskEvaluasisTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('desk_evaluasis');
+        Schema::dropIfExists('asesmen_kecukupans');
     }
 }

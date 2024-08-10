@@ -1,13 +1,13 @@
 <?php
-
-use App\Models\ListLkps;
+use App\Models\Jenjang;
 use App\Models\ProgramStudi;
 use App\Models\Tahun;
+use App\Models\Timeline;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateListDocumentsTable extends Migration
+class CreateBeritaAcarasTable extends Migration
 {
     /**
      * Run the migrations.
@@ -16,12 +16,13 @@ class CreateListDocumentsTable extends Migration
      */
     public function up()
     {
-        Schema::create('list_documents', function (Blueprint $table) {
+        Schema::create('berita_acaras', function (Blueprint $table) {
             $table->id();
             $table->foreignIdFor(ProgramStudi::class)->nullable();
             $table->foreignIdFor(Tahun::class)->nullable();
-            $table->foreignIdFor(ListLkps::class)->nullable();
-            $table->string('nama_dokumen');
+            $table->string('file');
+            $table->enum('status', ['0', '1', '2'])->default('0');
+            $table->text('keterangan')->nullable();
             $table->timestamps();
         });
     }
@@ -33,6 +34,6 @@ class CreateListDocumentsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('list_documents');
+        Schema::dropIfExists('berita_acaras');
     }
 }

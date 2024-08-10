@@ -15,8 +15,8 @@ class CreateTahunsTable extends Migration
     {
         Schema::create('tahuns', function (Blueprint $table) {
             $table->id();
-            $table->string('tahun');
-            $table->boolean('is_active')->default(false);
+            $table->char('tahun', 4);
+            $table->boolean('is_active')->default(true);
             $table->date('mulai_akreditasi');
             $table->date('akhir_akreditasi')->nullable();
             $table->timestamps();
