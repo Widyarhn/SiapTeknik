@@ -17,6 +17,7 @@ class CreateKriteriasTable extends Migration
             $table->id();
             $table->string('kriteria');
             $table->string('butir');
+            $table->boolean('kuantitatif')->default(false);
             $table->timestamps();
         });
     }

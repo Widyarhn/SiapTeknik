@@ -150,25 +150,25 @@ Route::group(["middleware" => ["autentikasi"]], function () {
         Route::post('dashboard-asesor/berita-acara/deskEval', [DashboardAsesorController::class, 'deskEval'])->name('dashboard-asesor.berita-acara.deskEval');
         Route::post('dashboard-asesor/berita-acara/asesmenLapangan', [DashboardAsesorController::class, 'asesmenLapangan'])->name('dashboard-asesor.berita-acara.asesmenLapangan');
         Route::resource('dashboard-asesor', DashboardAsesorController::class);
-    
+
         Route::get('instrumen-asesor/instrumen/{id}', [InstrumenAsesorController::class, 'instrumen'])->name('instrumen-asesor.instrumen');
-        
+
         Route::get('asesor-ajuanprodi/getLkps/{id_prodi}', [AjuanAsesorController::class, 'getLkps'])->name('asesor-ajuanprodi.getLkps');
         Route::get('asesor-ajuanprodi/prodi/{id_prodi}', [AjuanAsesorController::class, 'prodi'])->name('asesor-ajuanprodi.prodi');
-        
+
         Route::get('datadukung-d3/download/{id}', [DataDukungAsesorController::class, 'download'])->name('asesor.data-prodi.data-dukung.download');
         Route::get('datadukung-d3/json/{id_prodi}', [DataDukungAsesorController::class, 'json'])->name('asesor.data-prodi.data-dukung.json');
         Route::get('datadukung-d3/show/{id}', [DataDukungAsesorController::class, 'show'])->name('asesor.data-prodi.data-dukung.show');
         Route::resource('datadukung-d3', DataDukungAsesorController::class);
-        
+
         Route::get('rekap-nilaid3/store', [RekapPenilaianController::class, 'store'])->name('rekap-nilaid3.store');
-        
+
         Route::get('rekap-nilaiAk/json/{id_prodi}', [RekapPenilaianController::class, 'json'])->name('rekap-nilaiAk.json');
         Route::get('rekap-nilaiAl/json/{id_prodi}', [RekapPenilaianController::class, 'jsonAkhir'])->name('rekap-nilaiAl.jsonAkhir');
         Route::get('rekap-nilaiAk/prodi/{id_prodi}', [RekapPenilaianController::class, 'prodi'])->name('rekap-nilaiAk.prodi');
         Route::get('rekap-nilaiAl/prodi/{id_prodi}', [RekapPenilaianController::class, 'prodiasesmen'])->name('rekap-nilaiAl.prodi');
         Route::resource('rekap-nilai', RekapPenilaianController::class);
-        
+
         Route::post('nilai-asesmen-kecukupan/store', [NilaiDeskEvalController::class, 'store'])->name('asesmen-kecukupan.store');
         Route::post('nilai-asesmen-kecukupan/calculate/{id}', [NilaiDeskEvalController::class, 'calculateItem'])->name('asesmen-kecukupan.calculate');
         Route::get('nilai-asesmen-kecukupan/json/{id}', [NilaiDeskEvalController::class, 'json'])->name('asesmen-kecukupan.json');
@@ -176,18 +176,18 @@ Route::group(["middleware" => ["autentikasi"]], function () {
         Route::post('nilai-asesmen-kecukupan/update/{id}', [NilaiDeskEvalController::class, 'update'])->name('asesor.penilaian.asesmen-kecukupan.update');
         Route::get('nilai-asesmen-kecukupan/elemen/{id_prodi}', [NilaiDeskEvalController::class, 'elemen'])->name('asesor.penilaian.asesmen-kecukupan.elemen');
         Route::resource('nilai-asesmen-kecukupan', NilaiDeskEvalController::class);
-        
+
         Route::post('nilai-asesmenlapangan/store', [NilaiAsesmenLapanganD3Controller::class, 'store'])->name('nilai-asesmenlapangan.store');
         Route::post('nilai-asesmenlapangan/update/{id}', [NilaiAsesmenLapanganD3Controller::class, 'update'])->name('nilai-asesmenlapangan.update');
         Route::get('nilai-asesmenlapangan/json/{id}', [NilaiAsesmenLapanganD3Controller::class, 'json'])->name('nilai-asesmenlapangan.json');
         Route::get('nilai-asesmenlapangan/elemen/{id_prodi}', [NilaiAsesmenLapanganD3Controller::class, 'elemen'])->name('nilai-asesmenlapangan.elemen');
         Route::get('nilai-asesmenlapangan/show/{id}/{id_prodi}', [NilaiAsesmenLapanganD3Controller::class, 'show'])->name('asesor.penilaian.asesmen-lapangan.show');
         Route::resource('nilai-asesmenlapangan', NilaiAsesmenLapanganD3Controller::class);
-        
+
         Route::get('nilai-perelemen/jsonBagian/{id}', [NilaiController::class, 'jsonBagian'])->name('nilai-perelemen.jsonBagian');
         Route::get('nilai-perelemen/{id}', [NilaiController::class, 'bagian'])->name('nilai-perelemen.bagian');
         Route::resource('nilai-akreditasi', NilaiController::class);
-        
+
         Route::get('nilai-deskeval/history/{id_prodi}', [NilaiDeskEvalController::class, 'history'])->name('asesor.nilai-deskeval.history');
         Route::get('nilai-deskeval/jsonHistory/{id_prodi}', [NilaiDeskEvalController::class, 'jsonHistory'])->name('asesor.nilai-deskeval.jsonHistory');
     });
@@ -200,7 +200,7 @@ Route::group(["middleware" => ["autentikasi"]], function () {
         Route::get('instrumen-prodi/json/{id_jenjang}', [InstrumenProdiController::class, 'json'])->name('prodi.instrumen.json');
         Route::get('instrumen-prodi/download/{id}', [InstrumenProdiController::class, 'download'])->name('prodi.instrumen.download');
         Route::resource('instrumen-prodi', InstrumenProdiController::class);
-        
+
         /** Dokumen Ajuan Prodi */
         Route::get('ajuan-prodi/downloadlkps/{id}', [AjuanProdiController::class, 'downloadlkps'])->name('ajuan-prodi.downloadlkps');
         Route::post('ajuan-prodi/import-lkps/{id_prodi}', [AjuanProdiController::class, 'importLkps'])->name('ajuan-prodi.importLkps');
@@ -213,19 +213,24 @@ Route::group(["middleware" => ["autentikasi"]], function () {
         Route::get('ajuan-prodi/prodi/{id_prodi}', [AjuanProdiController::class, 'prodi'])->name('ajuan-prodi.prodi');
         Route::post('ajuan-prodi/prodi/ajukan', [AjuanProdiController::class, 'ajukan'])->name('ajuan-prodi.ajukan');
         Route::get('ajuan-prodi/history/{id_prodi}', [AjuanProdiController::class, 'history'])->name('ajuan-prodi.history');
-        
+
         // Route::resource('ajuan-prodi', AjuanProdiController::class);
         /**data dukung prodi */
-        Route::get('data-dukung/dataHistory/{id}/{id_prodi}', [DataDukungProdiController::class, 'dataHistory'])->name('prodi.data-dukung.dataHistory');
-        Route::get('data-dukung/elemenHistory/{id}', [DataDukungProdiController::class, 'elemenHistory'])->name('prodi.data-dukung.elemenHistory');
-        Route::get('data-dukung/jsonHistory/{id_prodi}', [DataDukungProdiController::class, 'jsonHistory'])->name('prodi.data-dukung.jsonHistory');
-        Route::get('data-dukung/history/{id_prodi}', [DataDukungProdiController::class, 'history'])->name('prodi.data-dukung.history');
-        Route::put('data-dukung/update/{id}', [DataDukungProdiController::class, 'update'])->name('prodi.data-dukung.update');
+        // Route::get('data-dukung/dataHistory/{id}/{id_prodi}', [DataDukungProdiController::class, 'dataHistory'])->name('prodi.data-dukung.dataHistory');
+        // Route::get('data-dukung/elemenHistory/{id}', [DataDukungProdiController::class, 'elemenHistory'])->name('prodi.data-dukung.elemenHistory');
+        // Route::get('data-dukung/jsonHistory/{id_prodi}', [DataDukungProdiController::class, 'jsonHistory'])->name('prodi.data-dukung.jsonHistory');
+        // Route::put('data-dukung/update/{id}', [DataDukungProdiController::class, 'update'])->name('prodi.data-dukung.update');
+        // Route::get('data-dukung/history/{id_prodi}', [DataDukungProdiController::class, 'history'])->name('prodi.data-dukung.history');
+    
+        Route::get('data-dukung/fetch/{id}', [DataDukungProdiController::class, 'fetch'])->name('prodi.data-dukung.fetch');
+        Route::put('data-dukung/update', [DataDukungProdiController::class, 'update'])->name('prodi.data-dukung.update');
+        Route::delete('data-dukung/delete', [DataDukungProdiController::class, 'delete'])->name('prodi.data-dukung.delete');
         Route::post('data-dukung/store', [DataDukungProdiController::class, 'store'])->name('prodi.data-dukung.store');
-        Route::get('data-dukung/data/{id}/{id_prodi}/{tahun}', [DataDukungProdiController::class, 'data'])->name('prodi.data-dukung.data');
+        Route::get('data-dukung/{id}/{id_prodi}/{tahun}', [DataDukungProdiController::class, 'data'])->name('prodi.data-dukung.data');
         Route::get('data-dukung/json/{id_prodi}', [DataDukungProdiController::class, 'json'])->name('prodi.data-dukung.json');
         Route::get('data-dukung/elemen/{id}', [DataDukungProdiController::class, 'elemen'])->name('prodi.data-dukung.elemen');
         Route::resource('data-dukung', DataDukungProdiController::class);
+
         /**nilai prodi */
         Route::get('nilai-d3/json', [NilaiProdiController::class, 'json'])->name('prodi.diploma-tiga.nilai.json');
         Route::resource('nilai-d3', NilaiProdiController::class);

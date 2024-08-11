@@ -16,9 +16,11 @@ return new class extends Migration
             $table->id();
             $table->foreignIdFor(ProgramStudi::class)->nullable();
             $table->string('label');
-            $table->string('sheet_name');
-            $table->string('cell');
-            $table->string('nilai');
+            $table->string('sheet_name')->nullable();
+            $table->string('cell')->nullable();
+            $table->string('nilai')->nullable();
+            $table->string('file')->nullable();
+            $table->string('display_name')->nullable();
             $table->timestamps();
         });
     }

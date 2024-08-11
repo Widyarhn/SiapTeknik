@@ -560,7 +560,7 @@ class AkreditasiController extends Controller
             }
         } catch (\Exception $e) {
             // Debugging jika terjadi error
-            dd($e->getMessage(), $ind, $matrixs);
+            dd($e->getMessage(), $matrixs);
         }
 
         // Menggabungkan data yang akan dikirim ke view

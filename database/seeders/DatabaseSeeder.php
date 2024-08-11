@@ -21,5 +21,6 @@ class DatabaseSeeder extends Seeder
         $this->call(KriteriaSeeder::class);
         $this->call(ProgramStudiSeeder::class);
         $this->call(RoleSeeder::class);
+        $this->call(LabelSeeder::class);
     }
 }

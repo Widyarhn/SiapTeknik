@@ -20,4 +20,8 @@ class SubKriteria extends Model
     {
         return $this->hasMany('App\Models\Indikator');
     }
+    public function rumus()
+    {
+        return $this->hasOne(Rumus::class);
+    }
 }

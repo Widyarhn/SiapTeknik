@@ -120,9 +120,16 @@
                                                                     <div class="badge badge-primary"> File data
                                                                         dukung </div>
                                                                 </th>
-                                                                @if ($m->data)
-                                                                    <td><a href="{{ url('storage/data_dukung/', $m->data->file) }}"
-                                                                            target="_blank">{{ $m->data->file }}</a>
+                                                                @if ($m->data_dukung->isNotEmpty())
+                                                                    <td>
+                                                                        <ul>
+                                                                            @foreach ($m->data_dukung as $data)
+                                                                                <li>
+                                                                                    <a href="{{ Storage::url($data->file) }}"
+                                                                                        target="_blank">{{ basename($data->nama) }}</a>
+                                                                                </li>
+                                                                            @endforeach
+                                                                        </ul>
                                                                     </td>
                                                                 @else
                                                                     <th> Belum ada file yang diupload</th>
@@ -175,7 +182,8 @@
                                                                             value="{{ $user_asesor->timeline->id }}" />
                                                                         <input type="text" placeholder="1-4"
                                                                             name="nilai"
-                                                                            class="form-control text-center" id="{{ $m->indikator->no_butir }}">
+                                                                            class="form-control text-center"
+                                                                            id="{{ $m->indikator->no_butir }}">
                                                                     </td>
                                                                 </tr>
                                                                 <tr>
@@ -224,7 +232,8 @@
                                                                             <input type="text" placeholder="1-4"
                                                                                 name="nilai"
                                                                                 value="{{ $m->asesmen_kecukupan->nilai }}"
-                                                                                class="form-control text-center" id="{{ $m->indikator->no_butir }}"/>
+                                                                                class="form-control text-center"
+                                                                                id="{{ $m->indikator->no_butir }}" />
                                                                         </td>
                                                                     </tr>
                                                                     <tr>
@@ -270,7 +279,8 @@
                                                                                 value="{{ $user_asesor->timeline->id }}" />
                                                                             <input type="text" placeholder="1-4"
                                                                                 name="nilai"
-                                                                                class="form-control text-center" id="{{ $m->indikator->no_butir }}">
+                                                                                class="form-control text-center"
+                                                                                id="{{ $m->indikator->no_butir }}">
                                                                         </td>
                                                                     </tr>
                                                                     <tr>
@@ -327,7 +337,8 @@
                                                         class="btn btn-secondary"><i class="fa fa-chevron-left"></i>
                                                         Kembali</a>
                                                 </div>
-                                                <button id="btn-save" class="btn {{ empty($m->asesmen_kecukupan) ? 'btn-secondary': 'btn-primary'}}">Simpan</button>
+                                                <button id="btn-save"
+                                                    class="btn {{ empty($m->asesmen_kecukupan) ? 'btn-secondary' : 'btn-primary' }}">Simpan</button>
                                             </div>
                                         </div>
                                     </div>
@@ -340,45 +351,151 @@
             </div>
         </div>
     </div>
+    @php
+        // Periksa apakah $matriks tidak kosong
+        if (!empty($matriks) && isset($matriks[0])) {
+            $kriteriaId = $matriks[0]->kriteria_id;
+        } else {
+            // Tangani kasus di mana $matriks kosong
+            $kriteriaId = null;
+        }
+    @endphp
     <script>
         var matriks = @json($matriks);
-        $(document).ready(function(){
-            $('#btn-save').click(function(e){
+
+        $(document).ready(function() {
+            $('#btn-save').click(function(e) {
                 e.preventDefault();
-                var data = {}; 
+                var data = {};
+
+                // Kelompokkan data berdasarkan rumus_id
                 $.each(matriks, function(index, matrik) {
-                    var key = matrik.indikator.no_butir.replace('.', '');
-                    if (matrik.indikator.rumus_id != null ) {
-                        data[key] = matrik.asesmen_kecukupan.nilai
+                    var noButir = matrik.indikator.no_butir;
+                    var rumus_id = matrik.indikator.rumus_id;
+                    var nilai = matrik.asesmen_kecukupan ? matrik.asesmen_kecukupan.nilai : null;
+
+                    // Cek jika noButir tidak null atau tidak undefined
+                    if (noButir !== null && noButir !== undefined) {
+                        var key = noButir.replace('.', '');
+
+                        // Inisialisasi array untuk rumus_id jika belum ada
+                        if (!data[rumus_id]) {
+                            data[rumus_id] = {};
+                        }
+
+                        // Simpan nilai berdasarkan key
+                        data[rumus_id][key] = nilai;
                     }
                 });
 
+                console.log('Data yang dikirim:', data); // Log data sebelum dikirim
+
                 var csrfToken = $('meta[name="csrf-token"]').attr('content');
-                
+
                 $.ajaxSetup({
                     headers: {
                         'X-CSRF-TOKEN': csrfToken
                     }
                 });
 
-                console.log(data);
+                @if ($kriteriaId)
+                    $.ajax({
+                        url: `{{ route('asesmen-kecukupan.calculate', $kriteriaId) }}`,
+                        type: 'POST',
+                        data: data,
+                        dataType: 'json',
+                        success: function(response) {
+                            console.log('Response dari server:', response);
+                            swal({
+                                title: 'Berhasil!',
+                                text: "Data berhasil disimpan.",
+                                icon: 'success',
+                            }).then(() => {
+                                // Tindakan setelah berhasil
+                            });
+                        },
+                        error: function(jqXHR, textStatus, errorThrown) {
+                            console.error('Terjadi kesalahan:', textStatus, errorThrown);
+                        }
+                    });
+                @else
+                    console.error('Matriks kosong atau tidak valid.');
+                @endif
                 
-                $.ajax({
-                    url: `{{ route('asesmen-kecukupan.calculate', $matriks[0]->kriteria_id) }}`,
-                    type: 'POST',
-                    data: data, // Convert data to JSON string
-                    dataType: 'json',
-                    success: function(response) {
-                        console.log('Data berhasil dikirim', response);
-                    },
-                    error: function(data) {
-                        console.error(data);
-                    }
-                });
             });
-        })
+        });
     </script>
+
+
+
+
+
+
+    {{-- <script> 
+        // var matriks = @json($matriks);
+        // $(document).ready(function() {
+        // $('#btn-save').click(function(e) {
+        // e.preventDefault();
+        // var data = {};
+        // $.each(matriks, function(index, matrik) {
+        // var key = matrik.indikator.no_butir.replace('.', '');
+        // if (matrik.indikator.rumus_id != null) {
+        // data[key] = matrik.asesmen_kecukupan.nilai
+        // }
+        // });
+
+        // var csrfToken = $('meta[name="csrf-token"]').attr('content');
+
+        // $.ajaxSetup({
+        // headers: {
+        // 'X-CSRF-TOKEN': csrfToken
+        // }
+        // });
+
+        // console.log(data);
+
+        // $.ajax({
+        // url: `{{ route('asesmen-kecukupan.calculate', $matriks[0]->kriteria_id) }}`,
+        // type: 'POST',
+        // data: data, // Convert data to JSON string
+        // dataType: 'json',
+        // success: function(response) {
+        // console.log('Data berhasil dikirim', response);
+        // },
+        // error: function(data) {
+        // console.error(data);
+        // }
+        // });
+        // });
+        // })
+
+    {{-- </script> --}}
 </body>
 </head>
 
 </html>
+{{-- // $.ajax({
+                //     url: `{{ route('asesmen-kecukupan.calculate', $matriks[0]->kriteria_id) }}`,
+                //     type: 'POST',
+                //     data: data,
+                //     dataType: 'json',
+                //     success: function(response) {
+                //         console.log('Response dari server:', response); // Log respons server
+                //         swal({
+                //             title: 'Berhasil!',
+                //             text: "Data berhasil disimpan.",
+                //             icon: 'success',
+                //         }).then(() => {
+                //             window.location.reload();
+                //         });
+                //     },
+                //     error: function(xhr, status, error) {
+                //         console.error('Error:', error); // Log error
+                //         console.error('Response text:', xhr.responseText); // Log respons text
+                //         swal({
+                //             title: 'Terjadi kesalahan!',
+                //             text: 'Server Error',
+                //             icon: 'error'
+                //         });
+                //     }
+                // }); --}}

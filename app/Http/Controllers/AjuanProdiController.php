@@ -2,24 +2,26 @@
 
 namespace App\Http\Controllers;
 
-use App\Imports\CustomImportLkps;
-use App\Models\Lkps;
-use App\Models\DokumenAjuan;
-use App\Models\ImportLkps;
-use App\Models\Kriteria;
-use App\Models\Led;
-use App\Models\ListDocument;
-use App\Models\ListLkps;
-use App\Models\PengajuanDokumen;
-use App\Models\Tahun;
-use Illuminate\Support\Facades\DB;
-use App\Models\ProgramStudi;
-use App\Models\SuratPengantar;
-use App\Models\UserProdi;
 use Carbon\Carbon;
+use App\Models\Led;
+use App\Models\Lkps;
+use App\Models\Tahun;
+use App\Models\Kriteria;
+use App\Models\ListLkps;
+use App\Models\UserProdi;
+use App\Models\ImportLkps;
+use App\Models\DokumenAjuan;
+use App\Models\ListDocument;
+use App\Models\ProgramStudi;
 use Illuminate\Http\Request;
+use App\Models\SuratPengantar;
+use App\Models\PengajuanDokumen;
+use App\Imports\CustomImportLkps;
+use App\Imports\LabelsImportLkps;
+use Illuminate\Support\Facades\DB;
 // use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
+use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Storage;
 
 class AjuanProdiController extends Controller
@@ -41,7 +43,7 @@ class AjuanProdiController extends Controller
                 $query->where('is_active', true);
             });
         }])->where('status',1 )->first();
-        $kriteria = Kriteria::get();
+        $kriteria = Kriteria::where('kuantitatif', 1)->get();
         $importLkps = ImportLkps::with('kriteria')->get();
 
         return view('prodi.dokumen.ajuan.index', [
@@ -286,6 +288,40 @@ class AjuanProdiController extends Controller
     //     return back()->with('success', 'Data imported and file saved successfully.');
     // }
 
+    // public function importLkps(Request $request)
+    // {
+    //     $request->validate([
+    //         'file' => 'required|mimes:xlsx,csv',
+    //         'id_prodi' => 'required|exists:program_studies,id',
+    //         'id_kriteria' => 'required|exists:kriterias,id',
+    //     ]);
+    //     // dd($request);
+        
+    //     try {
+    //         if($request->file('file')){
+    //             $file = $request->file('file');
+    //             // $fileName = $file->getClientOriginalName();
+    //             // $filePath = $file->storeAs('dok-import/d3', $fileName, 'public');
+    //             // dd(Storage::disk('public')->path($filePath));
+
+    //             // // Pastikan Storage telah diimpor dengan benar
+    //             // $fullPath = Storage::disk('public')->path($filePath);
+    //             // $fileContent = Storage::disk('public')->get($filePath);
+
+    //             // Buat instance dari CustomImportLkps dan panggil metode import
+    //             $importer = new CustomImportLkps();
+    //             $importer->import($file, $request->id_prodi, $request->id_kriteria);
+
+
+    //             return back()->with('success', 'Data imported and file saved successfully.');
+    //         }
+    //         return back()->with('error', 'Terjadi kesalahan');
+            
+    //     } catch (\Exception $e) {
+    //         return back()->with('error', 'Terjadi kesalahan saat mengimpor data: ' . $e->getMessage());
+    //     }
+    // }
+
     public function importLkps(Request $request)
     {
         $request->validate([
@@ -297,20 +333,7 @@ class AjuanProdiController extends Controller
         
         try {
             if($request->file('file')){
-                $file = $request->file('file');
-                // $fileName = $file->getClientOriginalName();
-                // $filePath = $file->storeAs('dok-import/d3', $fileName, 'public');
-                // dd(Storage::disk('public')->path($filePath));
-
-                // // Pastikan Storage telah diimpor dengan benar
-                // $fullPath = Storage::disk('public')->path($filePath);
-                // $fileContent = Storage::disk('public')->get($filePath);
-
-                // Buat instance dari CustomImportLkps dan panggil metode import
-                $importer = new CustomImportLkps();
-                $importer->import($file, $request->id_prodi, $request->id_kriteria);
-
-
+                Excel::import(new LabelsImportLkps, $request->file('file')->store('dok-import/d3', 'public'));
                 return back()->with('success', 'Data imported and file saved successfully.');
             }
             return back()->with('error', 'Terjadi kesalahan');

@@ -6,7 +6,6 @@ use App\Models\Rumus;
 use App\Models\Kriteria;
 use App\Models\UserAsesor;
 use App\Models\SubKriteria;
-use App\Models\DeskEvaluasi;
 use App\Models\ProgramStudi;
 use Illuminate\Http\Request;
 use App\Models\AsesmenKecukupan;
@@ -31,7 +30,7 @@ class NilaiDeskEvalController extends Controller
 
         ];
         $user_asesor = UserAsesor::with('tahun')->where("user_id", Auth::user()->id)->where("program_studi_id", $id_prodi)->first();
-        
+
         $program_studi = ProgramStudi::findOrFail($id_prodi);
         return view('asesor.penilaian.desk-evaluasi.index', $data,  ['program_studi' => $program_studi, 'user_asesor' => $user_asesor]);
     }
@@ -68,7 +67,7 @@ class NilaiDeskEvalController extends Controller
         // $matrixId = AsesmenKecukupan::where('user_asesor_id', Auth::user()->user_asesor->id)->pluck('matriks_penilaian_id');
         // $matrixs = MatriksPenilaian::whereIn('id', $matrixId)->get();
 
-        $matriks = MatriksPenilaian::with(['jenjang', 'kriteria', 'sub_kriteria', 'indikator'])->orderBy('kriteria_id', 'ASC')
+        $matriks = MatriksPenilaian::with(['jenjang', 'kriteria', 'sub_kriteria', 'indikator', 'data_dukung'])->orderBy('kriteria_id', 'ASC')
             ->where("jenjang_id", $user_asesor->jenjang_id)
             ->where("kriteria_id", $id)
             ->get();
@@ -141,7 +140,7 @@ class NilaiDeskEvalController extends Controller
             ]
         );
 
-        $desk_evaluasi = Deskevaluasi::find($id);
+        $desk_evaluasi = AsesmenKecukupan::find($id);
         $desk_evaluasi->nilai = $request->nilai;
         $desk_evaluasi->deskripsi = $request->deskripsi;
         $desk_evaluasi->program_studi_id = $request->program_studi_id;
@@ -160,15 +159,15 @@ class NilaiDeskEvalController extends Controller
         $kriteria = Kriteria::first();
         $matriks_penilaian = MatriksPenilaian::get();
         $program_studi = ProgramStudi::findOrFail($id_prodi);
-        $matriks = DeskEvaluasi::where("matriks_penilaian_id", "!=", null)->get();
-        $suplemen = DeskEvaluasi::where("suplemen_id", "!=", null)->get();
+        $matriks = AsesmenKecukupan::where("matriks_penilaian_id", "!=", null)->get();
+        $suplemen = AsesmenKecukupan::where("suplemen_id", "!=", null)->get();
 
         return view('asesor.rekap-penilaian.history.desk-evaluasi', ['user_asesor' => $user_asesor, 'program_studi' => $program_studi, 'matriks_penilaian' => $matriks_penilaian, "matriks" => $matriks, "suplemen" => $suplemen]);
     }
 
     public function jsonHistory(Request $request, $id_prodi)
     {
-        // $data = DeskEvaluasi::with('matriks_penilaian.kriteria')->where('program_studi_id', $id_prodi)->get();
+        // $data = AsesmenKecukupan::with('matriks_penilaian.kriteria')->where('program_studi_id', $id_prodi)->get();
         $kriteria = Kriteria::first();
         $program_studi = ProgramStudi::findOrFail($id_prodi);
         $matriks_penilaian = MatriksPenilaian::get();
@@ -176,7 +175,7 @@ class NilaiDeskEvalController extends Controller
 
         $user_asesor = UserAsesor::where("user_id", Auth::user()->id)->first();
 
-        $data = DeskEvaluasi::where('program_studi_id', $user_asesor->program_studi_id)
+        $data = AsesmenKecukupan::where('program_studi_id', $user_asesor->program_studi_id)
             ->where("tahun_id", $user_asesor->tahun_id)
             ->with(["matriks_penilaian", "suplemen"])
             ->get();
@@ -224,34 +223,76 @@ class NilaiDeskEvalController extends Controller
             ->rawColumns(['butir', 'deskripsi', 'nilai', 'nilai_bobot'])
             ->make(true);
     }
+    public function calculateItem(Request $request, string $id_kriteria)
+    {
+        try {
+            $sub_kriteria_ids = SubKriteria::where('kriteria_id', $id_kriteria)->pluck('id')->toArray();
+            $rumuses = Rumus::whereIn('sub_kriteria_id', $sub_kriteria_ids)->get();
+            $processedRumusIds = [];
 
-    public function calculateItem(Request $request, string $id_kriteria){
-        try{
-            $sub_kriteria_id = SubKriteria::where('kriteria_id', $id_kriteria)->pluck('id')->first();
+            foreach ($rumuses as $rumus) {
+                $rumus_id = $rumus->id;  
+                $variables = $request->get($rumus_id, []);  
 
-            $rumus = Rumus::where('sub_kriteria_id', $sub_kriteria_id)->first();
-            $persamaan = $rumus->rumus;
-            
-            $variables = $request->except('_token');
-
-            $result = $this->evaluator->evaluate($persamaan, $variables);
-
-            $rumus->t_butir = floatval($result['result']);
-            $rumus->save();
-
+                if (is_array($variables) && !empty($variables)) {
+                    if (!in_array($rumus_id, $processedRumusIds)) {
+                        $persamaan = $rumus->rumus;
+                        $result = $this->evaluator->evaluate($persamaan, $variables);
+                        $rumus->t_butir = floatval($result['result']);
+                        $rumus->save();
+                        $processedRumusIds[] = $rumus_id;
+                    } else {
+                        return redirect()->back()->with('error', 'Rumus_id sudah diproses: ' . $rumus_id);
+                    }
+                } else {
+                    return redirect()->back()->with('error', 'Data variabel tidak valid atau kosong untuk rumus_id: ' . $rumus_id);
+                }
+            }
             return response()->json([
-                'success'=> true,
+                'success' => true,
                 'message' => 'Berhasil menyimpan data',
             ]);
-
-        }catch(\Exception $e){
-            dd($e->getMessage());
-            // return response()->json([
-            //     'success'=> false,
-            //     'message' => $e->getMessage(),
-            // ], 500);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ], 500);
         }
-        
-
     }
+
+
+
+
+
+
+
+    // public function calculateItem(Request $request, string $id_kriteria){
+    //     try{
+    //         $sub_kriteria_id = SubKriteria::where('kriteria_id', $id_kriteria)->pluck('id')->first();
+
+    //         $rumus = Rumus::where('sub_kriteria_id', $sub_kriteria_id)->first();
+    //         $persamaan = $rumus->rumus;
+
+    //         $variables = $request->except('_token');
+
+    //         $result = $this->evaluator->evaluate($persamaan, $variables);
+
+    //         $rumus->t_butir = floatval($result['result']);
+    //         $rumus->save();
+
+    //         return response()->json([
+    //             'success'=> true,
+    //             'message' => 'Berhasil menyimpan data',
+    //         ]);
+
+    //     }catch(\Exception $e){
+    //         dd($e->getMessage());
+    //         // return response()->json([
+    //         //     'success'=> false,
+    //         //     'message' => $e->getMessage(),
+    //         // ], 500);
+    //     }
+
+
+    // }
 }

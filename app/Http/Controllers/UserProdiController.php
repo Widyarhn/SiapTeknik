@@ -94,7 +94,7 @@ class UserProdiController extends Controller
         $user_prodi = UserProdi::find($id);
         $user = User::where('role_id', '2')->get();
         $tahun = Tahun::where('is_active', 0)->get();
-        $program_studi = ProgramStudi::get();
+        $program_studi = ProgramStudi::where('jenjang_id', $user_prodi->jenjang_id)->get();
         return view('UPPS.user.edit-userprodi',compact('user_prodi', 'user', 'tahun', 'program_studi'));
     }
 

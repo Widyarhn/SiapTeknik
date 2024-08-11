@@ -39,7 +39,7 @@ class RekapPenilaianController extends Controller
             }
         } catch (\Exception $e) {
             // Debugging jika terjadi error
-            dd($e->getMessage(), $ind, $matrixs);
+            dd($e->getMessage(), $matrixs);
         }
 
         // Menggabungkan data yang akan dikirim ke view
@@ -109,7 +109,7 @@ class RekapPenilaianController extends Controller
                     $data[$matrixs->where('indikator_id', $ind->id)->first()->kriteria_id]['x'][$ind->id] = $ind;
             }
         } catch (\Exception $e) {
-            dd($e->getMessage(), $ind, $matrixs);
+            dd($e->getMessage(), $matrixs);
         }
         $program_studi = ProgramStudi::findOrFail($id_prodi);
 

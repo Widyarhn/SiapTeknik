@@ -67,7 +67,7 @@
                             $existingUP = $user_prodi->whereNull('tahun_id')->first();
                         @endphp
                         @if ($existingUP || $up->tahun->is_active == 1)
-                            {{-- @if ($existingUP&&$up->pengajuan_dokumen->status == 2)
+                            {{-- @if ($existingUP && $up->pengajuan_dokumen->status == 2)
                                 <div class="alert alert-warning alert-dismissible show fade alert-has-icon">
                                     <div class="alert-icon"><i class="far fa-lightbulb"></i></div>
                                     <div class="alert-body">
@@ -214,8 +214,7 @@
                                                                     @if (empty($up->led))
                                                                         <form
                                                                             action="{{ route('ajuan-prodi.storeled') }}"
-                                                                            method="post"
-                                                                            enctype="multipart/form-data"
+                                                                            method="post" enctype="multipart/form-data"
                                                                             id="formActionStore">
                                                                             @csrf
                                                                             @method('POST')
@@ -360,33 +359,50 @@
                                                     @endif
                                                 </div>
                                             @endforeach
+                                            <div class="modal-footer bg-whitesmoke br">
+                                                <button type="submit" class="btn btn-primary">Calculate</button>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="col-12 col-md-3 col-lg-3">
-                                    @if ($up->led != null)
-                                    @if (
-                                        !empty($up->led) &&
-                                            !empty($up->lkps) &&
-                                            !empty($up->surat_pengantar) &&
-                                            $up->led->status != 2 &&
-                                            $up->lkps->status != 2 &&
-                                            $up->surat_pengantar->status != 2 &&
-                                            $up->pengajuan_dokumen->status != 1)
-                                        <a href="javascript:void(0)" data-id="{{ $up->id }}"
-                                            data-lkps="{{ $up->lkps->id }}"
-                                            data-surat_pengantar="{{ $up->surat_pengantar->id }}"
-                                            data-led="{{ $up->led->id }}" data-tahun="{{ now()->year }}"
-                                            data-route="{{ route('ajuan-prodi.ajukan') }}"
-                                            class="text-center text-white btn-sm ajukan-btn">
-                                            <div class="card p-3"
-                                                style="background-color: rgba(20, 49, 239, 0.801); box-shadow: 0 4px 8px rgba(0, 0, 0, 0.11);">
-                                                <h6 class="m-0">Ajukan Akreditasi Prodi</h6>
-                                            </div>
-                                        </a>
-                                    @endif 
+                                    @if ($up->pengajuan_dokumen == null)
+                                        @if (!empty($up->led) && !empty($up->lkps) && !empty($up->surat_pengantar))
+                                            <a href="javascript:void(0)" data-id="{{ $up->id }}"
+                                                data-lkps="{{ $up->lkps->id }}"
+                                                data-surat_pengantar="{{ $up->surat_pengantar->id }}"
+                                                data-led="{{ $up->led->id }}" data-tahun="{{ now()->year }}"
+                                                data-route="{{ route('ajuan-prodi.ajukan') }}"
+                                                class="text-center text-white btn-sm ajukan-btn">
+                                                <div class="card p-3"
+                                                    style="background-color: rgba(20, 49, 239, 0.801); box-shadow: 0 4px 8px rgba(0, 0, 0, 0.11);">
+                                                    <h6 class="m-0">Ajukan Akreditasi Prodi</h6>
+                                                </div>
+                                            </a>
+                                        @endif
+                                    @else
+                                        @if (isset($up->led->status) &&
+                                                $up->led->status != 2 &&
+                                                isset($up->lkps->status) &&
+                                                $up->lkps->status != 2 &&
+                                                isset($up->surat_pengantar->status) &&
+                                                $up->surat_pengantar->status != 2 && isset($up->pengajuan_dokumen) &&
+                                                $up->pengajuan_dokumen->status != 1 &&
+                                                empty($up->pengajuan_dokumen->tanggal_selesai))
+                                            <a href="javascript:void(0)" data-id="{{ $up->id }}"
+                                                data-lkps="{{ $up->lkps->id }}"
+                                                data-surat_pengantar="{{ $up->surat_pengantar->id }}"
+                                                data-led="{{ $up->led->id }}" data-tahun="{{ now()->year }}"
+                                                data-route="{{ route('ajuan-prodi.ajukan') }}"
+                                                class="text-center text-white btn-sm ajukan-btn">
+                                                <div class="card p-3"
+                                                    style="background-color: rgba(20, 49, 239, 0.801); box-shadow: 0 4px 8px rgba(0, 0, 0, 0.11);">
+                                                    <h6 class="m-0">Ajukan Akreditasi Prodi</h6>
+                                                </div>
+                                            </a>
+                                        @endif
                                     @endif
-                                    
+
                                 </div>
                             </div>
                         @else

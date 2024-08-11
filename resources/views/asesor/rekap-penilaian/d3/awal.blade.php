@@ -4,8 +4,9 @@
 <head>
     <meta charset="UTF-8">
     <meta content="width=device-width, initial-scale=1, maximum-scale=1, shrink-to-fit=no" name="viewport">
-    <title>Asesor | Rekap Penilaian AK &rsaquo; {{ $program_studi->jenjang->jenjang }} {{ $program_studi->nama }}</title>
-    
+    <title>Asesor | Rekap Penilaian AK &rsaquo; {{ $program_studi->jenjang->jenjang }} {{ $program_studi->nama }}
+    </title>
+
     @include('body')
 
 <body>
@@ -103,7 +104,7 @@
                                                                                 @if ($item[$key]->sub_kriteria)
                                                                                     {{ $item[$key]->sub_kriteria->sub_kriteria }}
                                                                                 @else
-                                                                                    {{ $item[$key]->matriks->kriteria->kriteria }}
+                                                                                {{ $item[$key]->matriks->kriteria->butir }} {{ $item[$key]->matriks->kriteria->kriteria }}
                                                                                 @endif
                                                                             </td>
                                                                             <td>
@@ -120,22 +121,86 @@
                                                                             </td>
                                                                             <td rowspan="{{ count($item) }}">
                                                                                 @php
+                                                                                    // Inisialisasi variabel
+                                                                                    $total = 0;
+                                                                                    $bobotPerRumus = [];
+                                                                                    $rumuses = [];
+                                                                            
+                                                                                    // Loop untuk mengumpulkan bobot per rumus_id
                                                                                     foreach ($item as $indicator) {
-                                                                                        $total +=
-                                                                                            $indicator->bobot *
-                                                                                            $item[$key]->matriks
-                                                                                                ->asesmen_kecukupan
-                                                                                                ->nilai;
+                                                                                        if ($indicator->no_butir && $indicator->sub_kriteria->rumus) {
+                                                                                            // Ambil rumus_id dari indikator
+                                                                                            $rumus_id = $indicator->sub_kriteria->rumus->id ?? null;
+                                                                                            
+                                                                                            if ($rumus_id) {
+                                                                                                // Inisialisasi bobot jika belum ada
+                                                                                                if (!isset($bobotPerRumus[$rumus_id])) {
+                                                                                                    $bobotPerRumus[$rumus_id] = 0;
+                                                                                                }
+                                                                            
+                                                                                                // Tambah bobot berdasarkan rumus_id
+                                                                                                $bobotPerRumus[$rumus_id] += $indicator->bobot;
+                                                                            
+                                                                                                // Simpan rumus ke dalam array jika belum ada
+                                                                                                if (!isset($rumuses[$rumus_id])) {
+                                                                                                    $rumuses[$rumus_id] = $indicator->sub_kriteria->rumus;
+                                                                                                }
+                                                                                            }
+                                                                                        } else {
+                                                                                            // Jika tidak memiliki rumus_id, kalikan bobot dengan nilai
+                                                                                            $total += $indicator->bobot * ($indicator->matriks->asesmen_kecukupan->nilai ?? 0);
+                                                                                        }
+                                                                                    }
+                                                                            
+                                                                                    // Loop untuk menghitung total berdasarkan bobot dan t_butir
+                                                                                    foreach ($bobotPerRumus as $rumus_id => $totalBobot) {
+                                                                                        // Temukan rumus dengan rumus_id yang sesuai
+                                                                                        $rumus = $rumuses[$rumus_id] ?? null;
+                                                                            
+                                                                                        if ($rumus) {
+                                                                                            // Hitung total berdasarkan t_butir dan bobot total per rumus_id
+                                                                                            $total += $totalBobot * ($rumus->t_butir ?? 0);
+                                                                                        }
+                                                                                    }
+                                                                            
+                                                                                    // Tambah total perhitungan ke total keseluruhan
+                                                                                    $total_kes += $total;
+                                                                                @endphp
+                                                                            
+                                                                                <span class="badge badge-info">
+                                                                                    {{ number_format($total, 2) }}
+                                                                                </span>
+                                                                            </td>
+                                                                        </tr>
+                                                                            
+                                                                            
+                                                                            {{-- <td rowspan="{{ count($item) }}">
+                                                                                @php
+                                                                                    foreach ($item as $indicator) {
+                                                                                        if ($indicator->no_butir) {
+                                                                                            $total +=
+                                                                                                $indicator->bobot *
+                                                                                                $item[$key]
+                                                                                                    ->sub_kriteria
+                                                                                                    ->rumus->t_butir;
+                                                                                        } else {
+                                                                                            $total +=
+                                                                                                $indicator->bobot *
+                                                                                                $item[$key]->matriks
+                                                                                                    ->asesmen_kecukupan
+                                                                                                    ->nilai;
+                                                                                        }
                                                                                     }
                                                                                 @endphp
                                                                                 <span class="badge badge-info">
+
                                                                                     {{ $total }}
+
                                                                                     @php
                                                                                         $total_kes += $total;
                                                                                     @endphp
                                                                                 </span>
-                                                                            </td>
-                                                                        </tr>
+                                                                            </td> --}}
                                                                     @else
                                                                         <tr>
                                                                             <td>
@@ -150,6 +215,7 @@
                                                                             <td>
                                                                                 {{ $item[$key]->bobot }}
                                                                             </td>
+                                                                            
                                                                         </tr>
                                                                     @endif
                                                                     @php
@@ -162,33 +228,6 @@
 
                                                     </tbody>
                                                 </table>
-                                                {{-- <tr>
-                                                                <td>{{ $loop->iteration }}</td>
-                                                                <td rowspan="2">
-                                                                    @php
-                                                                    $matriks;
-                                                                        $firstRow = $item->first();
-                                                                        if (
-                                                                            $firstRow->matriks_penilaian
-                                                                                ->sub_kriteria != null
-                                                                        ) {
-                                                                            $matriks = $firstRow->matriks_penilaian
-                                                                                ->sub_kriteria->sub_kriteria;
-                                                                        } else {
-                                                                            $matriks = $firstRow->matriks_penilaian
-                                                                                ->kriteria->kriteria;
-                                                                        }
-                                                                    @endphp
-                                                                    {{ $matriks }}
-                                                                </td>
-                                                                <td rowspan="3" class="text-center">
-                                                                    hfds
-                                                                </td>
-                                                                <td>coba</td>
-                                                                <td></td>
-                                                                <td></td>
-                                                                <td></td>
-                                                            </tr> --}}
                                             </div>
                                         </div>
                                     </div>
@@ -204,7 +243,7 @@
                                                     <th>Total Nilai Asesmen Kecukupan</th>
                                                     <th>:</th>
                                                     <td>
-                                                        {{ $total_kes }}
+                                                        {{ number_format($total_kes, 2) }}
                                                     </td>
                                                     <th>Hasil Akreditasi</th>
                                                     <th>:</th>
@@ -235,100 +274,6 @@
 
                     </div>
                 </section>
-            </div>
-            <div class="modal fade" tabindex="-1" role="dialog" id="modalTambah">
-                <div class="modal-dialog" role="document">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title">Tambah Keterangan</h5>
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                            </button>
-                        </div>
-                        <form action="{{ route('rekap-nilaid3.store') }}" method="post" enctype="multipart/form-data"
-                            id="formActionTambah">
-                            @csrf
-                            @method('POST')
-                            <div class="modal-body" id="formTambah">
-                                <div class="card">
-                                    <form class="needs-validation" novalidate="">
-                                        <div class="card-body">
-                                            <div class="form-group">
-                                                <label class="form-label">Nama Asesor</label>
-                                                <input type="text" class="form-control" name="nama_asesor"
-                                                    required="">
-                                            </div>
-                                            <div class="row">
-                                                <div class="col-6 mb-1">
-                                                    <label class="form-label">Tanggal Batas</label>
-                                                    <input type="date" name="tanggal_batas" class="form-control"
-                                                        id="category">
-                                                </div>
-                                                <div class="col-6 mb-1">
-                                                    <label class="form-label">Tanggal Penilaian</label>
-                                                    <input type="date" name="tanggal_penilaian" class="form-control"
-                                                        id="stock_item">
-                                                </div>
-                                            </div>
-                                            <div class="form-group">
-                                                <label>Nama Perguruan Tinggi</label>
-                                                <input type="text" value="Politeknik Negeri Indramayu" readonly
-                                                    class="form-control" name="perguruan">
-                                            </div>
-                                            <div class="form-group">
-                                                <label class="form-label">Nama Jurusan</label>
-                                                <input type="text" class="form-control" value="Teknik Informatika"
-                                                    readonly name="jurusan">
-                                            </div>
-                                            <div class="row">
-                                                <div class="col-4 mb-1">
-                                                    <label class="form-label">Jenjang</label>
-                                                    <input type="text" class="form-control" placeholder="D3"
-                                                        readonly>
-                                                    </select>
-                                                </div>
-                                                <div class="col-8 mb-1">
-                                                    <label class="form-label">Prodi</label>
-                                                    <input type="text" class="form-control"
-                                                        placeholder="Teknik Informatika" readonly>
-                                                    <input type="hidden" class="form-control" value="1"
-                                                        name="program_studi_id">
-                                                </div>
-                                            </div>
-
-                                    </form>
-                                </div>
-
-                            </div>
-                            <div class="modal-footer bg-whitesmoke br">
-                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
-                                <button type="submit" class="btn btn-primary">Simpan</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="modal fade" tabindex="-1" role="dialog" id="modalEdit">
-            <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Edit Keterangan</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <form action="" method="post" enctype="multipart/form-data" id="formActionEdit">
-                        @csrf
-                        @method('PUT')
-                        <div class="modal-body" id="formEdit">
-                        </div>
-                        <div class="modal-footer bg-whitesmoke br">
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
-                            <button type="submit" class="btn btn-primary">Simpan</button>
-                        </div>
-                    </form>
-                </div>
             </div>
         </div>
         {{-- <script>
@@ -389,4 +334,5 @@
         </footer>
     </div>
 </body>
+
 </html>
