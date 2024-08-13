@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\AnotasiLabel;
 use App\Models\Rumus;
 use App\Models\Kriteria;
 use App\Models\UserAsesor;
@@ -67,7 +68,7 @@ class NilaiDeskEvalController extends Controller
         // $matrixId = AsesmenKecukupan::where('user_asesor_id', Auth::user()->user_asesor->id)->pluck('matriks_penilaian_id');
         // $matrixs = MatriksPenilaian::whereIn('id', $matrixId)->get();
 
-        $matriks = MatriksPenilaian::with(['jenjang', 'kriteria', 'sub_kriteria', 'indikator', 'data_dukung'])->orderBy('kriteria_id', 'ASC')
+        $matriks = MatriksPenilaian::with(['jenjang', 'kriteria', 'sub_kriteria', 'indikator', 'data_dukung', 'anotasi_label'])->orderBy('kriteria_id', 'ASC')
             ->where("jenjang_id", $user_asesor->jenjang_id)
             ->where("kriteria_id", $id)
             ->get();
@@ -126,11 +127,28 @@ class NilaiDeskEvalController extends Controller
 
     public function update(Request $request, $id)
     {
-        $validatedData = $request->validate(
-            [
-                'nilai' => ['required', 'numeric', 'min:1', 'max:4'],
+        $desk_evaluasi = AsesmenKecukupan::find($id);
+
+        $matriksId = $desk_evaluasi->matriks_penilaian_id;
+        $anotasiMatriksId = AnotasiLabel::where('matriks_penilaian_id', $matriksId)->first();
+
+        // Jika ada catatan di AnotasiLabel, ambil nilai saat ini sebagai default
+        // $nilaiDefault = $anotasiMatriksId ? $desk_evaluasi->nilai : $request->nilai;
+
+        $rules =  [
+            'nilai' => ['required', 'numeric', 'min:1', 'max:4'],
+            'deskripsi' => 'required'
+        ];
+
+        if ($anotasiMatriksId) {
+            $rules =  [
+                'nilai' => ['numeric', 'min:1', 'max:4'],
                 'deskripsi' => 'required'
-            ],
+            ];
+        }
+
+        $validatedData = $request->validate(
+            $rules,
             [
                 'nilai.required' => 'Nilai harus diisi',
                 'nilai.numeric' => 'Nilai harus berisi angka',
@@ -140,11 +158,11 @@ class NilaiDeskEvalController extends Controller
             ]
         );
 
-        $desk_evaluasi = AsesmenKecukupan::find($id);
-        $desk_evaluasi->nilai = $request->nilai;
-        $desk_evaluasi->deskripsi = $request->deskripsi;
-        $desk_evaluasi->program_studi_id = $request->program_studi_id;
-        $desk_evaluasi->tahun_id = $request->tahun_id;
+        if (!$anotasiMatriksId) {
+            $desk_evaluasi->nilai = $validatedData['nilai'];
+        }
+
+        $desk_evaluasi->deskripsi = $validatedData['deskripsi'];
         $desk_evaluasi->matriks_penilaian_id = $request->m_id;
         $desk_evaluasi->timeline_id = $request->timeline_id;
         $desk_evaluasi->user_asesor_id = $request->user_asesor_id;
@@ -152,6 +170,43 @@ class NilaiDeskEvalController extends Controller
 
         return redirect()->back()->with('success', 'Berhasil mengubah nilai dan deskripsi nilai');
     }
+
+    // public function update(Request $request, $id)
+    // {
+    //     $validatedData = $request->validate(
+    //         [
+    //             'nilai' => ['required', 'numeric', 'min:1', 'max:4'],
+    //             'deskripsi' => 'required'
+    //         ],
+    //         [
+    //             'nilai.required' => 'Nilai harus diisi',
+    //             'nilai.numeric' => 'Nilai harus berisi angka',
+    //             'nilai.min' => 'Nilai tidak boleh kurang dari 1',
+    //             'nilai.max' => 'Nilai tidak boleh lebih dari 4',
+    //             'deskripsi.required' => 'Deskripsi nilai harus diisi'
+    //         ]
+    //     );
+
+    //     $desk_evaluasi = AsesmenKecukupan::find($id);
+
+    //     $matriksId= $desk_evaluasi->matriks_penilaian_id;
+    //     $anotasiMatriksId = AnotasiLabel::where('matriks_penilaian_id', $matriksId)->first();
+
+    //     if($anotasiMatriksId != null){
+    //         $desk_evaluasi->nilai = $desk_evaluasi->nilai;
+    //     }else{
+    //         $desk_evaluasi->nilai = $request->nilai;
+    //     }
+    //     $desk_evaluasi->deskripsi = $request->deskripsi;
+    //     $desk_evaluasi->program_studi_id = $request->program_studi_id;
+    //     $desk_evaluasi->tahun_id = $request->tahun_id;
+    //     $desk_evaluasi->matriks_penilaian_id = $request->m_id;
+    //     $desk_evaluasi->timeline_id = $request->timeline_id;
+    //     $desk_evaluasi->user_asesor_id = $request->user_asesor_id;
+    //     $desk_evaluasi->save();
+
+    //     return redirect()->back()->with('success', 'Berhasil mengubah nilai dan deskripsi nilai');
+    // }
 
     public function history($id_prodi)
     {
@@ -231,8 +286,8 @@ class NilaiDeskEvalController extends Controller
             $processedRumusIds = [];
 
             foreach ($rumuses as $rumus) {
-                $rumus_id = $rumus->id;  
-                $variables = $request->get($rumus_id, []);  
+                $rumus_id = $rumus->id;
+                $variables = $request->get($rumus_id, []);
 
                 if (is_array($variables) && !empty($variables)) {
                     if (!in_array($rumus_id, $processedRumusIds)) {

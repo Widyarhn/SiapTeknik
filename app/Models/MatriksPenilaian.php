@@ -37,6 +37,10 @@ class MatriksPenilaian extends Model
     {
         return $this->hasOne(AsesmenKecukupan::class);
     }
+    public function anotasi_label()
+    {
+        return $this->hasOne(AnotasiLabel::class);
+    }
 
     public function asesmen_lapangan()
     {

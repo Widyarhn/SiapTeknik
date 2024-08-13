@@ -94,25 +94,36 @@
                                                     </div>
                                                     <div class="col-lg-4">
                                                         <div class="form-group">
-                                                            <label>Rumus</label>
+                                                            <label>Rumus (replace x = *)</label>
                                                             <input type="text" class="form-control" id="rumus"
-                                                                name="rumus">
+                                                                name="rumus" placeholder="contoh: ((2 * A) + B) / 3">
                                                         </div>
                                                     </div>
                                                 </div>
                                                 <div id="indikator-wrapper">
                                                     <div class="indikator-item">
                                                         <hr>
-                                                        <div class="form-row"  style="item-aligns: end;">
-                                                            <div class="custom-control custom-checkbox my-4">
-                                                                <input type="checkbox" class="custom-control-input" id="check"
-                                                                    name="indikator[0][check]">
-                                                                <label class="custom-control-label"
-                                                                    for="check">Centang jika indikator
-                                                                    menggunakan rumus</label>
+                                                        <div class="form-row">
+                                                            <div class="form-group col-lg-7"  style="item-aligns: end;">
+                                                                <div class="custom-control custom-checkbox my-4">
+                                                                    <input type="checkbox" class="custom-control-input" id="check"
+                                                                        name="indikator[0][check]">
+                                                                    <label class="custom-control-label"
+                                                                        for="check">Centang jika indikator
+                                                                        menggunakan rumus</label>
+                                                                </div>
+                                                            </div>
+                                                            <div class="form-group col-lg-5">
+                                                                <label>Anotasi untuk Rumus Skor (No. Matriks)</label>
+                                                                <select id="anotasi_id" class="form-control selectric"
+                                                                    name="indikator[0][anotasi_id]">
+                                                                    <option value="">-- Pilih --</option>
+                                                                    @foreach ($anotasi as $a)
+                                                                        <option value="{{ $a->id }}">{{ $a->rumus_label}}</option>
+                                                                    @endforeach
+                                                                </select>
                                                             </div>
                                                         </div>
-
                                                         <div class="form-row">
                                                             <div class="form-group col-lg-2">
                                                                 <label>Butir Deskripsi</label>
@@ -127,6 +138,7 @@
                                                                     placeholder="isi deskripsi">
                                                             </div>
                                                         </div>
+                                                        
                                                         <div class="form-group">
                                                             <label>4<span class="text-danger">*</span></label>
                                                             <input type="text" class="form-control"
@@ -189,74 +201,6 @@
                 </section>
             </div>
             <script>
-                // document.addEventListener('DOMContentLoaded', function(e) {
-                //     function addIndikatorRow() {
-                //         const indikatorWrapper = document.getElementById('indikator-wrapper');
-                //         const index = indikatorWrapper.querySelectorAll('.indikator-item').length;
-                //         const newItem = document.createElement('div');
-                //         newItem.className = 'indikator-item';
-                //         newItem.innerHTML = `
-    //             <hr>
-    //             <div class="form-row">
-    //                 <div class="form-group col-lg-7">
-    //                     <label>Deskripsi</label>
-    //                     <input type="text" class="form-control" name="indikator[${index}][deskriptor]" placeholder="isi deskripsi">
-    //                 </div>
-    //                 <div class="form-group col-lg-5">
-    //                     <label>Bobot Butir</label>
-    //                     <input type="text" class="form-control" name="indikator[${index}][bobot]" placeholder="contoh: 0.5">
-    //                 </div>
-    //             </div>
-    //             <div class="form-group">
-    //                 <label>4</label>
-    //                 <input type="text" class="form-control" name="indikator[${index}][sangat_baik]" placeholder="isi untuk deskripsi nilai sangat baik">
-    //             </div>
-    //             <div class="form-group">
-    //                 <label>3</label>
-    //                 <input type="text" class="form-control" name="indikator[${index}][baik]" placeholder="isi untuk deskripsi nilai baik">
-    //             </div>
-    //             <div class="form-group">
-    //                 <label>2</label>
-    //                 <input type="text" class="form-control" name="indikator[${index}][cukup]" placeholder="isi untuk deskripsi nilai cukup">
-    //             </div>
-    //             <div class="form-group">
-    //                 <label>1</label>
-    //                 <input type="text" class="form-control" name="indikator[${index}][kurang]" placeholder="isi untuk deskripsi nilai kurang">
-    //             </div>
-    //             <div class="form-group">
-    //                 <label>0</label>
-    //                 <input type="text" class="form-control" name="indikator[${index}][sangat_kurang]" placeholder="isi untuk deskripsi nilai sangat kurang">
-    //             </div>
-    //             <div class="d-flex align-items-center">
-    //                 <button type="button" class="btn btn-icon icon-left btn-danger remove-indikator ml-2 mb-4"><i class="fa fa-trash"></i> Hapus Indikator</button>
-    //                 <button type="button" class="btn btn-primary ml-2 mb-4 add-indikator"><i class="fas fa-plus"></i> Tambah Indikator</button>
-    //             </div>
-    //         `;
-                //         indikatorWrapper.appendChild(newItem);
-
-                //         newItem.querySelector('.remove-indikator').addEventListener('click', function() {
-                //             indikatorWrapper.removeChild(newItem);
-                //         });
-
-                //         newItem.querySelector('.add-indikator').addEventListener('click', addIndikatorRow);
-
-                //         // Update visibility of remove button
-                //         indikatorWrapper.querySelectorAll('.indikator-item').forEach(function(item, idx) {
-                //             const removeButton = item.querySelector('.remove-indikator');
-                //             removeButton.style.display = idx > 0 ? 'inline-block' : 'none';
-                //         });
-                //     }
-
-                //     document.querySelectorAll('.add-indikator').forEach(function(button) {
-                //         button.addEventListener('click', addIndikatorRow);
-                //     });
-
-                //     // Hide the initial remove button
-                //     const initialRemoveButton = document.querySelector('.indikator-item .remove-indikator');
-                //     if (initialRemoveButton) {
-                //         initialRemoveButton.style.display = 'none';
-                //     }
-                // });
                 document.addEventListener('DOMContentLoaded', function() {
                     let indikatorCount = 1;
 
@@ -268,11 +212,21 @@
                         newItem.className = 'indikator-item';
                         newItem.innerHTML = `
                             <hr>
-                            <div class="form-row"  style="item-aligns: end;">
-                                <div class="custom-control custom-checkbox my-3">
-                                    <input type="checkbox" class="custom-control-input" id="check${index}" name="indikator[${index}][check]">
-                                    <label class="custom-control-label"for="check${index}">Centang jika indikator
-                                        menggunakan rumus</label>
+                            <div class="form-row">
+                                <div class="form-group col-lg-7" style="item-aligns: end;">
+                                    <div class="custom-control custom-checkbox my-3">
+                                        <input type="checkbox" class="custom-control-input" id="check${index}" name="indikator[${index}][check]">
+                                        <label class="custom-control-label" for="check${index}">Centang jika indikator menggunakan rumus</label>
+                                    </div>
+                                </div>
+                                <div class="form-group col-lg-5">
+                                    <label>Anotasi untuk Rumus Skor (No. Matriks)<span class="text-danger">*</span></label>
+                                    <select id="anotasi_id" class="form-control selectric" name="indikator[${index}][anotasi_id]">
+                                    <option value="">-- Pilih --</option>
+                                    @foreach ($anotasi as $a)
+                                        <option value="{{ $a->id }}">{{ $a->rumus_label }}</option>
+                                    @endforeach
+                                    </select>
                                 </div>
                             </div>
                             <div class="form-group mb-0 mt-2" style="text-align: end;">

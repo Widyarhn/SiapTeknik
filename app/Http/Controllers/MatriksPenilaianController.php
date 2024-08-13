@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-
+use App\Models\AnotasiLabel;
 use App\Models\MatriksPenilaian;
 use App\Models\Jenjang;
 use App\Models\Kriteria;
@@ -65,7 +65,7 @@ class MatriksPenilaianController extends Controller
                 $indikator = '<table>
                     <tr>
                         <td>
-                            ' . ($noButir ? $noButir : '').' '.$row->indikator->deskriptor . '
+                            ' . ($noButir ? $noButir : '') . ' ' . $row->indikator->deskriptor . '
                         </td>
                     </tr>
                 </table>';
@@ -125,9 +125,17 @@ class MatriksPenilaianController extends Controller
 
     public function create(Request $request, $id)
     {
+
         $jenjang = Jenjang::findOrFail($id);
+
+        if ($id == 1) {
+            $anotasiLabels = AnotasiLabel::where('jenjang_id', 1)->get();
+        } else {
+            $anotasiLabels = AnotasiLabel::where('jenjang_id', 2)->get();
+        }
         $data = [
             "kriteria" => Kriteria::all(),
+            "anotasi" => $anotasiLabels,
             "matriks_penilaian" => MatriksPenilaian::all()
         ];
         return view('UPPS.matriks-penilaian.create', $data, ['jenjang' => $jenjang]);
@@ -150,6 +158,7 @@ class MatriksPenilaianController extends Controller
             'indikator.*.cukup' => 'sometimes|required|min:6',
             'indikator.*.kurang' => 'sometimes|required|min:6',
             'indikator.*.sangat_kurang' => 'sometimes|required|min:6',
+            'indikator.*.anotasi_id' => 'sometimes|nullable',
         ]);
 
         $subKriteriaId = null;
@@ -161,7 +170,7 @@ class MatriksPenilaianController extends Controller
             ]);
             $subKriteriaId = $subKriteria->id;
 
-            if($request->rumus){
+            if ($request->rumus) {
                 $rumus = Rumus::create([
                     'sub_kriteria_id' => $subKriteriaId,
                     'rumus' => $request->rumus,
@@ -174,7 +183,7 @@ class MatriksPenilaianController extends Controller
             return !empty($item['no_butir']);
         });
 
-        
+
 
         // Mengidentifikasi indikator dengan butir deskripsi dan bobot
         $indikatorDenganBobot = array_filter($indikatorDenganDeskripsi, function ($item) {
@@ -218,12 +227,18 @@ class MatriksPenilaianController extends Controller
                     'rumus_id' => array_key_exists('check', $indikatorData) ? $rumus->id : null,
                 ]);
 
-                MatriksPenilaian::create([
+                $matriks = MatriksPenilaian::create([
                     'jenjang_id' => $request->jenjang_id,
                     'kriteria_id' => $request->kriteria_id,
                     'sub_kriteria_id' => $subKriteriaId,
                     'indikator_id' => $indikator->id,
                 ]);
+
+                // Update AnotasiLabel berdasarkan anotasi_id
+                if (isset($indikatorData['anotasi_id'])) {
+                    AnotasiLabel::where('id', $indikatorData['anotasi_id'])
+                        ->update(['matriks_penilaian_id' => $matriks->id]);
+                }
             } else {
                 // Handle the case where data is missing
                 return response()->json(['error' => 'Incomplete data in indikator array'], 422);

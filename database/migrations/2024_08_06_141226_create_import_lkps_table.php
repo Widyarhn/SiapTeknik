@@ -18,8 +18,6 @@ return new class extends Migration
             $table->id();
             $table->foreignIdFor(Kriteria::class)->nullable();
             $table->foreignIdFor(ProgramStudi::class)->nullable();
-            $table->string('sheet_name');
-            $table->longText('json');
             $table->string('file')->nullable();
             $table->string('display_name')->nullable();
             $table->timestamps();

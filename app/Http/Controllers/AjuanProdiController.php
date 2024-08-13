@@ -10,16 +10,22 @@ use App\Models\Kriteria;
 use App\Models\ListLkps;
 use App\Models\UserProdi;
 use App\Models\ImportLkps;
+use App\Models\LabelImport;
 use App\Models\DokumenAjuan;
 use App\Models\ListDocument;
 use App\Models\ProgramStudi;
 use Illuminate\Http\Request;
 use App\Models\SuratPengantar;
+use App\Imports\ImportLkpsExcel;
 use App\Models\PengajuanDokumen;
 use App\Imports\CustomImportLkps;
-use App\Imports\LabelsImportLkps;
-use Illuminate\Support\Facades\DB;
 // use Illuminate\Contracts\Database\Eloquent\Builder;
+use App\Imports\LabelsImportLkps;
+use App\Models\AnotasiLabel;
+use App\Models\AsesmenKecukupan;
+use App\Models\RumusSkorImport;
+use App\Services\FormulaEvaluator;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Storage;
@@ -42,7 +48,7 @@ class AjuanProdiController extends Controller
             $q->whereHas('tahun', function ($query) {
                 $query->where('is_active', true);
             });
-        }])->where('status',1 )->first();
+        }])->where('status', 1)->first();
         $kriteria = Kriteria::where('kuantitatif', 1)->get();
         $importLkps = ImportLkps::with('kriteria')->get();
 
@@ -273,76 +279,6 @@ class AjuanProdiController extends Controller
         }
     }
 
-    // public function importLkps(Request $request)
-    // {
-    //     $id_prodi = session('id_prodi');
-    //     $request->validate([
-    //         'file' => 'required|mimes:xlsx,csv',
-    //     ]);
-
-    //     $path = $request->file('file')->store('dok-import/d3', 'public');
-
-    //     $importedData = Excel::toArray(new GenerateDataImport, 'storage/' . $path);
-
-
-    //     return back()->with('success', 'Data imported and file saved successfully.');
-    // }
-
-    // public function importLkps(Request $request)
-    // {
-    //     $request->validate([
-    //         'file' => 'required|mimes:xlsx,csv',
-    //         'id_prodi' => 'required|exists:program_studies,id',
-    //         'id_kriteria' => 'required|exists:kriterias,id',
-    //     ]);
-    //     // dd($request);
-        
-    //     try {
-    //         if($request->file('file')){
-    //             $file = $request->file('file');
-    //             // $fileName = $file->getClientOriginalName();
-    //             // $filePath = $file->storeAs('dok-import/d3', $fileName, 'public');
-    //             // dd(Storage::disk('public')->path($filePath));
-
-    //             // // Pastikan Storage telah diimpor dengan benar
-    //             // $fullPath = Storage::disk('public')->path($filePath);
-    //             // $fileContent = Storage::disk('public')->get($filePath);
-
-    //             // Buat instance dari CustomImportLkps dan panggil metode import
-    //             $importer = new CustomImportLkps();
-    //             $importer->import($file, $request->id_prodi, $request->id_kriteria);
-
-
-    //             return back()->with('success', 'Data imported and file saved successfully.');
-    //         }
-    //         return back()->with('error', 'Terjadi kesalahan');
-            
-    //     } catch (\Exception $e) {
-    //         return back()->with('error', 'Terjadi kesalahan saat mengimpor data: ' . $e->getMessage());
-    //     }
-    // }
-
-    public function importLkps(Request $request)
-    {
-        $request->validate([
-            'file' => 'required|mimes:xlsx,csv',
-            'id_prodi' => 'required|exists:program_studies,id',
-            'id_kriteria' => 'required|exists:kriterias,id',
-        ]);
-        // dd($request);
-        
-        try {
-            if($request->file('file')){
-                Excel::import(new LabelsImportLkps, $request->file('file')->store('dok-import/d3', 'public'));
-                return back()->with('success', 'Data imported and file saved successfully.');
-            }
-            return back()->with('error', 'Terjadi kesalahan');
-            
-        } catch (\Exception $e) {
-            return back()->with('error', 'Terjadi kesalahan saat mengimpor data: ' . $e->getMessage());
-        }
-    }
-
     public function history(Request $request, $id_prodi)
     {
         $program_studi = ProgramStudi::findOrFail($id_prodi);
@@ -366,7 +302,6 @@ class AjuanProdiController extends Controller
             'tanggal_hari_ini' => 'required|date',
         ]);
 
-
         // Cek apakah sudah ada pengajuan dokumen dengan ID yang sama
         $existingPengajuan = PengajuanDokumen::where('user_prodi_id', $request->user_prodi_id)
             ->where('led_id', $request->led_id)
@@ -384,14 +319,14 @@ class AjuanProdiController extends Controller
             $tahun = Tahun::where('id', $existingPengajuan->user_prodi->tahun->id)->firstOrFail();
             $tahun->mulai_akreditasi = $request->tanggal_hari_ini;
             $tahun->update();
-        } else{
+        } else {
             $tahun = new Tahun;
             $tahun->tahun = $request->tahun;
             $tahun->is_active = true;
             $tahun->mulai_akreditasi = $request->tanggal_hari_ini;
             $tahun->save();
 
-    
+
             // Membuat entri baru di tabel PengajuanDokumen
             $pengajuan = new PengajuanDokumen;
             $pengajuan->user_prodi_id = $request->user_prodi_id;
@@ -401,7 +336,6 @@ class AjuanProdiController extends Controller
             $pengajuan->tanggal_ajuan = $request->tanggal_hari_ini;
             $pengajuan->status = '1';
             $pengajuan->save();
-
         }
         // Mengupdate kolom tahun_id di tabel UserProdi
         $user_prodi = UserProdi::findOrFail($request->user_prodi_id);
@@ -425,4 +359,142 @@ class AjuanProdiController extends Controller
 
         return response()->json(['success' => true, 'message' => 'Pengajuan Akreditasi Program Studi Berhasil.']);
     }
+
+    // public function importLkps(Request $request)
+    // {
+    //     $id_prodi = session('id_prodi');
+    //     $request->validate([
+    //         'file' => 'required|mimes:xlsx,csv',
+    //     ]);
+
+    //     $path = $request->file('file')->store('dok-import/d3', 'public');
+
+    //     $importedData = Excel::toArray(new GenerateDataImport, 'storage/' . $path);
+
+
+    //     return back()->with('success', 'Data imported and file saved successfully.');
+    // }
+
+    // public function importLkps(Request $request)
+    // {
+    //     $request->validate([
+    //         'file' => 'required|mimes:xlsx,csv',
+    //         'id_prodi' => 'required|exists:program_studies,id',
+    //         'id_kriteria' => 'required|exists:kriterias,id',
+    //     ]);
+    //     // dd($request);
+
+    //     try {
+    //         if($request->file('file')){
+    //             $file = $request->file('file');
+    //             // $fileName = $file->getClientOriginalName();
+    //             // $filePath = $file->storeAs('dok-import/d3', $fileName, 'public');
+    //             // dd(Storage::disk('public')->path($filePath));
+
+    //             // // Pastikan Storage telah diimpor dengan benar
+    //             // $fullPath = Storage::disk('public')->path($filePath);
+    //             // $fileContent = Storage::disk('public')->get($filePath);
+
+    //             // Buat instance dari CustomImportLkps dan panggil metode import
+    //             $importer = new CustomImportLkps();
+    //             $importer->import($file, $request->id_prodi, $request->id_kriteria);
+
+
+    //             return back()->with('success', 'Data imported and file saved successfully.');
+    //         }
+    //         return back()->with('error', 'Terjadi kesalahan');
+
+    //     } catch (\Exception $e) {
+    //         return back()->with('error', 'Terjadi kesalahan saat mengimpor data: ' . $e->getMessage());
+    //     }
+    // }
+
+    public function importLkps(Request $request)
+    {
+        set_time_limit(900);
+        $request->validate([
+            'file' => 'required|mimes:xlsx,csv',
+            'id_prodi' => 'required|exists:program_studies,id',
+            'id_kriteria' => 'required|exists:kriterias,id',
+        ]);
+
+        try {
+            if ($request->file('file')) {
+                // Pass the uploaded file directly to the import class
+                // Excel::import(new LabelsImportLkps($request->file('file')), $request->file('file')->store('dok-import/d3', 'public'));
+                $importer = new ImportLkpsExcel();
+                $importer->import($request->file('file'), $request->id_prodi, $request->id_kriteria);
+                return back()->with('success', 'Data imported and file saved successfully.');
+            }
+            return back()->with('error', 'Terjadi kesalahan');
+        } catch (\Exception $e) {
+            return back()->with('error', 'Terjadi kesalahan saat mengimpor data: ' . $e->getMessage());
+        }
+    }
+
+    public function calculate($id_prodi)
+    {
+        $programStudi = ProgramStudi::with('jenjang')->find($id_prodi);
+        $jenjangName = $programStudi->jenjang->jenjang;
+        $jenjangId = $programStudi->jenjang_id;
+        
+        if ($jenjangName == "D3") {
+            $this->calculate10A($id_prodi,$jenjangId);
+        } else {
+            $this->calculateY($id_prodi);
+            $this->calculateZ($id_prodi);
+        }
+        return redirect()->back()->with('success', 'Perhitungan dan penyimpanan data berhasil.');
+    }
+
+    protected $evaluator;
+
+    public function __construct(FormulaEvaluator $evaluator)
+    {
+        $this->evaluator = $evaluator;
+    }
+
+    public function calculate10A($id_prodi,$jenjangId)
+    {
+        $labelImport = LabelImport::where('program_studi_id', $id_prodi)->get();
+
+        $rkVal = $labelImport->whereIn('label', ['N1', 'N2', 'N3', 'NDTPS'])->pluck('nilai', 'label');
+        $rkFaktor = [
+            'a' => 2,
+            'b' => 1,
+            'c' => 3,
+        ];
+
+        $rkVar = array_merge($rkFaktor, $rkVal->mapWithKeys(fn($nilai, $label) => [$label => (int)$nilai])->toArray());
+        $rk = $this->evaluator->evaluate('((a * N1) + (b * N2) + (c * N3)) / NDTPS', $rkVar);
+
+        $rkOriginal = $rk['result']; // Akses langsung nilai result
+        $rkConverted = floatval(str_replace(',', '.', $rkOriginal)); // Konversi menjadi float
+
+        // // Debugging
+        // dd([
+        //     'Original' => $rkOriginal,
+        //     'Converted' => $rkConverted,
+        // ]);
+
+        $nilai = ($rkConverted >= 4.0) ? 4.0 : $rkConverted;
+        $idMatriks = AnotasiLabel::where('rumus_label', '10.A')->first()->id;
+        $anotasiLabel = AnotasiLabel::where('rumus_label', '10.A')->where('jenjang_id',$jenjangId)->first();
+        $idMatriks = $anotasiLabel ? $anotasiLabel->matriks_penilaian_id : null;
+
+        // Simpan nilai ke dalam tabel AsesmenKecukupan
+        AsesmenKecukupan::updateOrCreate(
+            [
+                'matriks_penilaian_id' => $idMatriks,
+                'nilai' => $nilai,
+                'deskripsi' => "Hasil Kuantitatifff",
+            ]
+        );
+    }
+
+    // calculateY($id_prodi)
+    // calculateZ($id_prodi)
+    // calculateA($id_prodi)
+
+
 }

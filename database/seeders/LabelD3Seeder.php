@@ -3,9 +3,10 @@
 namespace Database\Seeders;
 
 use App\Models\LabelImport;
+use App\Models\ProgramStudi;
 use Illuminate\Database\Seeder;
 
-class LabelSeeder extends Seeder
+class LabelD3Seeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -14,7 +15,9 @@ class LabelSeeder extends Seeder
      */
     public function run()
     {
-        LabelImport::insert([[
+
+        $labels = [
+            [
                 "label" => "N1",
                 "sheet_name" => "1-1",
                 "cell"=> "Q13"
@@ -28,7 +31,6 @@ class LabelSeeder extends Seeder
                 "sheet_name" => "1-3",
                 "cell"=> "Q14"
             ],
-
             [
                 "label" => "NI1",
                 "sheet_name" => "1-1",
@@ -494,6 +496,15 @@ class LabelSeeder extends Seeder
                 "sheet_name" => "8f4",
                 "cell"=> "F13"
             ],
-        ]);
+        ];
+    
+        foreach(ProgramStudi::where('jenjang_id', 1)->get() as $key => $prodi)
+            foreach($labels as $item)
+                LabelImport::insert([
+                    'program_studi_id' => $prodi->id,
+                    "label" => $item["label"],
+                    "sheet_name" => $item["sheet_name"],
+                    "cell"=> $item["cell"],
+                ]);
     }
 }

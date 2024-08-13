@@ -67,18 +67,20 @@
                             $existingUP = $user_prodi->whereNull('tahun_id')->first();
                         @endphp
                         @if ($existingUP || $up->tahun->is_active == 1)
-                            {{-- @if ($existingUP && $up->pengajuan_dokumen->status == 2)
-                                <div class="alert alert-warning alert-dismissible show fade alert-has-icon">
-                                    <div class="alert-icon"><i class="far fa-lightbulb"></i></div>
-                                    <div class="alert-body">
-                                        <button class="close" data-dismiss="alert">
-                                            <span>&times;</span>
-                                        </button>
-                                        <div class="alert-title">Dokumen Akreditasi telah ditolak</div>
-                                        Catatan UPPS: {{ $up->pengajuan_dokumen->keterangan }}
-                                    </div>
+                            @if ($up->pengajuan_dokumen)
+                            @if ($up->pengajuan_dokumen->status == 2)
+                            <div class="alert alert-warning alert-dismissible show fade alert-has-icon">
+                                <div class="alert-icon"><i class="far fa-lightbulb"></i></div>
+                                <div class="alert-body">
+                                    <button class="close" data-dismiss="alert">
+                                        <span>&times;</span>
+                                    </button>
+                                    <div class="alert-title">Dokumen Akreditasi telah ditolak</div>
+                                    Catatan UPPS: {{ $up->pengajuan_dokumen->keterangan }}
                                 </div>
-                            @endif --}}
+                            </div>
+                            @endif
+                            @endif
                             <div class="row">
                                 <div class="col-12">
                                     <div class="card">
@@ -360,7 +362,7 @@
                                                 </div>
                                             @endforeach
                                             <div class="modal-footer bg-whitesmoke br">
-                                                <button type="submit" class="btn btn-primary">Calculate</button>
+                                                <a href="{{ route('ajuan-prodi.calculate', $up->program_studi_id) }}" class="btn btn-primary">Calculate</a>
                                             </div>
                                         </div>
                                     </div>

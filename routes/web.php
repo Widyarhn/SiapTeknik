@@ -213,6 +213,7 @@ Route::group(["middleware" => ["autentikasi"]], function () {
         Route::get('ajuan-prodi/prodi/{id_prodi}', [AjuanProdiController::class, 'prodi'])->name('ajuan-prodi.prodi');
         Route::post('ajuan-prodi/prodi/ajukan', [AjuanProdiController::class, 'ajukan'])->name('ajuan-prodi.ajukan');
         Route::get('ajuan-prodi/history/{id_prodi}', [AjuanProdiController::class, 'history'])->name('ajuan-prodi.history');
+        Route::get('ajuan-prodi/calculate/{id_prodi}', [AjuanProdiController::class, 'calculate'])->name('ajuan-prodi.calculate');
 
         // Route::resource('ajuan-prodi', AjuanProdiController::class);
         /**data dukung prodi */

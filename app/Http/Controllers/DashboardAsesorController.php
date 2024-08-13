@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\UserAsesor;
-use App\Models\DeskEvaluasi;
+use App\Models\AsesmenKecukupan;
 use App\Models\AsesmenLapangan;
 use App\Models\BaAsesmenLapangan;
 use App\Models\Timeline;
@@ -69,7 +69,7 @@ class DashboardAsesorController extends Controller
     {
         $user_asesor = UserAsesor::where("user_id", Auth::user()->id)->first();
 
-        $desk_evaluasi = DeskEvaluasi::where('program_studi_id', $user_asesor->program_studi_id)
+        $desk_evaluasi = AsesmenKecukupan::where('program_studi_id', $user_asesor->program_studi_id)
         ->where("tahun_id", $user_asesor->tahun_id)
         ->with(["matriks_penilaian", "suplemen"])
         ->get();

@@ -89,7 +89,6 @@
                                                         <tr>
                                                             <th class="text-center">Dokumen</th>
                                                             <th class="text-center">Nama File</th>
-                                                            <th></th>
                                                         </tr>
                                                     </thead>
                                                     <tbody>
@@ -109,19 +108,17 @@
                                                                     ->where('tahun_id', $item_tahun->tahun_id)
                                                                     ->first();
                                                             @endphp
-                                                            @if (empty($lkps))
-                                                            @else
-                                                                @if (count($item_tahun->tahun->lkps) == 0)
-                                                                    <td class="text-center">
-                                                                        Belum ada file yang diupload
-                                                                    </td>
+                                                            <td class="text-center">
+                                                                @if (empty($lkps))
                                                                 @else
-                                                                    <td class="text-center">
+                                                                    @if (count($item_tahun->tahun->lkps) == 0)
+                                                                        Belum ada file yang diupload
+                                                                    @else
                                                                         <a href="{{ url('storage/dokumen_prodi/', $lkps->file) }}"
                                                                             target="_blank">{{ $lkps->file }}</a>
-                                                                    </td>
+                                                                    @endif
                                                                 @endif
-                                                            @endif
+                                                            </td>
                                                         </tr>
                                                         <tr>
                                                             <td class="text-center">LED</td>
@@ -136,7 +133,6 @@
                                                                     @endif
                                                                 @endif
                                                             </td>
-
                                                         </tr>
                                                     </tbody>
                                                 </table>
@@ -156,39 +152,14 @@
                                                         <tr>
                                                             <th class="text-center">Dokumen</th>
                                                             <th class="text-center">Nama File</th>
-                                                            <th></th>
                                                         </tr>
                                                     </thead>
                                                     <tbody>
                                                         <tr>
                                                             <td class="text-center">Berita Acara</td>
-                                                            @php
-                                                                $lkps = Lkps::where(
-                                                                    'program_studi_id',
-                                                                    $item_tahun->program_studi_id,
-                                                                )
-                                                                    ->where('tahun_id', $item_tahun->tahun_id)
-                                                                    ->first();
-                                                                $led = Led::where(
-                                                                    'program_studi_id',
-                                                                    $item_tahun->program_studi_id,
-                                                                )
-                                                                    ->where('tahun_id', $item_tahun->tahun_id)
-                                                                    ->first();
-                                                            @endphp
-                                                            @if (empty($lkps))
-                                                            @else
-                                                                @if (count($item_tahun->tahun->lkps) == 0)
-                                                                    <td class="text-center">
-                                                                        Belum ada file yang diupload
-                                                                    </td>
-                                                                @else
-                                                                    <td class="text-center">
-                                                                        <a href="{{ url('storage/dokumen_prodi/', $lkps->file) }}"
-                                                                            target="_blank">{{ $lkps->file }}</a>
-                                                                    </td>
-                                                                @endif
-                                                            @endif
+                                                            <td class="text-center">
+                                                                Belum ada file yang diupload
+                                                            </td>
                                                         </tr>
                                                         <tr>
                                                             <td class="text-center">Saran & Rekomendasi</td>

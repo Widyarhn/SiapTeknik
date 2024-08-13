@@ -1,6 +1,7 @@
 <?php
 
-use App\Models\ProgramStudi;
+use App\Models\Jenjang;
+use App\Models\MatriksPenilaian;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -12,13 +13,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('label_imports', function (Blueprint $table) {
+        Schema::create('anotasi_labels', function (Blueprint $table) {
             $table->id();
-            $table->foreignIdFor(ProgramStudi::class)->nullable();
-            $table->string('label');
-            $table->string('sheet_name')->nullable();
-            $table->string('cell')->nullable();
-            $table->float('nilai')->nullable();
+            $table->foreignIdFor(Jenjang::class)->nullable();
+            $table->foreignIdFor(MatriksPenilaian::class)->nullable();
+            $table->string('rumus_label');
+            $table->longText('anotasi');
             $table->timestamps();
         });
     }
@@ -28,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('label_imports');
+        Schema::dropIfExists('anotasi_labels');
     }
 };
