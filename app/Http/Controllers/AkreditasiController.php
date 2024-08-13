@@ -2,26 +2,27 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\AsesmenKecukupan;
-use App\Models\DokumenAjuan;
-use App\Models\Indikator;
-use App\Models\Kriteria;
+use Carbon\Carbon;
 use App\Models\Led;
 use App\Models\Lkps;
+use App\Models\Role;
+use App\Models\User;
+use App\Models\Tahun;
+use App\Models\Kriteria;
+use App\Models\Timeline;
+use App\Models\Indikator;
+use App\Models\UserProdi;
+use App\Models\UserAsesor;
+use App\Models\DokumenAjuan;
+use App\Models\ProgramStudi;
+use Illuminate\Http\Request;
+use App\Models\SuratPengantar;
+use App\Models\AsesmenLapangan;
+use App\Models\AsesmenKecukupan;
 use App\Models\MatriksPenilaian;
 use App\Models\PengajuanDokumen;
-use App\Models\ProgramStudi;
-use App\Models\Role;
-use App\Models\SuratPengantar;
-use App\Models\Tahun;
-use App\Models\Timeline;
-use App\Models\User;
-use App\Models\UserAsesor;
-use App\Models\UserProdi;
-use Carbon\Carbon;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 use Yajra\DataTables\Facades\DataTables;
 
 class AkreditasiController extends Controller
@@ -195,6 +196,31 @@ class AkreditasiController extends Controller
         return response()->json(['success' => true, 'message' => 'Ajuan Selesai! Lihat ditahap selanjutnya!']);
     }
 
+    public function approve_al(Request $request, $id)
+    {
+        $ak = Timeline::find($id);
+
+        $ak->selesai = true;
+        $ak->keterangan = 'Approved';
+        $ak->save();
+
+        return redirect()->back()->with('success', 'Asesmen Lapangan telah disetujui!');
+    }
+
+    // public function disapprove_al(Request $request, $id)
+    // {
+    //     $request->validate([
+    //         'keterangan' => 'required|string',
+    //     ]);
+
+    //     $ak = Timeline::find($id);
+
+    //     $ak->status = '2';
+    //     $ak->keterangan = $request->input('keterangan');
+    //     $ak->save();
+
+    //     return redirect()->back()->with('success', 'Asesmen Kecukupan telah ditolak.');
+    // }
     public function approve_ak(Request $request, $id)
     {
         $ak = Timeline::find($id);
@@ -205,9 +231,9 @@ class AkreditasiController extends Controller
 
         $validated = $request->validate([
             'thn' => 'required|exists:tahuns,id',
-            'prodi' => 'required|exists:program_studis,id',
-            'tanggal_mulai' => 'required | date',
-            'tanggal_akhir' => 'required | date',
+            'prodi' => 'required|exists:program_studies,id',
+            'tanggal_mulai' => 'required|date',
+            'tanggal_akhir' => 'required|date',
         ]);
 
         $timeline = new Timeline();
@@ -215,9 +241,16 @@ class AkreditasiController extends Controller
         $timeline->program_studi_id = $request->prodi;
         $timeline->kegiatan = 'Asesmen Lapangan';
         $timeline->tanggal_mulai = $request->tanggal_mulai;
-        $timeline->tanggal_akhir = $request->tanggal_akhir;
+        $timeline->batas_waktu = $request->tanggal_akhir;
         $timeline->status = '0';
         $timeline->save();
+
+        $userAsesors = UserAsesor::where('timeline_id', $ak->id)->get();
+
+        foreach ($userAsesors as $userAsesor) {
+            $userAsesor->timeline_id = $timeline->id;
+            $userAsesor->save();
+        }
 
         return redirect()->back()->with('success', 'Asesmen Kecukupan telah disetujui. Lihat proses selanjutnya!');
     }
@@ -266,6 +299,7 @@ class AkreditasiController extends Controller
                 $q->where('is_active', 1);
             })
             ->get();
+
         foreach ($data as $item) {
             if (count($item->timeline) > 0) {
                 $format = [];
@@ -278,18 +312,50 @@ class AkreditasiController extends Controller
                     $format["keterangan"] = $timeline->keterangan;
                     $format["selesai"] = $timeline->selesai;
                 }
+
                 $nilai_asesor = [];
                 foreach ($item->user_asesor as $i => $user_asesor) {
                     $total = 0.0;
-                    foreach ($user_asesor->asesmen_kecukupan as  $asesmen_kecukupan) {
-                        $total += $asesmen_kecukupan->nilai * $asesmen_kecukupan->matriks_penilaian->indikator->bobot;
+                    $bobotPerRumus = [];
+                    $rumuses = [];
+
+                    foreach ($user_asesor->asesmen_kecukupan as $asesmen_kecukupan) {
+                        $indicator = $asesmen_kecukupan->matriks_penilaian->indikator;
+
+                        if ($indicator->no_butir && $indicator->sub_kriteria->rumus) {
+                            $rumus_id = $indicator->sub_kriteria->rumus->id ?? null;
+
+                            if ($rumus_id) {
+                                if (!isset($bobotPerRumus[$rumus_id])) {
+                                    $bobotPerRumus[$rumus_id] = 0;
+                                }
+
+                                $bobotPerRumus[$rumus_id] += $indicator->bobot;
+
+                                if (!isset($rumuses[$rumus_id])) {
+                                    $rumuses[$rumus_id] = $indicator->sub_kriteria->rumus;
+                                }
+                            }
+                        } else {
+                            $total += $indicator->bobot * ($asesmen_kecukupan->nilai ?? 0);
+                        }
                     }
-                    $format['nilai_asesor' . $i + 1] = $total;
+
+                    foreach ($bobotPerRumus as $rumus_id => $totalBobot) {
+                        $rumus = $rumuses[$rumus_id] ?? null;
+
+                        if ($rumus) {
+                            $total += $totalBobot * ($rumus->t_butir ?? 0);
+                        }
+                    }
+
+                    $format['nilai_asesor' . ($i + 1)] = $total;
                     $format['asesor' . ($i + 1)] = $user_asesor->id;
                 }
                 array_push($dt, $format);
             }
         }
+
         return datatables()->of($dt)
             ->addIndexColumn()
             ->addColumn('tahun', function ($row) {
@@ -299,48 +365,38 @@ class AkreditasiController extends Controller
                 return $row['program_studi'];
             })
             ->addColumn('nilai_asesor1', function ($row) {
-                // $total = 0.0;
-                // $data = AsesmenKecukupan::where('program_studi_id', $row->program_studi_id)
-                // ->where('user_asesor_id', $row->user_asesor_id)
-                // ->where('timeline_id', $row->timeline_id)
-                // ->get();
-                // foreach($data as $item){
-                //     $total += $item->nilai * $item->matriks_penilaian->indikator->bobot;
-                // }
                 return '
-                <a href="' . route('akreditasi.asesmenKecukupan.show', ['id' => $row['asesor1']]) . '">' . $row['nilai_asesor1'] . '</a>
-                ';
+            <a href="' . route('akreditasi.asesmenKecukupan.show', ['id' => $row['asesor1']]) . '">' . number_format($row['nilai_asesor1'], 2) . '</a>
+            ';
             })
             ->addColumn('nilai_asesor2', function ($row) {
                 if (array_key_exists('nilai_asesor2', $row)) {
-
                     return '
-                    <a href="' . route('akreditasi.asesmenKecukupan.show', ['id' => $row['asesor2']]) . '">' . $row['nilai_asesor2'] . '</a>
-                    ';
+                <a href="' . route('akreditasi.asesmenKecukupan.show', ['id' => $row['asesor2']]) . '">' . number_format($row['nilai_asesor2'], 2) . '</a>
+                ';
                 }
                 return '-';
             })
             ->addColumn('nilai_asesor3', function ($row) {
                 if (array_key_exists('nilai_asesor3', $row)) {
-
                     return '
-                    <a href="' . route('akreditasi.asesmenKecukupan.show', ['id' => $row['asesor3']]) . '">' . $row['nilai_asesor3'] . '</a>
-                    ';
+                <a href="' . route('akreditasi.asesmenKecukupan.show', ['id' => $row['asesor3']]) . '">' . number_format($row['nilai_asesor3'], 2) . '</a>
+                ';
                 }
                 return '-';
             })
             ->addColumn('action', function ($row) {
                 if ($row['selesai'] == 1) {
                     return '
-                    <div class="buttons btn btn-sm btn-success">' . $row['keterangan'] . '</div>
-                    ';
+                <div class="buttons btn btn-sm btn-success">' . $row['keterangan'] . '</div>
+                ';
                 } else {
                     return '<div class="buttons">
-                <button type="button" class="btn btn-success btn-sm approve-btn" data-id="' . $row['timeline'] . '" data-prodi="' . $row['prodi'] . '" data-thn="' . $row['thn'] . '"
-                    data-route="' . route('ak.approve', ['id' => $row['timeline']]) . '"><i class="fas fa-check"></i></button>
-                <button type="button" class="btn btn-danger btn-sm disapprove-btn" data-id="' . $row['timeline'] . '" 
-                    data-route="' . route('ak.disapprove', ['id' => $row['timeline']]) . '"><i class="fas fa-times"></i></button>
-                ';
+            <button type="button" class="btn btn-success btn-sm approve-btn" data-id="' . $row['timeline'] . '" data-prodi="' . $row['prodi'] . '" data-thn="' . $row['thn'] . '"
+                data-route="' . route('ak.approve', ['id' => $row['timeline']]) . '"><i class="fas fa-check"></i></button>
+            <button type="button" class="btn btn-danger btn-sm disapprove-btn" data-id="' . $row['timeline'] . '" 
+                data-route="' . route('ak.disapprove', ['id' => $row['timeline']]) . '"><i class="fas fa-times"></i></button>
+            ';
                 }
             })
             ->rawColumns(['tahun', 'prodi', 'nilai_asesor1', 'nilai_asesor2', 'nilai_asesor3', 'action'])
@@ -349,11 +405,12 @@ class AkreditasiController extends Controller
 
     public function asesmenLapangan()
     {
-        $timelines = Timeline::with(['program_studi', 'tahun' => function ($query) {
-            $query->where('is_active', 0);
-        }])
-            ->where('kegiatan', 'Asesmen Kecukupan')
-            ->where('status', '0')
+        $timelines = Timeline::with(['user_asesor.tahun' => function ($query) {
+            $query->where('is_active', 1);
+        }, 'user_asesor', 'program_studi', 'tahun'])
+            ->where('kegiatan', 'Asesmen Lapangan')
+            ->where('status', '1')
+            ->where('selesai', 0)
             ->get();
 
         $data = [
@@ -365,16 +422,18 @@ class AkreditasiController extends Controller
 
     public function jsonAl()
     {
+
         $dt = [];
         $data = ProgramStudi::with(['timeline' => function ($q) {
             $q->where('status', '1');
             $q->where('selesai', 0);
             $q->where('kegiatan', 'Asesmen Lapangan');
-        }, 'timeline.tahun', 'user_asesor.asesmen_kecukupan'])
+        }, 'user_asesor.asesmen_lapangan', 'berita_acara'])
             ->whereHas('timeline.tahun', function ($q) {
-                $q->where('is_active', 0);
+                $q->where('is_active', 1);
             })
             ->get();
+
         foreach ($data as $item) {
             if (count($item->timeline) > 0) {
                 $format = [];
@@ -387,14 +446,45 @@ class AkreditasiController extends Controller
                     $format["keterangan"] = $timeline->keterangan;
                     $format["selesai"] = $timeline->selesai;
                 }
+
                 $nilai_asesor = [];
                 foreach ($item->user_asesor as $i => $user_asesor) {
                     $total = 0.0;
-                    foreach ($user_asesor->desk_evaluasi as  $desk_evaluasi) {
-                        $total += $desk_evaluasi->nilai * $desk_evaluasi->matriks_penilaian->indikator->bobot;
+                    $bobotPerRumus = [];
+                    $rumuses = [];
+
+                    foreach ($user_asesor->asesmen_kecukupan as $asesmen_kecukupan) {
+                        $indicator = $asesmen_kecukupan->matriks_penilaian->indikator;
+
+                        if ($indicator->no_butir && $indicator->sub_kriteria->rumus) {
+                            $rumus_id = $indicator->sub_kriteria->rumus->id ?? null;
+
+                            if ($rumus_id) {
+                                if (!isset($bobotPerRumus[$rumus_id])) {
+                                    $bobotPerRumus[$rumus_id] = 0;
+                                }
+
+                                $bobotPerRumus[$rumus_id] += $indicator->bobot;
+
+                                if (!isset($rumuses[$rumus_id])) {
+                                    $rumuses[$rumus_id] = $indicator->sub_kriteria->rumus;
+                                }
+                            }
+                        } else {
+                            $total += $indicator->bobot * ($asesmen_kecukupan->nilai ?? 0);
+                        }
                     }
-                    $format['nilai_asesor' . $i + 1] = $total;
-                    $format["asesor"] = $user_asesor->id;
+
+                    foreach ($bobotPerRumus as $rumus_id => $totalBobot) {
+                        $rumus = $rumuses[$rumus_id] ?? null;
+
+                        if ($rumus) {
+                            $total += $totalBobot * ($rumus->t_butir ?? 0);
+                        }
+                    }
+
+                    $format['nilai_asesor' . ($i + 1)] = $total;
+                    $format['asesor' . ($i + 1)] = $user_asesor->id;
                 }
                 array_push($dt, $format);
             }
@@ -409,52 +499,43 @@ class AkreditasiController extends Controller
                 return $row['program_studi'];
             })
             ->addColumn('nilai_akhir', function ($row) {
-                // $total = 0.0;
-                // $data = AsesmenKecukupan::where('program_studi_id', $row->program_studi_id)
-                // ->where('user_asesor_id', $row->user_asesor_id)
-                // ->where('timeline_id', $row->timeline_id)
-                // ->get();
-                // foreach($data as $item){
-                //     $total += $item->nilai * $item->matriks_penilaian->indikator->bobot;
-                // }
                 return '
-                <a href="' . route('akreditasi.asesmenKecukupan.show', ['id' => $row['asesor']]) . '">' . $row['nilai_asesor1'] . '</a>
-                ';
+            <a href="' . route('akreditasi.asesmenLapangan.show', ['id' => $row['asesor1']]) . '">' . number_format($row['nilai_asesor1'], 2) . '</a>
+            ';
             })
             ->addColumn('berita_acara', function ($row) {
-                if (array_key_exists('nilai_asesor2', $row)) {
 
-                    return '
-                    <a href="' . route('akreditasi.asesmenKecukupan.show', ['id' => $row['asesor']]) . '">' . $row['nilai_asesor2'] . '</a>
-                    ';
-                }
+                return '-';
+            })
+            ->addColumn('saran_rekomendasi', function ($row) {
+
                 return '-';
             })
             ->addColumn('action', function ($row) {
+
                 if ($row['selesai'] == 1) {
                     return '
-                    <div class="buttons btn btn-sm btn-success">' . $row['keterangan'] . '</div>
-                    ';
+                <div class="buttons btn btn-sm btn-success">' . $row['keterangan'] . '</div>
+                ';
                 } else {
                     return '<div class="buttons">
-                <button type="button" class="btn btn-success btn-sm approve-btn" data-id="' . $row['timeline'] . '" data-prodi="' . $row['prodi'] . '" data-thn="' . $row['thn'] . '"
-                    data-route="' . route('ak.approve', ['id' => $row['timeline']]) . '"><i class="fas fa-check"></i></button>
-                <button type="button" class="btn btn-danger btn-sm disapprove-btn" data-id="' . $row['timeline'] . '" 
-                    data-route="' . route('ak.disapprove', ['id' => $row['timeline']]) . '"><i class="fas fa-times"></i></button>
-                ';
+            <button type="button" class="btn btn-success btn-sm approve-btn" data-id="' . $row['timeline'] . '" 
+                data-route="' . route('al.approve', ['id' => $row['timeline']]) . '"><i class="fas fa-check"></i></button>
+            ';
                 }
             })
-            ->rawColumns(['tahun', 'prodi', 'nilai_akhir', 'berita_acara', 'action'])
+            ->rawColumns(['tahun', 'prodi', 'nilai_akhir', 'berita_acara', 'saran_rekomendasi', 'action'])
             ->make(true);
     }
 
     public function finish()
     {
         $timelines = Timeline::with(['program_studi', 'tahun' => function ($query) {
-            $query->where('is_active', 0);
+            $query->where('is_active', 1);
         }])
-            ->where('kegiatan', 'Asesmen Kecukupan')
-            ->where('status', '0')
+            ->where('kegiatan', 'Asesmen Lapangan')
+            ->where('status', '1')
+            ->where('selesai', '1')
             ->get();
 
         $data = [
@@ -463,6 +544,121 @@ class AkreditasiController extends Controller
         ];
         return view('UPPS.akreditasi.selesai', $data);
     }
+
+    public function finishJson()
+    {
+        $dt = [];
+        $data = ProgramStudi::with(['timeline' => function ($q) {
+            $q->where('status', '1');
+            $q->where('selesai', 1);
+            $q->where('kegiatan', 'Asesmen Lapangan');
+        }, 'user_asesor.asesmen_lapangan', 'berita_acara', 'sertifikat'])
+            ->whereHas('timeline.tahun', function ($q) {
+                $q->where('is_active', 1);
+            })
+            ->get();
+
+        foreach ($data as $item) {
+            if (count($item->timeline) > 0) {
+                $format = [];
+                foreach ($item->timeline as $timeline) {
+                    $format["tahun"] = $timeline->tahun->tahun;
+                    $format["program_studi"] = $item->jenjang->jenjang . ' ' . $item->nama;
+                    $format["timeline"] = $timeline->id;
+                    $format["prodi"] = $timeline->program_studi_id;
+                    $format["thn"] = $timeline->tahun_id;
+                    $format["keterangan"] = $timeline->keterangan;
+                    $format["selesai"] = $timeline->selesai;
+                }
+
+                $nilai_asesor = [];
+                $total_kes = 0;
+                foreach ($item->user_asesor as $i => $user_asesor) {
+                    $total = 0.0;
+                    $bobotPerRumus = [];
+                    $rumuses = [];
+
+                    foreach ($user_asesor->asesmen_kecukupan as $asesmen_kecukupan) {
+                        $indicator = $asesmen_kecukupan->matriks_penilaian->indikator;
+
+                        if ($indicator->no_butir && $indicator->sub_kriteria->rumus) {
+                            $rumus_id = $indicator->sub_kriteria->rumus->id ?? null;
+
+                            if ($rumus_id) {
+                                if (!isset($bobotPerRumus[$rumus_id])) {
+                                    $bobotPerRumus[$rumus_id] = 0;
+                                }
+
+                                $bobotPerRumus[$rumus_id] += $indicator->bobot;
+
+                                if (!isset($rumuses[$rumus_id])) {
+                                    $rumuses[$rumus_id] = $indicator->sub_kriteria->rumus;
+                                }
+                            }
+                        } else {
+                            $total += $indicator->bobot * ($asesmen_kecukupan->nilai ?? 0);
+                        }
+                    }
+
+                    foreach ($bobotPerRumus as $rumus_id => $totalBobot) {
+                        $rumus = $rumuses[$rumus_id] ?? null;
+
+                        if ($rumus) {
+                            $total += $totalBobot * ($rumus->t_butir ?? 0);
+                        }
+                    }
+
+                    $format['nilai_asesor' . ($i + 1)] = $total;
+                    $format['asesor' . ($i + 1)] = $user_asesor->id;
+
+                    // Menambah nilai total keseluruhan dari semua asesor
+                    $total_kes += $total;
+                }
+
+                // Kondisi untuk menentukan hasil akreditasi
+                if ($total_kes >= 1 && $total_kes <= 200) {
+                    $format['akreditasi'] = 'TIDAK MEMENUHI SYARAT PERINGKAT';
+                } elseif ($total_kes >= 200 && $total_kes <= 301) {
+                    $format['akreditasi'] = 'BAIK';
+                } elseif ($total_kes >= 301 && $total_kes <= 361) {
+                    $format['akreditasi'] = 'BAIK SEKALI';
+                } elseif ($total_kes >= 361) {
+                    $format['akreditasi'] = 'UNGGUL';
+                }
+
+                array_push($dt, $format);
+            }
+        }
+
+        return datatables()->of($dt)
+            ->addIndexColumn()
+            ->addColumn('tahun', function ($row) {
+                return $row['tahun'];
+            })
+            ->addColumn('prodi', function ($row) {
+                return $row['program_studi'];
+            })
+            ->addColumn('akreditasi', function ($row) {
+                return $row['akreditasi'] ?? '-';
+            })
+            ->addColumn('sertifikat', function ($row) {
+                return '-';
+            })
+            ->addColumn('saran_rekomendasi', function ($row) {
+                return '-';
+            })
+            ->addColumn('berita_acara', function ($row) {
+                return '-';
+            })
+            ->addColumn('action', function ($row) {
+                return '
+            <a class="btn btn-secondary btn-sm" href="' . route('upps.dokumenajuan.prodi', ['id_prodi' => $row['prodi']]) . '"><i class="fas fa-eye"></i></a>
+            ';
+            })
+            ->rawColumns(['tahun', 'prodi', 'akreditasi', 'berita_acara', 'saran_rekomendasi', 'sertifikat', 'action'])
+            ->make(true);
+    }
+
 
 
     /**
@@ -542,7 +738,9 @@ class AkreditasiController extends Controller
         $indicatorsId = $matrixs->pluck('indikator_id');
 
         // Mengambil data indikator beserta relasi yang diperlukan
-        $indicators = Indikator::with(['matriks.kriteria', 'matriks.asesmen_kecukupan', 'sub_kriteria.kriteria'])
+        $indicators = Indikator::with(['matriks.kriteria', 'matriks.asesmen_kecukupan' => function ($q) use ($id) {
+            $q->where('user_asesor_id', $id)->get();
+        }, 'sub_kriteria.kriteria'])
             ->whereIn('id', $indicatorsId)
             ->get();
 
@@ -573,34 +771,94 @@ class AkreditasiController extends Controller
         return view('UPPS.akreditasi.showAK', $data);
     }
 
+    public function showAl($id)
+    {
+        // Mengambil data user asesor dengan timeline yang sesuai
+        $userAsesor = UserAsesor::with(['user', 'timeline' => function ($q) {
+            $q->where('status', '1')
+                ->where('selesai', 0)
+                ->where('kegiatan', 'Asesmen Lapangan');
+        }])->where('id', $id)
+            ->first();
+
+        // Mengambil id matriks penilaian yang terkait dengan user asesor
+        $matrixId = AsesmenLapangan::where('user_asesor_id',  $id)->pluck('matriks_penilaian_id');
+
+        // Mengambil data matriks penilaian berdasarkan id yang didapat
+        $matrixs = MatriksPenilaian::whereIn('id', $matrixId)->get();
+
+        // Mengambil id indikator yang terkait dengan matriks penilaian
+        $indicatorsId = $matrixs->pluck('indikator_id');
+
+        // Mengambil data indikator beserta relasi yang diperlukan
+        $indicators = Indikator::with(['matriks.kriteria', 'matriks.asesmen_lapangan' => function ($q) use ($id) {
+            $q->where('user_asesor_id', $id)->get();
+        }, 'sub_kriteria.kriteria'])
+            ->whereIn('id', $indicatorsId)
+            ->get();
+
+        $dataa = []; // Inisialisasi array untuk menyimpan data yang akan ditampilkan
+
+        // Mengelompokkan data indikator berdasarkan kriteria dan sub kriteria
+        try {
+            foreach ($indicators as $ind) {
+                $kriteriaId = $matrixs->where('indikator_id', $ind->id)->first()->kriteria_id;
+                if ($ind->sub_kriteria) {
+                    $dataa[$kriteriaId][$ind->sub_kriteria->id][$ind->id] = $ind;
+                } else {
+                    $dataa[$kriteriaId]['x'][$ind->id] = $ind;
+                }
+            }
+        } catch (\Exception $e) {
+            // Debugging jika terjadi error
+            dd($e->getMessage(), $matrixs);
+        }
+
+        // Menggabungkan data yang akan dikirim ke view
+        $data = [
+            'data' => $dataa,
+            'user_asesor' => $userAsesor,
+        ];
+
+        // Mengembalikan view dengan data yang telah dipersiapkan
+        return view('UPPS.akreditasi.showAl', $data);
+    }
+
 
     public function detail($id, $id_krit)
     {
-        // $data = [
-        //     'asesmen_kecukupan' => AsesmenKecukupan::findOrFail($id_krit)
-        //         ->with(['user_asesor', 'timeline' => function ($q) {
-        //             $q->where('status', '1');
-        //             $q->where('selesai', 0);
-        //             $q->where('kegiatan', 'Asesmen Kecukupan');
-        //         }])->where('user_asesor_id', $id)
-        //         ->get(),
-            
-
-        // ];
         $user_asesor = UserAsesor::with(['user', 'timeline' => function ($q) {
-                $q->where('status', '1');
-                $q->where('selesai', 0);
-                $q->where('kegiatan', 'Asesmen Kecukupan');
-            }])->where('id', $id)
-                ->first();
+            $q->where('status', '1');
+            $q->where('selesai', 0);
+            $q->where('kegiatan', 'Asesmen Kecukupan');
+        }])->where('id', $id)
+            ->first();
 
-        $matriks = MatriksPenilaian::with(['jenjang', 'kriteria', 'sub_kriteria', 'indikator','asesmen_kecukupan'=> function ($q) use ($id){
+        $matriks = MatriksPenilaian::with(['jenjang', 'kriteria', 'sub_kriteria', 'indikator', 'data_dukung', 'anotasi_label', 'asesmen_kecukupan' => function ($q) use ($id) {
             $q->where('user_asesor_id', $id);
         }])->orderBy('kriteria_id', 'ASC')
             ->where("jenjang_id", $user_asesor->jenjang_id)
             ->where("kriteria_id", $id_krit)
             ->get();
-        return view('UPPS.akreditasi.detailAK', ['matriks' => $matriks, 'user_asesor' =>$user_asesor]);
+        return view('UPPS.akreditasi.detailAK', ['matriks' => $matriks, 'user_asesor' => $user_asesor]);
+    }
+
+    public function detailAl($id, $id_krit)
+    {
+        $user_asesor = UserAsesor::with(['user', 'timeline' => function ($q) {
+            $q->where('status', '1');
+            $q->where('selesai', 0);
+            $q->where('kegiatan', 'Asesmen Lapangan');
+        }])->where('id', $id)
+            ->first();
+
+        $matriks = MatriksPenilaian::with(['jenjang', 'kriteria', 'sub_kriteria', 'indikator', 'data_dukung', 'anotasi_label', 'asesmen_lapangan' => function ($q) use ($id) {
+            $q->where('user_asesor_id', $id);
+        }])->orderBy('kriteria_id', 'ASC')
+            ->where("jenjang_id", $user_asesor->jenjang_id)
+            ->where("kriteria_id", $id_krit)
+            ->get();
+        return view('UPPS.akreditasi.detailAl', ['matriks' => $matriks, 'user_asesor' => $user_asesor]);
     }
 
     public function rekap($id)
@@ -657,6 +915,59 @@ class AkreditasiController extends Controller
             ->make(true);
     }
 
+    public function rekapAl($id)
+    {
+        $data = AsesmenKecukupan::with(['timeline' => function ($q) {
+            $q->where('status', '1');
+            $q->where('selesai', 0);
+            $q->where('kegiatan', 'Asesmen Lapangan');
+        }, 'matriks_penilaian'])->where("user_asesor_id", $id)
+            ->get();
+
+        return DataTables::of($data)
+            ->addIndexColumn()
+            ->addColumn('sub_kriteria', function ($row) {
+                if ($row->matriks_penilaian->sub_kriteria != null) {
+                    return $row->matriks_penilaian->sub_kriteria->sub_kriteria;
+                } else {
+                    return $row->matriks_penilaian->kriteria->butir . ' ' . $row->matriks_penilaian->kriteria->kriteria;
+                }
+            })
+            ->addColumn('deskripsi', function ($row) {
+                if ($row->deskripsi) {
+                    return $row->deskripsi;
+                } else {
+                    return ' ';
+                }
+            })
+            ->addColumn('nilai', function ($row) {
+                if ($row->nilai) {
+                    return $row->nilai;
+                } else {
+                    return ' ';
+                }
+            })
+            ->addColumn('bobot', function ($row) {
+                if ($row->matriks_penilaian != null) {
+                    return $row->matriks_penilaian->indikator->bobot;
+                } else {
+                    return ' ';
+                }
+            })
+            ->addColumn('nilai_bobot', function ($row) {
+                if ($row->matriks_penilaian != null) {
+                    return '<span class="badge badge-info">' . $row->nilai * $row->matriks_penilaian->indikator->bobot . '</span>';
+                } else {
+                    return ' ';
+                }
+            })
+            ->addColumn('action', function ($row) {
+                $btn = '<a href="' . route('akreditasi.asesmenLapangan.detail', ['id' => $row->user_asesor_id, 'id_krit' => $row->id]) . '" class="show btn btn-secondary btn-sm"><i class="fa fa-solid fa-eye"></i></a>';
+                return $btn;
+            })
+            ->rawColumns(['action', 'sub_kriteria', 'deskripsi', 'nilai', 'bobot', 'nilai_bobot'])
+            ->make(true);
+    }
     /**
      * Show the form for editing the specified resource.
      *

@@ -21,14 +21,14 @@
                 <section class="section">
                     <div class="section-header">
                         <div class="section-header-back">
-                            <a href="{{ route('akreditasi.asesmenKecukupan') }}" class="btn btn-icon"><i
+                            <a href="{{ route('akreditasi.asesmenLapangan') }}" class="btn btn-icon"><i
                                     class="fas fa-arrow-left"></i></a>
                         </div>
-                        <h1>Detail Asesmen Kecukupan</h1>
+                        <h1>Detail Asesmen Lapangan</h1>
                         <div class="section-header-breadcrumb">
                             <div class="breadcrumb-item active"><a href="{{ url('dashboard-UPPS') }}">Dashboard</a>
                             </div>
-                            <div class="breadcrumb-item">Asesmen Kecukupan</div>
+                            <div class="breadcrumb-item">Asesmen Lapangan</div>
                         </div>
                     </div>
 
@@ -37,7 +37,7 @@
                             {{ $user_asesor->jenjang->jenjang }}
                             {{ $user_asesor->program_studi->nama }}</h2>
                         <p class="section-lead">
-                            Hasil rekap penilaian asesmen kecukupan {{ $user_asesor->jenjang->jenjang }}
+                            Hasil rekap penilaian asesmen lapangan {{ $user_asesor->jenjang->jenjang }}
                             {{ $user_asesor->program_studi->nama }} oleh {{ $user_asesor->user->nama }} sebagai
                             {{ $user_asesor->jabatan }}.
                         </p>
@@ -46,12 +46,12 @@
                             <div class="col-12">
                                 <div class="card">
                                     <div class="card-header">
-                                        <h4>Tabel Rekap Penilaian Asesmen Kecukupan {{ $user_asesor->jenjang->jenjang }}
+                                        <h4>Tabel Rekap Penilaian Asesmen lapangan {{ $user_asesor->jenjang->jenjang }}
                                             {{ $user_asesor->program_studi->nama }}</h4>
                                     </div>
                                     <div class="card-body">
                                         <div class="table-responsive">
-                                            <table class="table table-bordered" id="rekapTable">
+                                            <table class="table table-bordered" id="alRekapTable">
                                                 <thead>
                                                     <tr>
                                                         <th width ="5%">No</th>
@@ -95,10 +95,10 @@
                                                                             {{ $item[$key]->no_butir }}
                                                                         </td>
                                                                         <td>
-                                                                            {{ $item[$key]->matriks->asesmen_kecukupan->deskripsi }}
+                                                                            {{ $item[$key]->matriks->asesmen_lapangan->deskripsi }}
                                                                         </td>
                                                                         <td>
-                                                                            {{ $item[$key]->matriks->asesmen_kecukupan->nilai }}
+                                                                            {{ $item[$key]->matriks->asesmen_lapangan->nilai }}
                                                                         </td>
                                                                         <td>
                                                                             {{ $item[$key]->bobot }}
@@ -132,7 +132,7 @@
                                                                                         }
                                                                                     } else {
                                                                                         // Jika tidak memiliki rumus_id, kalikan bobot dengan nilai
-                                                                                        $total += $indicator->bobot * ($indicator->matriks->asesmen_kecukupan->nilai ?? 0);
+                                                                                        $total += $indicator->bobot * ($indicator->matriks->asesmen_lapangan->nilai ?? 0);
                                                                                     }
                                                                                 }
                                                                         
@@ -156,7 +156,7 @@
                                                                             </span>
                                                                         </td>
                                                                         <td rowspan="{{ count($item) }}">
-                                                                            <a href="{{ route('akreditasi.asesmenKecukupan.detail', ['id' => $item[$key]->matriks->asesmen_kecukupan->user_asesor_id, 'id_krit' => $item[$key]->matriks->kriteria_id]) }}"
+                                                                            <a href="{{ route('akreditasi.asesmenLapangan.detail', ['id' => $item[$key]->matriks->asesmen_lapangan->user_asesor_id, 'id_krit' => $item[$key]->matriks->kriteria_id]) }}"
                                                                                 class="show btn btn-secondary btn-sm">
                                                                                 <i class="fa fa-solid fa-eye"></i></a>
 
@@ -168,10 +168,10 @@
                                                                             {{ $item[$key]->no_butir }}
                                                                         </td>
                                                                         <td>
-                                                                            {{ $item[$key]->matriks->asesmen_kecukupan->deskripsi }}
+                                                                            {{ $item[$key]->matriks->asesmen_lapangan->deskripsi }}
                                                                         </td>
                                                                         <td>
-                                                                            {{ $item[$key]->matriks->asesmen_kecukupan->nilai }}
+                                                                            {{ $item[$key]->matriks->asesmen_lapangan->nilai }}
                                                                         </td>
                                                                         <td>
                                                                             {{ $item[$key]->bobot }}
@@ -200,7 +200,7 @@
                                     <div class="card-body">
                                         <table class="table table-borderless mt-1 mb-0">
                                             <tr>
-                                                <th>Total Nilai Asesmen Kecukupan</th>
+                                                <th>Total Nilai Asesmen Lapangan</th>
                                                 <th>:</th>
                                                 <td>
                                                     {{ number_format($total_kes, 2) }}
@@ -224,84 +224,14 @@
                                 </div>
                             </div>
                         </div>
-
-                        {{-- <div class="row">
-                            <div class="col-12">
-                                <div class="card">
-                                    <div class="card-header">
-                                        <h4>Tabel Rekap Penilaian Asesmen Kecukupan {{ $user_asesor->jenjang->jenjang }}
-                                            {{ $user_asesor->program_studi->nama }}</h4>
-                                    </div>
-                                    <div class="card-body">
-                                        <div class="table-responsive">
-                                            <table class="table table-striped" id="akRekapTable">
-                                                <thead>
-                                                    <tr>
-                                                        <th width ="5%">No</th>
-                                                        <th>Aspek Penilaian</th>
-                                                        <th>Deskripsi Hasil Asesmen</th>
-                                                        <th>Bobot</th>
-                                                        <th>Nilai</th>
-                                                        <th>Nilai Terbobot</th>
-                                                        <th>Aksi</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody></tbody>
-                                            </table>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-12">
-                                <div class="card">
-                                    <div class="card-body">
-                                        <table class="table table-borderless mt-1 mb-0">
-                                            <tr>
-                                                <th>Total Nilai Asesmen Kecukupan</th>
-                                                <th>:</th>
-                                                <td>
-                                                    @php
-                                                        $total = 0.0; // Inisialisasi variabel total
-                                                    @endphp
-                                                    @foreach ($desk_evaluasi as $item)
-                                                        @php
-                                                            $total +=
-                                                                $item->nilai *
-                                                                $item->matriks_penilaian->indikator->bobot;
-                                                        @endphp
-                                                    @endforeach
-                                                    {{ $total }}
-                                                </td>
-                                                <th>Hasil Akreditasi</th>
-                                                <th>:</th>
-                                                <td>
-                                                    @if ($total >= 1 && $total <= 200)
-                                                        TIDAK MEMENUHI SYARAT PERINGKAT
-                                                    @elseif($total >= 200 && $total <= 301)
-                                                        BAIK
-                                                    @elseif($total >= 301 && $total <= 361)
-                                                        BAIK SEKALI
-                                                    @elseif($total >= 361)
-                                                        UNGGUL
-                                                    @endif
-                                                </td>
-                                            </tr>
-                                        </table>
-                                    </div>
-                                </div>
-                            </div>
-                        </div> --}}
-
                 </section>
             </div>
             <script>
                 $(function() {
-                    $('#akRekapTable').dataTable({
+                    $('#RekapTable').dataTable({
                         processing: true,
                         serverSide: true,
-                        ajax: "{{ route('akreditasi.asesmenKecukupan.rekap', $user_asesor->id) }}",
+                        ajax: "{{ route('akreditasi.asesmenLapangan.rekap', $user_asesor->id) }}",
                         columns: [{
                                 data: 'DT_RowIndex',
                                 name: 'DT_RowIndex',

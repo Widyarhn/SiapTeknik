@@ -1,6 +1,7 @@
 @php
     use App\Models\Lkps;
     use App\Models\Led;
+    use App\Models\SuratPengantar;
 @endphp
 <!DOCTYPE html>
 <html lang="en">
@@ -92,44 +93,66 @@
                                                         </tr>
                                                     </thead>
                                                     <tbody>
+                                                        @php
+                                                            $lkps = Lkps::where(
+                                                                'program_studi_id',
+                                                                $item_tahun->program_studi_id,
+                                                            )
+                                                                ->where('tahun_id', $item_tahun->tahun_id)
+                                                                ->first();
+                                                            $led = Led::where(
+                                                                'program_studi_id',
+                                                                $item_tahun->program_studi_id,
+                                                            )
+                                                                ->where('tahun_id', $item_tahun->tahun_id)
+                                                                ->first();
+                                                            $surat_pengantar = SuratPengantar::where(
+                                                                'program_studi_id',
+                                                                $item_tahun->program_studi_id,
+                                                            )
+                                                                ->where('tahun_id', $item_tahun->tahun_id)
+                                                                ->first();
+                                                        @endphp
                                                         <tr>
-                                                            <td class="text-center">LKPS</td>
-                                                            @php
-                                                                $lkps = Lkps::where(
-                                                                    'program_studi_id',
-                                                                    $item_tahun->program_studi_id,
-                                                                )
-                                                                    ->where('tahun_id', $item_tahun->tahun_id)
-                                                                    ->first();
-                                                                $led = Led::where(
-                                                                    'program_studi_id',
-                                                                    $item_tahun->program_studi_id,
-                                                                )
-                                                                    ->where('tahun_id', $item_tahun->tahun_id)
-                                                                    ->first();
-                                                            @endphp
-                                                            <td class="text-center">
-                                                                @if (empty($lkps))
+                                                            <td class="text-center">Surat Pengantar</td>
+                                                            <td>
+                                                                @if (empty($surat_pengantar))
                                                                 @else
-                                                                    @if (count($item_tahun->tahun->lkps) == 0)
+                                                                    @if (count($item_tahun->tahun->surat_pengantar) == 0)
                                                                         Belum ada file yang diupload
                                                                     @else
-                                                                        <a href="{{ url('storage/dokumen_prodi/', $lkps->file) }}"
-                                                                            target="_blank">{{ $lkps->file }}</a>
+                                                                        <a href="{{ Storage::url($surat_pengantar->file) }}"
+                                                                            target="_blank">{{ basename($surat_pengantar->file) }}</a>
                                                                     @endif
                                                                 @endif
                                                             </td>
                                                         </tr>
                                                         <tr>
+                                                            <td class="text-center">LKPS</td>
+
+                                                            <td>
+                                                                @if (empty($lkps))
+                                                                @else
+                                                                    @if (count($item_tahun->tahun->lkps) == 0)
+                                                                        Belum ada file yang diupload
+                                                                    @else
+                                                                        <a href="{{ Storage::url($lkps->file) }}"
+                                                                            target="_blank">{{ basename($lkps->file) }}</a>
+                                                                    @endif
+                                                                @endif
+                                                            </td>
+                                                        </tr>
+
+                                                        <tr>
                                                             <td class="text-center">LED</td>
-                                                            <td class="text-center">
+                                                            <td>
                                                                 @if (empty($led))
                                                                 @else
                                                                     @if (count($item_tahun->tahun->led) == 0)
                                                                         Belum ada file yang diupload
                                                                     @else
-                                                                        <a href="{{ url('storage/dokumen_prodi/', $led->file) }}"
-                                                                            target="_blank">{{ $led->file }}</a>
+                                                                        <a href="{{ Storage::url($led->file) }}"
+                                                                            target="_blank">{{ basename($led->file) }}</a>
                                                                     @endif
                                                                 @endif
                                                             </td>
@@ -158,38 +181,21 @@
                                                         <tr>
                                                             <td class="text-center">Berita Acara</td>
                                                             <td class="text-center">
-                                                                Belum ada file yang diupload
+                                                                -
                                                             </td>
                                                         </tr>
                                                         <tr>
                                                             <td class="text-center">Saran & Rekomendasi</td>
                                                             <td class="text-center">
-                                                                @if (empty($led))
-                                                                @else
-                                                                    @if (count($item_tahun->tahun->led) == 0)
-                                                                        Belum ada file yang diupload
-                                                                    @else
-                                                                        <a href="{{ url('storage/dokumen_prodi/', $led->file) }}"
-                                                                            target="_blank">{{ $led->file }}</a>
-                                                                    @endif
-                                                                @endif
+                                                                -
                                                             </td>
 
                                                         </tr>
                                                         <tr>
                                                             <td class="text-center">Sertifikat</td>
                                                             <td class="text-center">
-                                                                @if (empty($led))
-                                                                @else
-                                                                    @if (count($item_tahun->tahun->led) == 0)
-                                                                        Belum ada file yang diupload
-                                                                    @else
-                                                                        <a href="{{ url('storage/dokumen_prodi/', $led->file) }}"
-                                                                            target="_blank">{{ $led->file }}</a>
-                                                                    @endif
-                                                                @endif
+                                                                -
                                                             </td>
-
                                                         </tr>
                                                     </tbody>
                                                 </table>

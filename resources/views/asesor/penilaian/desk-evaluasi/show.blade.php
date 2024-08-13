@@ -157,9 +157,236 @@
                                                                 @endif
                                                             </td>
                                                         </tr>
-                                                        {{-- kuantitatif baru create user_asesor null --}}
 
+                                                        {{-- @if ($m->anotasi_label)
+                                                            @if (empty($m->asesmen_kecukupan->user_asesor_id == $user_asesor->id) && $m->asesmen_kecukupan->matriks_penilaian_id == $m->anotasi_label->matriks_penilaian_id)
+                                                                <form
+                                                                    action="{{ route('asesor.penilaian.asesmen-kecukupan.update', $m->asesmen_kecukupan->id) }}"
+                                                                    method="post" enctype="multipart/form-data"
+                                                                    id="formActionUpdate">
+                                                                    @csrf
+                                                                    @method('POST')
+                                                                    <tr>
+                                                                        <th>
+                                                                            <div class="badge badge-primary">Nilai</div>
+                                                                        </th>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <td>
+                                                                            <input type="hidden" name="m_id"
+                                                                                value="{{ $m->id }}" />
+                                                                            <input type="hidden" name="user_asesor_id"
+                                                                                value="{{ $user_asesor->id }}" />
+                                                                            <input type="hidden" name="timeline_id"
+                                                                                value="{{ $user_asesor->timeline->id }}" />
+                                                                            <input type="text" placeholder="1-4"
+                                                                                name="nilai"
+                                                                                value=" {{ $m->asesmen_kecukupan->nilai }}"
+                                                                                class="form-control text-center"
+                                                                                id="{{ $m->indikator->no_butir }}"
+                                                                                disabled>
 
+                                                                        </td>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <th>
+                                                                            <div class="badge badge-primary">Deskripsi
+                                                                                Nilai</div>
+                                                                        </th>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <td>
+                                                                            <textarea name="deskripsi" class="form-control">{{ $m->asesmen_kecukupan->deskripsi }}</textarea>
+                                                                        </td>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <td>
+                                                                            <div class="d-grid col-md-6 mt-2">
+                                                                                <div class="btn-group">
+                                                                                    <button type="submit"
+                                                                                        class="btn btn-outline-warning">Edit</button>
+                                                                                </div>
+                                                                            </div>
+                                                                        </td>
+                                                                    </tr>
+                                                                </form>
+                                                            @elseif(!empty($m->asesmen_kecukupan->user_asesor_id == $user_asesor->id))
+                                                                <form
+                                                                    action="{{ route('asesor.penilaian.asesmen-kecukupan.update', $m->asesmen_kecukupan->id) }}"
+                                                                    method="post" enctype="multipart/form-data"
+                                                                    id="formActionUpdate">
+                                                                    @csrf
+                                                                    @method('POST')
+                                                                    <tr>
+                                                                        <th>
+                                                                            <div class="badge badge-primary">Nilai</div>
+                                                                        </th>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <td>
+                                                                            <input type="hidden" name="m_id"
+                                                                                value="{{ $m->id }}" />
+                                                                            <input type="hidden" name="user_asesor_id"
+                                                                                value="{{ $user_asesor->id }}" />
+                                                                            <input type="hidden" name="timeline_id"
+                                                                                value="{{ $user_asesor->timeline->id }}" />
+                                                                            @if ($m->anotasi_label)
+                                                                                @if ($m->asesmen_kecukupan->matriks_penilaian_id == $m->anotasi_label->matriks_penilaian_id)
+                                                                                    <input type="text"
+                                                                                        placeholder="1-4" name="nilai"
+                                                                                        value=" {{ $m->asesmen_kecukupan->nilai }}"
+                                                                                        class="form-control text-center"
+                                                                                        id="{{ $m->indikator->no_butir }}"
+                                                                                        disabled>
+                                                                                @else
+                                                                                    <input type="text"
+                                                                                        placeholder="1-4" name="nilai"
+                                                                                        value=" {{ $m->asesmen_kecukupan->nilai }}"
+                                                                                        class="form-control text-center"
+                                                                                        id="{{ $m->indikator->no_butir }}">
+                                                                                @endif
+                                                                            @else
+                                                                                <input type="text" placeholder="1-4"
+                                                                                    name="nilai"
+                                                                                    value=" {{ $m->asesmen_kecukupan->nilai }}"
+                                                                                    class="form-control text-center"
+                                                                                    id="{{ $m->indikator->no_butir }}">
+                                                                            @endif
+                                                                        </td>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <th>
+                                                                            <div class="badge badge-primary">Deskripsi
+                                                                                Nilai</div>
+                                                                        </th>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <td>
+                                                                            <textarea name="deskripsi" class="form-control">{{ $m->asesmen_kecukupan->deskripsi }}</textarea>
+                                                                        </td>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <td>
+                                                                            <div class="d-grid col-md-6 mt-2">
+                                                                                <div class="btn-group">
+                                                                                    <button type="submit"
+                                                                                        class="btn btn-outline-warning">Edit</button>
+                                                                                </div>
+                                                                            </div>
+                                                                        </td>
+                                                                    </tr>
+                                                                </form>
+                                                            @endif
+                                                        @else
+                                                            @if (empty($m->asesmen_kecukupan->user_asesor_id == $user_asesor->id) && empty($m->asesmen_kecukupan->matriks_penilaian_id))
+                                                                <form action="{{ route('asesmen-kecukupan.store') }}"
+                                                                    method="post" enctype="multipart/form-data"
+                                                                    id="formActionStore">
+                                                                    @csrf
+                                                                    @method('POST')
+                                                                    <tr>
+                                                                        <th>
+                                                                            <div class="badge badge-primary">Nilai
+                                                                            </div>
+                                                                        </th>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <td>
+                                                                            <input type="hidden" name="m_id"
+                                                                                value="{{ $m->id }}" />
+                                                                            <input type="hidden"
+                                                                                name="user_asesor_id"
+                                                                                value="{{ $user_asesor->id }}" />
+                                                                            <input type="hidden" name="timeline_id"
+                                                                                value="{{ $user_asesor->timeline->id }}" />
+                                                                            <input type="text" placeholder="1-4"
+                                                                                name="nilai"
+                                                                                class="form-control text-center"
+                                                                                id="{{ $m->indikator->no_butir }}">
+                                                                        </td>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <th>
+                                                                            <div class="badge badge-primary">
+                                                                                Deskripsi
+                                                                                Nilai
+                                                                            </div>
+                                                                        </th>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <td>
+                                                                            <textarea name="deskripsi" class="form-control"></textarea>
+                                                                        </td>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <td>
+                                                                            <div class="d-grid col-md-6 mt-2">
+                                                                                <div class="btn-group">
+                                                                                    <button type="submit"
+                                                                                        class="btn btn-outline-primary">Tambahkan</button>
+                                                                                </div>
+                                                                            </div>
+                                                                        </td>
+                                                                    </tr>
+                                                                </form>
+                                                            @else
+                                                                <form
+                                                                    action="{{ route('asesor.penilaian.asesmen-kecukupan.update', $m->asesmen_kecukupan->id) }}"
+                                                                    method="post" enctype="multipart/form-data"
+                                                                    id="formActionUpdate">
+                                                                    @csrf
+                                                                    @method('POST')
+                                                                    <tr>
+                                                                        <th>
+                                                                            <div class="badge badge-primary">
+                                                                                Nilai</div>
+                                                                        </th>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <td>
+                                                                            <input type="hidden" name="m_id"
+                                                                                value="{{ $m->id }}" />
+                                                                            <input type="hidden"
+                                                                                name="user_asesor_id"
+                                                                                value="{{ $user_asesor->id }}" />
+                                                                            <input type="hidden" name="timeline_id"
+                                                                                value="{{ $user_asesor->timeline->id }}" />
+
+                                                                            <input type="text" placeholder="1-4"
+                                                                                name="nilai"
+                                                                                value=" {{ $m->asesmen_kecukupan->nilai }}"
+                                                                                class="form-control text-center"
+                                                                                id="{{ $m->indikator->no_butir }}">
+
+                                                                        </td>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <th>
+                                                                            <div class="badge badge-primary">
+                                                                                Deskripsi
+                                                                                Nilai</div>
+                                                                        </th>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <td>
+                                                                            <textarea name="deskripsi" class="form-control">{{ $m->asesmen_kecukupan->deskripsi }}</textarea>
+                                                                        </td>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <td>
+                                                                            <div class="d-grid col-md-6 mt-2">
+                                                                                <div class="btn-group">
+                                                                                    <button type="submit"
+                                                                                        class="btn btn-outline-warning">Edit</button>
+                                                                                </div>
+                                                                            </div>
+                                                                        </td>
+                                                                    </tr>
+                                                                </form>
+                                                            @endif
+                                                        @endif --}}
+
+                                                        
                                                         @if ($m->asesmen_kecukupan)
                                                             @if ($m->asesmen_kecukupan->user_asesor_id == $user_asesor->id)
                                                                 <form
@@ -279,25 +506,6 @@
                                                                 </form>
                                                             @endif
                                                         @else
-                                                            <tr>
-                                                                <td>
-                                                                    <textarea name="deskripsi" class="form-control"></textarea>
-                                                                </td>
-                                                            </tr>
-                                                            <tr>
-                                                                <td>
-                                                                    <div class="d-grid col-md-6 mt-2">
-                                                                        <div class="btn-group">
-                                                                            <button type="submit"
-                                                                                class="btn btn-outline-primary">Tambahkan</button>
-                                                                        </div>
-                                                                    </div>
-                                                                </td>
-                                                            </tr>
-                                                            </form>
-                                                        @endif
-
-                                                        {{-- @if (empty($m->asesmen_kecukupan))
                                                             <form action="{{ route('asesmen-kecukupan.store') }}"
                                                                 method="post" enctype="multipart/form-data"
                                                                 id="formActionStore">
@@ -305,7 +513,8 @@
                                                                 @method('POST')
                                                                 <tr>
                                                                     <th>
-                                                                        <div class="badge badge-primary">Nilai</div>
+                                                                        <div class="badge badge-primary">Nilai
+                                                                        </div>
                                                                     </th>
                                                                 </tr>
                                                                 <tr>
@@ -324,7 +533,8 @@
                                                                 </tr>
                                                                 <tr>
                                                                     <th>
-                                                                        <div class="badge badge-primary">Deskripsi Nilai
+                                                                        <div class="badge badge-primary">Deskripsi
+                                                                            Nilai
                                                                         </div>
                                                                     </th>
                                                                 </tr>
@@ -344,7 +554,10 @@
                                                                     </td>
                                                                 </tr>
                                                             </form>
-                                                        @else
+                                                        @endif
+
+
+                                                        {{-- @if ($m->asesmen_kecukupan)
                                                             @if ($m->asesmen_kecukupan->user_asesor_id == $user_asesor->id)
                                                                 <form
                                                                     action="{{ route('asesor.penilaian.asesmen-kecukupan.update', $m->asesmen_kecukupan->id) }}"
@@ -354,23 +567,43 @@
                                                                     @method('POST')
                                                                     <tr>
                                                                         <th>
-                                                                            <div class="badge badge-primary">Nilai</div>
+                                                                            <div class="badge badge-primary">Nilai
+                                                                            </div>
                                                                         </th>
                                                                     </tr>
                                                                     <tr>
                                                                         <td>
                                                                             <input type="hidden" name="m_id"
                                                                                 value="{{ $m->id }}" />
-                                                                            <input type="hidden" name="user_asesor_id"
+                                                                            <input type="hidden"
+                                                                                name="user_asesor_id"
                                                                                 value="{{ $user_asesor->id }}" />
                                                                             <input type="hidden" name="timeline_id"
                                                                                 value="{{ $user_asesor->timeline->id }}" />
-
-                                                                            <input type="text" placeholder="1-4"
-                                                                                name="nilai"
-                                                                                value="{{ $m->asesmen_kecukupan->nilai }}"
-                                                                                class="form-control text-center"
-                                                                                id="{{ $m->indikator->no_butir }}" />
+                                                                            @if ($m->anotasi_label)
+                                                                                @if ($m->asesmen_kecukupan->matriks_penilaian_id == $m->anotasi_label->matriks_penilaian_id)
+                                                                                    <input type="text"
+                                                                                        placeholder="1-4"
+                                                                                        name="nilai"
+                                                                                        value=" {{ $m->asesmen_kecukupan->nilai }}"
+                                                                                        class="form-control text-center"
+                                                                                        id="{{ $m->indikator->no_butir }}"
+                                                                                        disabled>
+                                                                                @else
+                                                                                    <input type="text"
+                                                                                        placeholder="1-4"
+                                                                                        name="nilai"
+                                                                                        value=" {{ $m->asesmen_kecukupan->nilai }}"
+                                                                                        class="form-control text-center"
+                                                                                        id="{{ $m->indikator->no_butir }}">
+                                                                                @endif
+                                                                            @else
+                                                                                <input type="text"
+                                                                                    placeholder="1-4" name="nilai"
+                                                                                    value=" {{ $m->asesmen_kecukupan->nilai }}"
+                                                                                    class="form-control text-center"
+                                                                                    id="{{ $m->indikator->no_butir }}">
+                                                                            @endif
                                                                         </td>
                                                                     </tr>
                                                                     <tr>
@@ -396,55 +629,167 @@
                                                                     </tr>
                                                                 </form>
                                                             @else
-                                                                <form action="{{ route('asesmen-kecukupan.store') }}"
-                                                                    method="post" enctype="multipart/form-data"
-                                                                    id="formActionStoreNew">
-                                                                    @csrf
-                                                                    @method('POST')
-                                                                    <tr>
-                                                                        <th>
-                                                                            <div class="badge badge-primary">Nilai</div>
-                                                                        </th>
-                                                                    </tr>
-                                                                    <tr>
-                                                                        <td>
-                                                                            <input type="hidden" name="m_id"
-                                                                                value="{{ $m->id }}" />
-                                                                            <input type="hidden" name="user_asesor_id"
-                                                                                value="{{ $user_asesor->id }}" />
-                                                                            <input type="hidden" name="timeline_id"
-                                                                                value="{{ $user_asesor->timeline->id }}" />
-                                                                            <input type="text" placeholder="1-4"
-                                                                                name="nilai"
-                                                                                class="form-control text-center"
-                                                                                id="{{ $m->indikator->no_butir }}">
-                                                                        </td>
-                                                                    </tr>
-                                                                    <tr>
-                                                                        <th>
-                                                                            <div class="badge badge-primary">Deskripsi
-                                                                                Nilai</div>
-                                                                        </th>
-                                                                    </tr>
-                                                                    <tr>
-                                                                        <td>
-                                                                            <textarea name="deskripsi" class="form-control"></textarea>
-                                                                        </td>
-                                                                    </tr>
-                                                                    <tr>
-                                                                        <td>
-                                                                            <div class="d-grid col-md-6 mt-2">
-                                                                                <div class="btn-group">
-                                                                                    <button type="submit"
-                                                                                        class="btn btn-outline-primary">Tambahkan</button>
-                                                                                </div>
-                                                                            </div>
-                                                                        </td>
-                                                                    </tr>
-                                                                </form>
-                                                            @endif
-                                                        @endif --}}
+                                                                @if (empty($m->asesmen_kecukupan->user_asesor_id))
+                                                                    <form
+                                                                        action="{{ route('asesor.penilaian.asesmen-kecukupan.update', $m->asesmen_kecukupan->id) }}"
+                                                                        method="post" enctype="multipart/form-data"
+                                                                        id="formActionUpdate">
+                                                                        @csrf
+                                                                        @method('POST')
+                                                                        <tr>
+                                                                            <th>
+                                                                                <div class="badge badge-primary">
+                                                                                    Nilai</div>
+                                                                            </th>
+                                                                        </tr>
+                                                                        <tr>
+                                                                            <td>
+                                                                                <input type="hidden" name="m_id"
+                                                                                    value="{{ $m->id }}" />
+                                                                                <input type="hidden"
+                                                                                    name="user_asesor_id"
+                                                                                    value="{{ $user_asesor->id }}" />
+                                                                                <input type="hidden"
+                                                                                    name="timeline_id"
+                                                                                    value="{{ $user_asesor->timeline->id }}" />
 
+                                                                                <input type="text"
+                                                                                    placeholder="1-4" name="nilai"
+                                                                                    value=" {{ $m->asesmen_kecukupan->nilai }}"
+                                                                                    class="form-control text-center"
+                                                                                    id="{{ $m->indikator->no_butir }}"
+                                                                                    disabled>
+
+                                                                            </td>
+                                                                        </tr>
+                                                                        <tr>
+                                                                            <th>
+                                                                                <div class="badge badge-primary">
+                                                                                    Deskripsi
+                                                                                    Nilai</div>
+                                                                            </th>
+                                                                        </tr>
+                                                                        <tr>
+                                                                            <td>
+                                                                                <textarea name="deskripsi" class="form-control">{{ $m->asesmen_kecukupan->deskripsi }}</textarea>
+                                                                            </td>
+                                                                        </tr>
+                                                                        <tr>
+                                                                            <td>
+                                                                                <div class="d-grid col-md-6 mt-2">
+                                                                                    <div class="btn-group">
+                                                                                        <button type="submit"
+                                                                                            class="btn btn-outline-warning">Edit</button>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </td>
+                                                                        </tr>
+                                                                    </form>
+                                                                @else
+                                                                    <form
+                                                                        action="{{ route('asesmen-kecukupan.store') }}"
+                                                                        method="post" enctype="multipart/form-data"
+                                                                        id="formActionStore">
+                                                                        @csrf
+                                                                        @method('POST')
+                                                                        <tr>
+                                                                            <th>
+                                                                                <div class="badge badge-primary">Nilai
+                                                                                </div>
+                                                                            </th>
+                                                                        </tr>
+                                                                        <tr>
+                                                                            <td>
+                                                                                <input type="hidden" name="m_id"
+                                                                                    value="{{ $m->id }}" />
+                                                                                <input type="hidden"
+                                                                                    name="user_asesor_id"
+                                                                                    value="{{ $user_asesor->id }}" />
+                                                                                <input type="hidden"
+                                                                                    name="timeline_id"
+                                                                                    value="{{ $user_asesor->timeline->id }}" />
+                                                                                <input type="text"
+                                                                                    placeholder="1-4" name="nilai"
+                                                                                    class="form-control text-center"
+                                                                                    id="{{ $m->indikator->no_butir }}">
+                                                                            </td>
+                                                                        </tr>
+                                                                        <tr>
+                                                                            <th>
+                                                                                <div class="badge badge-primary">
+                                                                                    Deskripsi
+                                                                                    Nilai
+                                                                                </div>
+                                                                            </th>
+                                                                        </tr>
+                                                                        <tr>
+                                                                            <td>
+                                                                                <textarea name="deskripsi" class="form-control"></textarea>
+                                                                            </td>
+                                                                        </tr>
+                                                                        <tr>
+                                                                            <td>
+                                                                                <div class="d-grid col-md-6 mt-2">
+                                                                                    <div class="btn-group">
+                                                                                        <button type="submit"
+                                                                                            class="btn btn-outline-primary">Tambahkan</button>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </td>
+                                                                        </tr>
+                                                                    </form>
+                                                                @endif
+                                                            @endif
+                                                        @else
+                                                            <form action="{{ route('asesmen-kecukupan.store') }}"
+                                                                method="post" enctype="multipart/form-data"
+                                                                id="formActionStore">
+                                                                @csrf
+                                                                @method('POST')
+                                                                <tr>
+                                                                    <th>
+                                                                        <div class="badge badge-primary">Nilai
+                                                                        </div>
+                                                                    </th>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td>
+                                                                        <input type="hidden" name="m_id"
+                                                                            value="{{ $m->id }}" />
+                                                                        <input type="hidden" name="user_asesor_id"
+                                                                            value="{{ $user_asesor->id }}" />
+                                                                        <input type="hidden" name="timeline_id"
+                                                                            value="{{ $user_asesor->timeline->id }}" />
+                                                                        <input type="text" placeholder="1-4"
+                                                                            name="nilai"
+                                                                            class="form-control text-center"
+                                                                            id="{{ $m->indikator->no_butir }}">
+                                                                    </td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <th>
+                                                                        <div class="badge badge-primary">Deskripsi
+                                                                            Nilai
+                                                                        </div>
+                                                                    </th>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td>
+                                                                        <textarea name="deskripsi" class="form-control"></textarea>
+                                                                    </td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td>
+                                                                        <div class="d-grid col-md-6 mt-2">
+                                                                            <div class="btn-group">
+                                                                                <button type="submit"
+                                                                                    class="btn btn-outline-primary">Tambahkan</button>
+                                                                            </div>
+                                                                        </div>
+                                                                    </td>
+                                                                </tr>
+                                                            </form>
+                                                        @endif --}}
 
                                                     </table>
                                                 </div>

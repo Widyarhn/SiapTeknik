@@ -66,6 +66,8 @@ Route::group(["middleware" => ["autentikasi"]], function () {
         Route::post('akreditasi/asesmen-kecukupan/{id}', [AkreditasiController::class, 'selesai_ak'])->name('ak.selesai');
         Route::post('akreditasi/approve_ak/{id}', [AkreditasiController::class, 'approve_ak'])->name('ak.approve');
         Route::post('akreditasi/disapprove_ak/{id}', [AkreditasiController::class, 'disapprove_ak'])->name('ak.disapprove');
+        Route::post('akreditasi/approve_al/{id}', [AkreditasiController::class, 'approve_al'])->name('al.approve');
+        Route::post('akreditasi/disapprove_al/{id}', [AkreditasiController::class, 'disapprove_al'])->name('al.disapprove');
         Route::post('akreditasi/dokumen_ajuan/{id}', [AkreditasiController::class, 'selesai'])->name('dokumen_selesai');
         Route::post('akreditasi/approve/{id}/{type?}', [AkreditasiController::class, 'approve'])->name('dokumen_approve');
         Route::post('akreditasi/disapprove/{id}', [AkreditasiController::class, 'disapprove'])->name('dokumen_disapprove');
@@ -73,10 +75,14 @@ Route::group(["middleware" => ["autentikasi"]], function () {
         Route::get('akreditasi/asesmen-kecukupan/show/{id}/{id_krit}', [AkreditasiController::class, 'detail'])->name('akreditasi.asesmenKecukupan.detail');
         Route::get('akreditasi/asesmen-kecukupan/show/{id}', [AkreditasiController::class, 'show'])->name('akreditasi.asesmenKecukupan.show');
         Route::get('akreditasi/asesmen-kecukupan/json', [AkreditasiController::class, 'jsonAk'])->name('Upps.asesmen-kecukupan.json');
+        Route::get('akreditasi/asesmen-lapangan/show/rekap/{id}', [AkreditasiController::class, 'rekapAl'])->name('akreditasi.asesmenLapangan.rekap');
+        Route::get('akreditasi/asesmen-lapangan/show/{id}/{id_krit}', [AkreditasiController::class, 'detailAl'])->name('akreditasi.asesmenLapangan.detail');
+        Route::get('akreditasi/asesmen-lapangan/show/{id}', [AkreditasiController::class, 'showAl'])->name('akreditasi.asesmenLapangan.show');
         Route::get('akreditasi/asesmen-lapangan/json', [AkreditasiController::class, 'jsonAl'])->name('Upps.asesmen-lapangan.json');
         Route::get('akreditasi/asesmen-lapangan', [AkreditasiController::class, 'asesmenLapangan'])->name('akreditasi.asesmenLapangan');
         Route::get('akreditasi/asesmen-kecukupan', [AkreditasiController::class, 'asesmenKecukupan'])->name('akreditasi.asesmenKecukupan');
         Route::get('akreditasi/selesai', [AkreditasiController::class, 'finish'])->name('akreditasi.selesai');
+        Route::get('akreditasi/selesai/json', [AkreditasiController::class, 'finishJson'])->name('UPPS.akreditasi.selesai.json');
         Route::get('akreditasi/detail/{id_prodi}', [AkreditasiController::class, 'detail'])->name('UPPS.akreditasi.detail');
         Route::post('akreditasi/penugasanProdi', [AkreditasiController::class, 'penugasanProdi'])->name('UPPS.akreditasi.penugasanProdi');
         Route::post('akreditasi/penugasanAsesor', [AkreditasiController::class, 'penugasanAsesor'])->name('UPPS.akreditasi.penugasanAsesor');
@@ -174,11 +180,14 @@ Route::group(["middleware" => ["autentikasi"]], function () {
         Route::get('nilai-asesmen-kecukupan/json/{id}', [NilaiDeskEvalController::class, 'json'])->name('asesmen-kecukupan.json');
         Route::get('nilai-asesmen-kecukupan/show/{id}/{id_prodi}', [NilaiDeskEvalController::class, 'show'])->name('asesor.penilaian.asesmen-kecukupan.show');
         Route::post('nilai-asesmen-kecukupan/update/{id}', [NilaiDeskEvalController::class, 'update'])->name('asesor.penilaian.asesmen-kecukupan.update');
+        Route::post('nilai-asesmen-kecukupan/selesai/{id}', [NilaiDeskEvalController::class, 'selesai'])->name('asesor.ak.selesai');
         Route::get('nilai-asesmen-kecukupan/elemen/{id_prodi}', [NilaiDeskEvalController::class, 'elemen'])->name('asesor.penilaian.asesmen-kecukupan.elemen');
         Route::resource('nilai-asesmen-kecukupan', NilaiDeskEvalController::class);
 
+        Route::post('nilai-asesmenlapangan/selesai/{id}', [NilaiAsesmenLapanganD3Controller::class, 'selesai'])->name('asesor.al.selesai');
         Route::post('nilai-asesmenlapangan/store', [NilaiAsesmenLapanganD3Controller::class, 'store'])->name('nilai-asesmenlapangan.store');
         Route::post('nilai-asesmenlapangan/update/{id}', [NilaiAsesmenLapanganD3Controller::class, 'update'])->name('nilai-asesmenlapangan.update');
+        Route::post('nilai-asesmenlapangan/calculate/{id}', [NilaiAsesmenLapanganD3Controller::class, 'calculateItem'])->name('asesmen-lapangan.calculate');
         Route::get('nilai-asesmenlapangan/json/{id}', [NilaiAsesmenLapanganD3Controller::class, 'json'])->name('nilai-asesmenlapangan.json');
         Route::get('nilai-asesmenlapangan/elemen/{id_prodi}', [NilaiAsesmenLapanganD3Controller::class, 'elemen'])->name('nilai-asesmenlapangan.elemen');
         Route::get('nilai-asesmenlapangan/show/{id}/{id_prodi}', [NilaiAsesmenLapanganD3Controller::class, 'show'])->name('asesor.penilaian.asesmen-lapangan.show');
@@ -191,6 +200,7 @@ Route::group(["middleware" => ["autentikasi"]], function () {
         Route::get('nilai-deskeval/history/{id_prodi}', [NilaiDeskEvalController::class, 'history'])->name('asesor.nilai-deskeval.history');
         Route::get('nilai-deskeval/jsonHistory/{id_prodi}', [NilaiDeskEvalController::class, 'jsonHistory'])->name('asesor.nilai-deskeval.jsonHistory');
     });
+
     Route::group(["middleware" => ["can:Prodi"]], function () {
         Route::resource('dashboard-prodi', DashboardProdiController::class);
 

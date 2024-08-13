@@ -68,7 +68,7 @@
                                     </div> --}}
                                     <div class="card-body">
                                         <div class="table-responsive">
-                                            <table class="table table-striped" id="asesmenKecukupanTable">
+                                            <table class="table table-striped" id="finishTable">
                                                 <thead>
                                                     <tr>
                                                         <th>No</th>
@@ -76,6 +76,8 @@
                                                         <th>Program Studi</th>
                                                         <th>Akreditasi</th>
                                                         <th>Sertifikat</th>
+                                                        <th>Berita Acara</th>
+                                                        <th>Saran & Rekomendasi</th>
                                                         <th>Aksi</th>
                                                     </tr>
                                                 </thead>
@@ -103,10 +105,10 @@
 
     <script>
         $(function() {
-            $('#asesmenKecukupanTable').dataTable({
+            $('#finishTable').dataTable({
                 processing: true,
                 serverSide: true,
-                ajax: "{{ route('Upps.asesmen-lapangan.json') }}",
+                ajax: "{{ route('UPPS.akreditasi.selesai.json') }}",
                 columns: [{
                         data: 'DT_RowIndex',
                         name: 'DT_RowIndex',
@@ -120,12 +122,19 @@
                         name: 'prodi'
                     },
                     {
-                        data: 'nilai_akhir',
-                        name: 'nilai_akhir'
+                        data: 'akreditasi',
+                        name: 'akreditasi'
+                    },
+                    {
+                        data: 'sertifikat',
+                        name: 'sertifikat'
                     },
                     {
                         data: 'berita_acara',
                         name: 'berita_acara'
+                    },{
+                        data: 'saran_rekomendasi',
+                        name: 'saran_rekomendasi'
                     },
                     {
                         data: 'action',

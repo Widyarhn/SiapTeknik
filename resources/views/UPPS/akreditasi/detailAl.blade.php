@@ -24,7 +24,7 @@
                         <div class="section-header-breadcrumb">
                             <div class="breadcrumb-item active"><a href="{{ url('dashboard-UPPS') }}">Dashboard</a>
                             </div>
-                            <div class="breadcrumb-item"><a href="{{ route('akreditasi.asesmenKecukupan.show', $user_asesor->id) }}">Asesmen Kecukupan</a></div>
+                            <div class="breadcrumb-item"><a href="{{ route('akreditasi.asesmenLapangan.show', $user_asesor->id) }}">Asesmen Lapangan</a></div>
                             <div class="breadcrumb-item">Detail Kriteria</div>
                         </div>
                     </div>
@@ -32,7 +32,7 @@
                     <div class="section-body">
                         <h2 class="section-title">Detail Penilaian Kriteria oleh Asesor {{ $user_asesor->user->nama }}</h2>
                         <p class="section-lead">
-                            Detail Kriteria Penilaian asesmen kecukupan {{ $user_asesor->jenjang->jenjang }}
+                            Detail Kriteria Penilaian asesmen lapangan {{ $user_asesor->jenjang->jenjang }}
                             {{ $user_asesor->program_studi->nama }} oleh {{ $user_asesor->user->nama }} sebagai
                             {{ $user_asesor->jabatan }}.
                         </p>
@@ -41,7 +41,7 @@
                             <div class="col-12">
                                 <div class="card">
                                     <div class="card-header">
-                                        <h4>Tabel Detail Penilaian Asesmen Kecukupan {{ $user_asesor->jenjang->jenjang }}
+                                        <h4>Tabel Detail Penilaian Asesmen lapangan {{ $user_asesor->jenjang->jenjang }}
                                             {{ $user_asesor->program_studi->nama }}</h4>
                                     </div>
                                 </div>
@@ -140,13 +140,13 @@
                                                             </td>
                                                         </tr>
                                                         {{-- @php
-                                                            $cob = $m->asesmen_kecukupan->user_asesor_id;
+                                                            $cob = $m->asesmen_lapangan->user_asesor_id;
                                                             dd($cob);
                                                         @endphp --}}
-                                                        @if ($m->asesmen_kecukupan)
-                                                            @if ($m->asesmen_kecukupan->user_asesor_id == $user_asesor->id)
+                                                        @if ($m->asesmen_lapangan)
+                                                            @if ($m->asesmen_lapangan->user_asesor_id == $user_asesor->id)
                                                                 <form
-                                                                    action="{{ route('asesor.penilaian.asesmen-kecukupan.update', $m->asesmen_kecukupan->id) }}"
+                                                                    action="{{ route('nilai-asesmenlapangan.update', $m->asesmen_lapangan->id) }}"
                                                                     method="post" enctype="multipart/form-data"
                                                                     id="formActionUpdate">
                                                                     @csrf
@@ -165,24 +165,24 @@
                                                                             <input type="hidden" name="timeline_id"
                                                                                 value="{{ $user_asesor->timeline->id }}" />
                                                                             @if ($m->anotasi_label)
-                                                                                @if ($m->asesmen_kecukupan->matriks_penilaian_id == $m->anotasi_label->matriks_penilaian_id)
+                                                                                @if ($m->asesmen_lapangan->matriks_penilaian_id == $m->anotasi_label->matriks_penilaian_id)
                                                                                     <input type="text"
                                                                                         placeholder="1-4" name="nilai"
-                                                                                        value=" {{ $m->asesmen_kecukupan->nilai }}"
+                                                                                        value=" {{ $m->asesmen_lapangan->nilai }}"
                                                                                         class="form-control text-center"
                                                                                         id="{{ $m->indikator->no_butir }}"
                                                                                         disabled>
                                                                                 @else
                                                                                     <input type="text"
                                                                                         placeholder="1-4" name="nilai"
-                                                                                        value=" {{ $m->asesmen_kecukupan->nilai }}"
+                                                                                        value=" {{ $m->asesmen_lapangan->nilai }}"
                                                                                         class="form-control text-center"
                                                                                         id="{{ $m->indikator->no_butir }}">
                                                                                 @endif
                                                                             @else
                                                                                 <input type="text" placeholder="1-4"
                                                                                     name="nilai"
-                                                                                    value=" {{ $m->asesmen_kecukupan->nilai }}"
+                                                                                    value=" {{ $m->asesmen_lapangan->nilai }}"
                                                                                     class="form-control text-center"
                                                                                     id="{{ $m->indikator->no_butir }}">
                                                                             @endif
@@ -196,7 +196,7 @@
                                                                     </tr>
                                                                     <tr>
                                                                         <td>
-                                                                            <textarea name="deskripsi" class="form-control">{{ $m->asesmen_kecukupan->deskripsi }}</textarea>
+                                                                            <textarea name="deskripsi" class="form-control">{{ $m->asesmen_lapangan->deskripsi }}</textarea>
                                                                         </td>
                                                                     </tr>
                                                                     <tr>
@@ -212,7 +212,7 @@
                                                                 </form>
                                                             @else
                                                                 <form
-                                                                    action="{{ route('asesor.penilaian.asesmen-kecukupan.update', $m->asesmen_kecukupan->id) }}"
+                                                                    action="{{ route('nilai-asesmenlapangan.update', $m->asesmen_lapangan->id) }}"
                                                                     method="post" enctype="multipart/form-data"
                                                                     id="formActionUpdate">
                                                                     @csrf
@@ -232,7 +232,7 @@
                                                                                 value="{{ $user_asesor->timeline->id }}" />
 
                                                                             <input type="text" name="nilai"
-                                                                                value="{{ $m->asesmen_kecukupan->nilai }}"
+                                                                                value="{{ $m->asesmen_lapangan->nilai }}"
                                                                                 class="form-control text-center"
                                                                                 disabled />
                                                                         </td>
@@ -246,7 +246,7 @@
                                                                     </tr>
                                                                     <tr>
                                                                         <td>
-                                                                            <textarea name="deskripsi" class="form-control">{{ $m->asesmen_kecukupan->deskripsi }}</textarea>
+                                                                            <textarea name="deskripsi" class="form-control">{{ $m->asesmen_lapangan->deskripsi }}</textarea>
                                                                         </td>
                                                                     </tr>
                                                                     <tr>
@@ -303,7 +303,7 @@
                                     <div class="col-md-12">
                                         <div class="card-body">
                                                 <div class="text-center">
-                                                    <a href="{{ route('akreditasi.asesmenKecukupan.show', $user_asesor->id) }}"
+                                                    <a href="{{ route('akreditasi.asesmenLapangan.show', $user_asesor->id) }}"
                                                         class="btn btn-secondary"><i class="fa fa-chevron-left"></i>
                                                         Kembali</a>
                                                 </div>

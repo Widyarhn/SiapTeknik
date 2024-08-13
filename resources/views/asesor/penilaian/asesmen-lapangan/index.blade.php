@@ -42,6 +42,14 @@
                                 <div class="card">
                                     <div class="card-header">
                                             <h4>Tabel Elemen Penilaian D3</h4>
+                                            <div class="card-header-action">
+                                                <a href="javascript:void(0)" data-id="{{ $user_asesor->timeline_id }}"
+                                                    class="btn btn-outline-info btn-selesai"
+                                                    style="border-radius: 30px;"
+                                                    data-route="{{ route('asesor.ak.selesai', $user_asesor->timeline_id) }}">
+                                                    <i class="fas fa-check"></i> Selesaikan Asesmen Lapangan
+                                                </a>
+                                            </div>
                                     </div>
                                     <div class="card-body">
                                         <div class="table-responsive">
@@ -95,7 +103,49 @@
                 })
             })
 
+            $(document).ready(function() {
+            $("body").on('click', '.btn-selesai', function() {
+                let id = $(this).data('id');
+                let route = $(this).data('route');
 
+                swal({
+                    title: 'Selesaikan?',
+                    html: 'Apakah Anda yakin ingin menyelesaikan asesmen kecukupan ini?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Oke!',
+                    cancelButtonText: 'Batal',
+                    buttons: true,
+                    dangerMode: true,
+                }).then((willSelesaikan) => {
+                    console.log(willSelesaikan);
+                    if (willSelesaikan) {
+                        $.ajax({
+                            url: route,
+                            method: 'POST',
+                            data: {
+                                _token: "{{ csrf_token() }}",
+                                id: id,
+                            }
+                        }).done(function(response) {
+                            swal({
+                                title: 'Berhasil!',
+                                text: "Asesmen berhasil diselesaikan, Silahkan lihat ditahap selanjutnya!",
+                                icon: 'success',
+                            }).then(() => {
+                                window.location.reload();
+                            });
+                        }).fail(function() {
+                            swal({
+                                title: 'Terjadi kesalahan!',
+                                text: 'Server Error',
+                                icon: 'error'
+                            });
+                        });
+                    }
+                });
+            });
+        });
     </script>
     <footer class="main-footer">
         @include('footer')

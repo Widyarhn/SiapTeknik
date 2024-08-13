@@ -178,28 +178,19 @@
                                                             <form
                                                                 action="{{ route('nilai-asesmenlapangan.update', $m->asesmen_lapangan->id) }}"
                                                                 method="post" enctype="multipart/form-data"
-                                                                id="formActionStore">
+                                                                id="formActionUpdate">
                                                                 @csrf
                                                                 @method('POST')
                                                                 <tr>
                                                                     <th>
-                                                                        <div class="badge badge-primary">
-                                                                            Nilai
-                                                                        </div>
+                                                                        <div class="badge badge-primary">Nilai</div>
                                                                     </th>
                                                                 </tr>
                                                                 <tr>
                                                                     <td>
-                                                                        <input type="hidden" id="formActionUpdate" />
-                                                                        {{-- <input type="hidden"
-                                                                            value="{{ $program_studi->id }}"
-                                                                            name="program_studi_id" /> --}}
                                                                         <input type="hidden"
                                                                             value="{{ $m->id }}"
                                                                             name="m_id" />
-                                                                        {{-- <input type="hidden"
-                                                                            value="{{ $user_asesor->tahun->id }}"
-                                                                            name="tahun_id" /> --}}
                                                                         <input type="hidden"
                                                                             value="{{ $user_asesor->id }}"
                                                                             name="user_asesor_id" />
@@ -209,14 +200,16 @@
 
                                                                         <input type="text" placeholder="1-4"
                                                                             name="nilai"
-                                                                            value=" {{ $m->asesmen_lapangan->nilai }}"
-                                                                            class="form-control text-center" />
+                                                                            value="{{ $m->asesmen_lapangan->nilai }}"
+                                                                            class="form-control text-center"  @if ($m->anotasi_label) disabled @endif id="{{ $m->indikator->no_butir }}"/>
+                                                                            @if ($m->anotasi_label)
+                                                                            <input type="hidden" name="nilai" value="{{ $m->asesmen_kecukupan->nilai }} "id="{{ $m->indikator->no_butir }}">
+                                                                            @endif
                                                                     </td>
                                                                 </tr>
                                                                 <tr>
                                                                     <th>
-                                                                        <div class="badge badge-primary">
-                                                                            Deskripsi Nilai
+                                                                        <div class="badge badge-primary">Deskripsi Nilai
                                                                         </div>
                                                                     </th>
                                                                 </tr>
@@ -230,9 +223,7 @@
                                                                         <div class="d-grid col-md-6 mt-2">
                                                                             <div class="btn-group">
                                                                                 <button type="submit"
-                                                                                    class="btn btn-outline-warning">
-                                                                                    Edit
-                                                                                </button>
+                                                                                    class="btn btn-outline-warning">Edit</button>
                                                                             </div>
                                                                         </div>
                                                                     </td>
@@ -246,23 +237,14 @@
                                                                 @method('POST')
                                                                 <tr>
                                                                     <th>
-                                                                        <div class="badge badge-primary">
-                                                                            Nilai
-                                                                        </div>
+                                                                        <div class="badge badge-primary">Nilai</div>
                                                                     </th>
                                                                 </tr>
                                                                 <tr>
                                                                     <td>
-                                                                        <input type="hidden" id="formActionStore" />
-                                                                        {{-- <input type="hidden"
-                                                                            value="{{ $program_studi->id }}"
-                                                                            name="program_studi_id" /> --}}
                                                                         <input type="hidden"
                                                                             value="{{ $m->id }}"
                                                                             name="m_id" />
-                                                                        {{-- <input type="hidden"
-                                                                            value="{{ $user_asesor->tahun->id }}"
-                                                                            name="tahun_id" /> --}}
                                                                         <input type="hidden"
                                                                             value="{{ $user_asesor->id }}"
                                                                             name="user_asesor_id" />
@@ -272,19 +254,23 @@
 
                                                                         <input type="text" placeholder="1-4"
                                                                             name="nilai"
-                                                                            class="form-control text-center">
+                                                                            value="{{ $m->asesmen_kecukupan->nilai ?? '' }}"
+                                                                            class="form-control text-center"
+                                                                            @if ($m->anotasi_label) disabled @endif id="{{ $m->indikator->no_butir }}">
+                                                                            @if ($m->anotasi_label)
+                                                                            <input type="hidden" name="nilai" value="{{ $m->asesmen_kecukupan->nilai }}" id="{{ $m->indikator->no_butir }}">
+                                                                            @endif
                                                                     </td>
                                                                 </tr>
                                                                 <tr>
                                                                     <th>
-                                                                        <div class="badge badge-primary">
-                                                                            Deskripsi Nilai
+                                                                        <div class="badge badge-primary">Deskripsi Nilai
                                                                         </div>
                                                                     </th>
                                                                 </tr>
                                                                 <tr>
                                                                     <td>
-                                                                        <textarea name="deskripsi" class="form-control"></textarea>
+                                                                        <textarea name="deskripsi" class="form-control">{{ $m->asesmen_kecukupan->deskripsi ?? '' }}</textarea>
                                                                     </td>
                                                                 </tr>
                                                                 <tr>
@@ -292,15 +278,15 @@
                                                                         <div class="d-grid col-md-6 mt-2">
                                                                             <div class="btn-group">
                                                                                 <button type="submit"
-                                                                                    class="btn btn-outline-primary">
-                                                                                    Tambahkan
-                                                                                </button>
+                                                                                    class="btn btn-outline-primary">Tambahkan</button>
                                                                             </div>
                                                                         </div>
                                                                     </td>
                                                                 </tr>
                                                             </form>
                                                         @endif
+
+
                                                     </table>
                                                 </div>
                                             </div>
@@ -342,6 +328,80 @@
         </div>
     </div>
 </body>
+@php
+        // Periksa apakah $matriks tidak kosong
+        if (!empty($matriks) && isset($matriks[0])) {
+            $kriteriaId = $matriks[0]->kriteria_id;
+        } else {
+            // Tangani kasus di mana $matriks kosong
+            $kriteriaId = null;
+        }
+    @endphp
+    <script>
+        var matriks = @json($matriks);
+
+        $(document).ready(function() {
+            $('#btn-save').click(function(e) {
+                e.preventDefault();
+                var data = {};
+
+                // Kelompokkan data berdasarkan rumus_id
+                $.each(matriks, function(index, matrik) {
+                    var noButir = matrik.indikator.no_butir;
+                    var rumus_id = matrik.indikator.rumus_id;
+                    var nilai = matrik.asesmen_lapangan ? matrik.asesmen_lapangan.nilai : null;
+
+                    // Cek jika noButir tidak null atau tidak undefined
+                    if (noButir !== null && noButir !== undefined) {
+                        var key = noButir.replace('.', '');
+
+                        // Inisialisasi array untuk rumus_id jika belum ada
+                        if (!data[rumus_id]) {
+                            data[rumus_id] = {};
+                        }
+
+                        // Simpan nilai berdasarkan key
+                        data[rumus_id][key] = nilai;
+                    }
+                });
+
+                console.log('Data yang dikirim:', data); // Log data sebelum dikirim
+
+                var csrfToken = $('meta[name="csrf-token"]').attr('content');
+
+                $.ajaxSetup({
+                    headers: {
+                        'X-CSRF-TOKEN': csrfToken
+                    }
+                });
+
+                @if ($kriteriaId)
+                    $.ajax({
+                        url: `{{ route('asesmen-lapangan.calculate', $kriteriaId) }}`,
+                        type: 'POST',
+                        data: data,
+                        dataType: 'json',
+                        success: function(response) {
+                            console.log('Response dari server:', response);
+                            swal({
+                                title: 'Berhasil!',
+                                text: "Data berhasil disimpan.",
+                                icon: 'success',
+                            }).then(() => {
+                                // Tindakan setelah berhasil
+                            });
+                        },
+                        error: function(jqXHR, textStatus, errorThrown) {
+                            console.error('Terjadi kesalahan:', textStatus, errorThrown);
+                        }
+                    });
+                @else
+                    console.error('Matriks kosong atau tidak valid.');
+                @endif
+
+            });
+        });
+    </script>
 </head>
 
 </html>

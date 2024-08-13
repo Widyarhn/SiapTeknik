@@ -292,19 +292,54 @@
                                                                             {{-- matiin dulu --}}
                                                                             <td rowspan="{{ count($item) }}">
                                                                                 @php
+                                                                                    // Inisialisasi variabel
+                                                                                    $total = 0;
+                                                                                    $bobotPerRumus = [];
+                                                                                    $rumuses = [];
+                                                                            
+                                                                                    // Loop untuk mengumpulkan bobot per rumus_id
                                                                                     foreach ($item as $indicator) {
-                                                                                        $total +=
-                                                                                            $indicator->bobot *
-                                                                                            $item[$key]->matriks
-                                                                                                ->asesmen_lapangan
-                                                                                                ->nilai;
+                                                                                        if ($indicator->no_butir && $indicator->sub_kriteria->rumus) {
+                                                                                            // Ambil rumus_id dari indikator
+                                                                                            $rumus_id = $indicator->sub_kriteria->rumus->id ?? null;
+                                                                                            
+                                                                                            if ($rumus_id) {
+                                                                                                // Inisialisasi bobot jika belum ada
+                                                                                                if (!isset($bobotPerRumus[$rumus_id])) {
+                                                                                                    $bobotPerRumus[$rumus_id] = 0;
+                                                                                                }
+                                                                            
+                                                                                                // Tambah bobot berdasarkan rumus_id
+                                                                                                $bobotPerRumus[$rumus_id] += $indicator->bobot;
+                                                                            
+                                                                                                // Simpan rumus ke dalam array jika belum ada
+                                                                                                if (!isset($rumuses[$rumus_id])) {
+                                                                                                    $rumuses[$rumus_id] = $indicator->sub_kriteria->rumus;
+                                                                                                }
+                                                                                            }
+                                                                                        } else {
+                                                                                            // Jika tidak memiliki rumus_id, kalikan bobot dengan nilai
+                                                                                            $total += $indicator->bobot * ($indicator->matriks->asesmen_lapangan->nilai ?? 0);
+                                                                                        }
                                                                                     }
+                                                                            
+                                                                                    // Loop untuk menghitung total berdasarkan bobot dan t_butir
+                                                                                    foreach ($bobotPerRumus as $rumus_id => $totalBobot) {
+                                                                                        // Temukan rumus dengan rumus_id yang sesuai
+                                                                                        $rumus = $rumuses[$rumus_id] ?? null;
+                                                                            
+                                                                                        if ($rumus) {
+                                                                                            // Hitung total berdasarkan t_butir dan bobot total per rumus_id
+                                                                                            $total += $totalBobot * ($rumus->t_butir ?? 0);
+                                                                                        }
+                                                                                    }
+                                                                            
+                                                                                    // Tambah total perhitungan ke total keseluruhan
+                                                                                    $total_kes += $total;
                                                                                 @endphp
+                                                                            
                                                                                 <span class="badge badge-info">
-                                                                                    {{ $total }}
-                                                                                    @php
-                                                                                        $total_kes += $total;
-                                                                                    @endphp
+                                                                                    {{ number_format($total, 2) }}
                                                                                 </span>
                                                                             </td>
                                                                         </tr>
@@ -353,18 +388,18 @@
                                                     <th>Total Nilai Asesmen Lapangan</th>
                                                     <th>:</th>
                                                     <td>
-                                                        {{ $total_kes }}
+                                                        {{ number_format($total_kes, 2) }}
                                                     </td>
                                                     <th>Hasil Akreditasi</th>
                                                     <th>:</th>
                                                     <td>
-                                                        @if ($total >= 1 && $total <= 200)
+                                                        @if ($total_kes >= 1 && $total_kes <= 200)
                                                             TIDAK MEMENUHI SYARAT PERINGKAT
-                                                        @elseif($total >= 200 && $total <= 301)
+                                                        @elseif($total_kes >= 200 && $total_kes <= 301)
                                                             BAIK
-                                                        @elseif($total >= 301 && $total <= 361)
+                                                        @elseif($total_kes >= 301 && $total_kes <= 361)
                                                             BAIK SEKALI
-                                                        @elseif($total >= 361)
+                                                        @elseif($total_kes >= 361)
                                                             UNGGUL
                                                         @endif
                                                     </td>

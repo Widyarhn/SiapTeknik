@@ -599,7 +599,7 @@
                                 }).done(function(response) {
                                     swal({
                                         title: 'Berhasil!',
-                                        text: "Dokumen berhasil disetujui!",
+                                        text: "Asesmen Lapangan berhasil disetujui!",
                                         icon: 'success',
                                     }).then(() => {
                                         window.location.reload();

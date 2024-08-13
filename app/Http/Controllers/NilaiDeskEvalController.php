@@ -11,6 +11,7 @@ use App\Models\ProgramStudi;
 use Illuminate\Http\Request;
 use App\Models\AsesmenKecukupan;
 use App\Models\MatriksPenilaian;
+use App\Models\Timeline;
 use Yajra\DataTables\DataTables;
 use App\Services\FormulaEvaluator;
 use Illuminate\Support\Facades\Auth;
@@ -36,6 +37,15 @@ class NilaiDeskEvalController extends Controller
         return view('asesor.penilaian.desk-evaluasi.index', $data,  ['program_studi' => $program_studi, 'user_asesor' => $user_asesor]);
     }
 
+    public function selesai($id)
+    {
+        $timeline = Timeline::find($id);
+        $timeline->status = "1";
+        $timeline->save();
+
+        return response()->json(['success' => true, 'message' => 'Asesmen Kecukupan Selesai! Lihat Info selanjutnya!']);
+    }
+
     public function json(Request $request, $id_prodi)
     {
         $data = Kriteria::orderBy('id', 'ASC')->get();
@@ -59,7 +69,6 @@ class NilaiDeskEvalController extends Controller
         $user_asesor = UserAsesor::where("user_id", Auth::user()->id)
             ->where("program_studi_id", $program_studi->id) // Menggunakan $program_studi->id untuk mendapatkan ID program studi
             ->first();
-
         if (!$user_asesor) {
             // Tangani kondisi ketika user_asesor tidak ditemukan
             return response()->json(['error' => 'User Asesor not found'], 404);
@@ -68,11 +77,13 @@ class NilaiDeskEvalController extends Controller
         // $matrixId = AsesmenKecukupan::where('user_asesor_id', Auth::user()->user_asesor->id)->pluck('matriks_penilaian_id');
         // $matrixs = MatriksPenilaian::whereIn('id', $matrixId)->get();
 
-        $matriks = MatriksPenilaian::with(['jenjang', 'kriteria', 'sub_kriteria', 'indikator', 'data_dukung', 'anotasi_label'])->orderBy('kriteria_id', 'ASC')
+        $matriks = MatriksPenilaian::with(['jenjang', 'kriteria', 'sub_kriteria', 'indikator', 'data_dukung', 'anotasi_label', 'asesmen_kecukupan'=>function($q) use ($user_asesor){
+            $q->where('user_asesor_id', $user_asesor->id);
+        }])->orderBy('kriteria_id', 'ASC')
             ->where("jenjang_id", $user_asesor->jenjang_id)
             ->where("kriteria_id", $id)
             ->get();
-
+        
 
         return view("asesor.penilaian.desk-evaluasi.show", compact("kriteria", "program_studi", "user_asesor", "matriks"));
 
@@ -314,12 +325,6 @@ class NilaiDeskEvalController extends Controller
             ], 500);
         }
     }
-
-
-
-
-
-
 
     // public function calculateItem(Request $request, string $id_kriteria){
     //     try{

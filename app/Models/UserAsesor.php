@@ -41,6 +41,9 @@ class UserAsesor extends Model
     {
         return $this->hasMany(AsesmenKecukupan::class);
     }
-    
+    public function asesmen_lapangan()
+    {
+        return $this->hasMany(AsesmenLapangan::class);
+    }
 
 }

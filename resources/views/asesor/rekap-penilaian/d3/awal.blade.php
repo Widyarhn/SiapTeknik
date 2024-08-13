@@ -248,13 +248,13 @@
                                                     <th>Hasil Akreditasi</th>
                                                     <th>:</th>
                                                     <td>
-                                                        @if ($total >= 1 && $total <= 200)
+                                                        @if ($total_kes >= 1 && $total_kes <= 200)
                                                             TIDAK MEMENUHI SYARAT PERINGKAT
-                                                        @elseif($total >= 200 && $total <= 301)
+                                                        @elseif($total_kes >= 200 && $total_kes <= 301)
                                                             BAIK
-                                                        @elseif($total >= 301 && $total <= 361)
+                                                        @elseif($total_kes >= 301 && $total_kes <= 361)
                                                             BAIK SEKALI
-                                                        @elseif($total >= 361)
+                                                        @elseif($total_kes >= 361)
                                                             UNGGUL
                                                         @endif
                                                     </td>

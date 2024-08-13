@@ -59,13 +59,13 @@
                                                 Dokumen Ajuan</a>
                                         </li>
                                         <li class="nav-item">
-                                            <a class="nav-link "
-                                                href="{{ route('akreditasi.asesmenKecukupan') }}"><i
+                                            <a class="nav-link " href="{{ route('akreditasi.asesmenKecukupan') }}"><i
                                                     class="fas fa-regular fa-circle"></i>
                                                 Asesmen Kecukupan</a>
                                         </li>
                                         <li class="nav-item">
-                                            <a class="nav-link active" href="{{ route('akreditasi.asesmenLapangan') }}"><i
+                                            <a class="nav-link active"
+                                                href="{{ route('akreditasi.asesmenLapangan') }}"><i
                                                     class="fas fa-circle"></i> Asesmen Lapangan</a>
                                         </li>
                                         <li class="nav-item">
@@ -86,7 +86,7 @@
                                     </div> --}}
                                     <div class="card-body">
                                         <div class="table-responsive">
-                                            <table class="table table-striped" id="asesmenKecukupanTable">
+                                            <table class="table table-striped" id="asesmenLapanganTable">
                                                 <thead>
                                                     <tr>
                                                         <th>No</th>
@@ -94,6 +94,7 @@
                                                         <th>Program Studi</th>
                                                         <th>Nilai Akhir</th>
                                                         <th>Berita Acara</th>
+                                                        <th>Saran & Rekomendasi</th>
                                                         <th>Aksi</th>
                                                     </tr>
                                                 </thead>
@@ -190,7 +191,7 @@
 
     <script>
         $(function() {
-            $('#asesmenKecukupanTable').dataTable({
+            $('#asesmenLapanganTable').dataTable({
                 processing: true,
                 serverSide: true,
                 ajax: "{{ route('Upps.asesmen-lapangan.json') }}",
@@ -215,6 +216,10 @@
                         name: 'berita_acara'
                     },
                     {
+                        data: 'saran_rekomendasi',
+                        name: 'saran_rekomendasi'
+                    },
+                    {
                         data: 'action',
                         name: 'action',
                         orderable: false,
@@ -225,21 +230,46 @@
         })
 
         $(document).ready(function() {
-            // Event handler untuk tombol disapprove
-            $('body').on('click', '.approve-btn', function() {
+            $("body").on('click', '.approve-btn', function() {
                 let id = $(this).data('id');
-                let prodi = $(this).data('prodi');
-                let thn = $(this).data('thn');
                 let route = $(this).data('route');
 
-                // Atur form action dan input values
-                $('#approveForm').attr('action', route);
-                $('#docId').val(id);
-                $('#docProdi').val(prodi);
-                $('#docThn').val(thn);
-
-                // Tampilkan modal
-                $('#approveModal').modal('show');
+                swal({
+                    title: 'Selesaikan?',
+                    html: 'Apakah Anda yakin ingin menyelesaikan asesmen ini?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Oke!',
+                    cancelButtonText: 'Batal',
+                    buttons: true,
+                    dangerMode: true,
+                }).then((willSelesaikan) => {
+                    console.log(willSelesaikan);
+                    if (willSelesaikan) {
+                        $.ajax({
+                            url: route,
+                            method: 'POST',
+                            data: {
+                                _token: "{{ csrf_token() }}",
+                                id: id,
+                            }
+                        }).done(function(response) {
+                            swal({
+                                title: 'Berhasil!',
+                                text: "Asesmen berhasil diselesaikan, Silahkan lihat ditahap selanjutnya!",
+                                icon: 'success',
+                            }).then(() => {
+                                window.location.reload();
+                            });
+                        }).fail(function() {
+                            swal({
+                                title: 'Terjadi kesalahan!',
+                                text: 'Server Error',
+                                icon: 'error'
+                            });
+                        });
+                    }
+                });
             });
         });
 
@@ -262,5 +292,3 @@
 </body>
 
 </html>
-
-
