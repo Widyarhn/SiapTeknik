@@ -8,10 +8,10 @@ use Illuminate\Support\Facades\DB;
 use App\Models\User;
 use App\Models\Tahun;
 use App\Models\Jenjang;
-use App\Models\USerAsesor;
+use App\Models\UserAsesor;
 use App\Models\ProgramStudi;
 
-class USerAsesorController extends Controller
+class UserAsesorController extends Controller
 {
     
     public function asesor(Request $request, $id)
