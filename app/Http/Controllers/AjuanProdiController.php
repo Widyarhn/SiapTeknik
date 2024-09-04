@@ -8,22 +8,25 @@ use App\Models\Lkps;
 use App\Models\Tahun;
 use App\Models\Kriteria;
 use App\Models\ListLkps;
+use App\Models\Instrumen;
 use App\Models\UserProdi;
 use App\Models\ImportLkps;
 use App\Models\LabelImport;
+use App\Models\AnotasiLabel;
 use App\Models\DokumenAjuan;
 use App\Models\ListDocument;
 use App\Models\ProgramStudi;
 use Illuminate\Http\Request;
 use App\Models\SuratPengantar;
+use App\Models\LampiranRenstra;
+// use Illuminate\Contracts\Database\Eloquent\Builder;
+use App\Models\RumusSkorImport;
+use App\Models\SuratPernyataan;
 use App\Imports\ImportLkpsExcel;
+use App\Models\AsesmenKecukupan;
 use App\Models\PengajuanDokumen;
 use App\Imports\CustomImportLkps;
-// use Illuminate\Contracts\Database\Eloquent\Builder;
 use App\Imports\LabelsImportLkps;
-use App\Models\AnotasiLabel;
-use App\Models\AsesmenKecukupan;
-use App\Models\RumusSkorImport;
 use App\Services\FormulaEvaluator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
@@ -38,6 +41,7 @@ class AjuanProdiController extends Controller
         session(['id_prodi' => $id_prodi]);
 
         $program_studi = ProgramStudi::findOrFail($id_prodi);
+        $jenjang_id = $program_studi->jenjang_id;
 
         $user_prodi = UserProdi::with('tahun', 'pengajuan_dokumen', 'surat_pengantar', 'lkps', 'led')->where("user_id", Auth::user()->id)
             ->where("program_studi_id", $id_prodi)
@@ -51,6 +55,19 @@ class AjuanProdiController extends Controller
         }])->where('status', 1)->first();
         $kriteria = Kriteria::where('kuantitatif', 1)->get();
         $importLkps = ImportLkps::with('kriteria')->get();
+        $templateKeyword = '';
+
+        if ($jenjang_id === 1) {
+            $templateKeyword = 'Template LKPS D3';
+        } elseif ($jenjang_id === 2) {
+            $templateKeyword = 'Template LKPS D4';
+        }
+
+        // Ambil data template berdasarkan jenjang_id
+        $templates = Instrumen::where('judul', 'like', '%' . $templateKeyword . '%')
+            ->where('jenjang_id', $jenjang_id)
+            ->orderBy('id', 'ASC')
+            ->get();
 
         return view('prodi.dokumen.ajuan.index', [
             'pengajuan' => $pengajuan,
@@ -59,6 +76,7 @@ class AjuanProdiController extends Controller
             'now' => $tahunSaatIni,
             'kriteria' => $kriteria,
             'importLkps' => $importLkps,
+            'templates' => $templates,
         ]);
     }
 
@@ -192,6 +210,178 @@ class AjuanProdiController extends Controller
         }
     }
 
+    public function storePernyataan(Request $request)
+    {
+        $validatedData = $request->validate(
+            [
+                'file' => ['required', 'mimes:pdf']
+            ],
+            [
+                'file.mimes' => 'File harus berupa pdf'
+            ]
+        );
+
+        // Mulai transaksi
+        DB::beginTransaction();
+
+        try {
+            $file = $request->file('file');
+            $nama_file = $file->getClientOriginalName();
+            $nama_file_storage = $file->storeAs('dokumen-prodi/surat-pernyataan', $nama_file, 'public');
+
+            $sp = new SuratPernyataan;
+            $sp->file = $nama_file_storage;
+            $sp->program_studi_id = $request->program_studi_id;
+            $sp->tahun_id = null;
+            $sp->status = '0';
+            $sp->save();
+
+            // // Simpan ke tabel dokumen_ajuan
+            // $dokumen_ajuan = new DokumenAjuan;
+            // $dokumen_ajuan->step_id = $led->id; // menghubungkan dengan ID lkps
+            // $dokumen_ajuan->program_studi_id = $request->program_studi_id;
+            // $dokumen_ajuan->kategori = 'led';
+            // $dokumen_ajuan->pengajuan_ulang = false; // atau nilai default yang sesuai
+            // $dokumen_ajuan->keterangan = 'Pengajuan Dokumen LED';
+            // $dokumen_ajuan->save();
+
+            // Commit transaksi jika semua operasi berhasil
+            DB::commit();
+
+            return redirect()->back()->with('success', 'Surat Pernyataan Berhasil Diunggah');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->with('error', 'Terjadi kesalahan saat mengunggah dokumen Surat Pernyataan: ' . $e->getMessage());
+        }
+    }
+
+    public function updatePernyataan(Request $request, $id)
+    {
+        // Mulai transaksi
+        DB::beginTransaction();
+
+        try {
+            $sp = SuratPernyataan::find($id);
+
+            // Jika ada file baru, upload file dan update nama file
+            if ($request->hasFile('file')) {
+                // Hapus file lama jika ada
+                if ($sp->file) {
+                    Storage::disk('public')->delete($sp->file);
+                }
+                $file = $request->file('file');
+                $nama_file = $file->getClientOriginalName();
+                $nama_file_storage = $file->storeAs('dokumen-prodi/surat-pernyataan', $nama_file, 'public');
+            }
+
+            $sp->file = $nama_file_storage;
+            $sp->program_studi_id = $request->program_studi_id;
+            $sp->tahun_id = null;
+            $sp->status = '0';
+            $sp->keterangan = null;
+            $sp->save();
+
+            // // Update data Dokumen Ajuan yang terkait
+            // $dokumen_ajuan = DokumenAjuan::where('step_id', $led->id)->firstOrFail();
+            // $dokumen_ajuan->program_studi_id = $request->program_studi_id;
+            // $dokumen_ajuan->keterangan = 'Update dokumen led';
+            // $dokumen_ajuan->save();
+
+            // Commit transaksi jika semua operasi berhasil
+            DB::commit();
+
+            return redirect()->back()->with('success', 'Surat Pernyataan Berhasil Diperbarui');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->with('error', 'Terjadi kesalahan saat memperbarui Surat Pernyataan: ' . $e->getMessage());
+        }
+    }
+    public function storeLampiranRenstra(Request $request)
+    {
+        $validatedData = $request->validate(
+            [
+                'file' => ['required', 'mimes:pdf']
+            ],
+            [
+                'file.mimes' => 'File harus berupa pdf'
+            ]
+        );
+
+        // Mulai transaksi
+        DB::beginTransaction();
+
+        try {
+            $file = $request->file('file');
+            $nama_file = $file->getClientOriginalName();
+            $nama_file_storage = $file->storeAs('dokumen-prodi/lampiran-renstra', $nama_file, 'public');
+
+            $lr = new LampiranRenstra;
+            $lr->file = $nama_file_storage;
+            $lr->program_studi_id = $request->program_studi_id;
+            $lr->tahun_id = null;
+            $lr->status = '0';
+            $lr->save();
+
+            // // Simpan ke tabel dokumen_ajuan
+            // $dokumen_ajuan = new DokumenAjuan;
+            // $dokumen_ajuan->step_id = $led->id; // menghubungkan dengan ID lkps
+            // $dokumen_ajuan->program_studi_id = $request->program_studi_id;
+            // $dokumen_ajuan->kategori = 'led';
+            // $dokumen_ajuan->pengajuan_ulang = false; // atau nilai default yang sesuai
+            // $dokumen_ajuan->keterangan = 'Pengajuan Dokumen LED';
+            // $dokumen_ajuan->save();
+
+            // Commit transaksi jika semua operasi berhasil
+            DB::commit();
+
+            return redirect()->back()->with('success', 'Dokumen Lampiran Berhasil Diunggah');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->with('error', 'Terjadi kesalahan saat mengunggah dokumen Lampiran: ' . $e->getMessage());
+        }
+    }
+
+    public function updateLampiranRenstra(Request $request, $id)
+    {
+        // Mulai transaksi
+        DB::beginTransaction();
+
+        try {
+            $lr = LampiranRenstra::find($id);
+
+            // Jika ada file baru, upload file dan update nama file
+            if ($request->hasFile('file')) {
+                // Hapus file lama jika ada
+                if ($lr->file) {
+                    Storage::disk('public')->delete($lr->file);
+                }
+                $file = $request->file('file');
+                $nama_file = $file->getClientOriginalName();
+                $nama_file_storage = $file->storeAs('dokumen-prodi/lampiran-renstra', $nama_file, 'public');
+            }
+
+            $lr->file = $nama_file_storage;
+            $lr->program_studi_id = $request->program_studi_id;
+            $lr->tahun_id = null;
+            $lr->status = '0';
+            $lr->keterangan = null;
+            $lr->save();
+
+            // // Update data Dokumen Ajuan yang terkait
+            // $dokumen_ajuan = DokumenAjuan::where('step_id', $led->id)->firstOrFail();
+            // $dokumen_ajuan->program_studi_id = $request->program_studi_id;
+            // $dokumen_ajuan->keterangan = 'Update dokumen led';
+            // $dokumen_ajuan->save();
+
+            // Commit transaksi jika semua operasi berhasil
+            DB::commit();
+
+            return redirect()->back()->with('success', 'Dokumen Lampiran Berhasil Diperbarui');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->with('error', 'Terjadi kesalahan saat memperbarui Dokumen Lampiran: ' . $e->getMessage());
+        }
+    }
     public function storeled(Request $request)
     {
         $validatedData = $request->validate(
@@ -286,8 +476,11 @@ class AjuanProdiController extends Controller
         $user_prodi = UserProdi::where("user_id", Auth::user()->id)
             ->where("program_studi_id", $id_prodi)
             ->get();
+        
+            $kriteria = Kriteria::where('kuantitatif', 1)->get();
+            $importLkps = ImportLkps::with('kriteria')->get();
 
-        return view('prodi.dokumen.ajuan.history', ['program_studi' => $program_studi, 'user_prodi' => $user_prodi]);
+        return view('prodi.dokumen.ajuan.history', ['program_studi' => $program_studi, 'kriteria' => $kriteria,'importLkps' => $importLkps, 'user_prodi' => $user_prodi]);
     }
 
 
@@ -352,6 +545,14 @@ class AjuanProdiController extends Controller
         $lkps->tahun_id = $tahun->id;
         $lkps->update();
 
+        $spernyataan = SuratPernyataan::findOrFail($request->spernyataan_id);
+        $spernyataan->tahun_id = $tahun->id;
+        $spernyataan->update();
+
+        $lampiran = LampiranRenstra::findOrFail($request->lampiran_id);
+        $lampiran->tahun_id = $tahun->id;
+        $lampiran->update();
+
         // Mengupdate kolom tahun_id di tabel SuratPengantar
         $surat_pengantar = SuratPengantar::findOrFail($request->surat_pengantar_id);
         $surat_pengantar->tahun_id = $tahun->id;
@@ -411,7 +612,7 @@ class AjuanProdiController extends Controller
 
     public function importLkps(Request $request)
     {
-        set_time_limit(900);
+        set_time_limit(1000);
         $request->validate([
             'file' => 'required|mimes:xlsx,csv',
             'id_prodi' => 'required|exists:program_studies,id',
@@ -432,65 +633,7 @@ class AjuanProdiController extends Controller
         }
     }
 
-    public function calculate($id_prodi)
-    {
-        $programStudi = ProgramStudi::with('jenjang')->find($id_prodi);
-        $jenjangName = $programStudi->jenjang->jenjang;
-        $jenjangId = $programStudi->jenjang_id;
-        
-        if ($jenjangName == "D3") {
-            $this->calculate10A($id_prodi,$jenjangId);
-        } else {
-            $this->calculateY($id_prodi);
-            $this->calculateZ($id_prodi);
-        }
-        return redirect()->back()->with('success', 'Perhitungan dan penyimpanan data berhasil.');
-    }
 
-    protected $evaluator;
-
-    public function __construct(FormulaEvaluator $evaluator)
-    {
-        $this->evaluator = $evaluator;
-    }
-
-    public function calculate10A($id_prodi,$jenjangId)
-    {
-        $labelImport = LabelImport::where('program_studi_id', $id_prodi)->get();
-
-        $rkVal = $labelImport->whereIn('label', ['N1', 'N2', 'N3', 'NDTPS'])->pluck('nilai', 'label');
-        $rkFaktor = [
-            'a' => 2,
-            'b' => 1,
-            'c' => 3,
-        ];
-
-        $rkVar = array_merge($rkFaktor, $rkVal->mapWithKeys(fn($nilai, $label) => [$label => (int)$nilai])->toArray());
-        $rk = $this->evaluator->evaluate('((a * N1) + (b * N2) + (c * N3)) / NDTPS', $rkVar);
-
-        $rkOriginal = $rk['result']; // Akses langsung nilai result
-        $rkConverted = floatval(str_replace(',', '.', $rkOriginal)); // Konversi menjadi float
-
-        // // Debugging
-        // dd([
-        //     'Original' => $rkOriginal,
-        //     'Converted' => $rkConverted,
-        // ]);
-
-        $nilai = ($rkConverted >= 4.0) ? 4.0 : $rkConverted;
-        $idMatriks = AnotasiLabel::where('rumus_label', '10.A')->first()->id;
-        $anotasiLabel = AnotasiLabel::where('rumus_label', '10.A')->where('jenjang_id',$jenjangId)->first();
-        $idMatriks = $anotasiLabel ? $anotasiLabel->matriks_penilaian_id : null;
-
-        // Simpan nilai ke dalam tabel AsesmenKecukupan
-        AsesmenKecukupan::updateOrCreate(
-            [
-                'matriks_penilaian_id' => $idMatriks,
-                'nilai' => $nilai,
-                'deskripsi' => "Hasil Kuantitatifff",
-            ]
-        );
-    }
 
     // calculateY($id_prodi)
     // calculateZ($id_prodi)

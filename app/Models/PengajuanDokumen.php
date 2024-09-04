@@ -29,7 +29,7 @@ class PengajuanDokumen extends Model
     // }
     public function user_prodi()
     {
-        return $this->belongsTo(UserProdi::class);
+        return $this->belongsTo(UserProdi::class, 'user_prodi_id');
     }
     public function program_studi()
     {

@@ -128,7 +128,7 @@ class NilaiAsesmenLapanganD3Controller extends Controller
         // Validasi input dari form
         $validatedData = $request->validate(
             [
-                'nilai' => ['required', 'numeric', 'min:1', 'max:4'],
+                'nilai' => ['required', 'numeric'],
                 'deskripsi' => 'required'
             ],
             [

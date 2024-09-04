@@ -77,9 +77,7 @@ class NilaiDeskEvalController extends Controller
         // $matrixId = AsesmenKecukupan::where('user_asesor_id', Auth::user()->user_asesor->id)->pluck('matriks_penilaian_id');
         // $matrixs = MatriksPenilaian::whereIn('id', $matrixId)->get();
 
-        $matriks = MatriksPenilaian::with(['jenjang', 'kriteria', 'sub_kriteria', 'indikator', 'data_dukung', 'anotasi_label', 'asesmen_kecukupan'=>function($q) use ($user_asesor){
-            $q->where('user_asesor_id', $user_asesor->id);
-        }])->orderBy('kriteria_id', 'ASC')
+        $matriks = MatriksPenilaian::with(['jenjang', 'kriteria', 'sub_kriteria', 'indikator', 'data_dukung', 'anotasi_label', 'asesmen_kecukupan'])->orderBy('kriteria_id', 'ASC')
             ->where("jenjang_id", $user_asesor->jenjang_id)
             ->where("kriteria_id", $id)
             ->get();
@@ -291,6 +289,7 @@ class NilaiDeskEvalController extends Controller
     }
     public function calculateItem(Request $request, string $id_kriteria)
     {
+        
         try {
             $sub_kriteria_ids = SubKriteria::where('kriteria_id', $id_kriteria)->pluck('id')->toArray();
             $rumuses = Rumus::whereIn('sub_kriteria_id', $sub_kriteria_ids)->get();

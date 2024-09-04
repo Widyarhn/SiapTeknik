@@ -21,6 +21,10 @@ class UserAsesor extends Model
     {
         return $this->belongsTo(User::class, 'user_id');
     }
+    public function rpembinaan()
+    {
+        return $this->hasMany('App\Models\RPembinaan');
+    }
     
     public function jenjang()
     {

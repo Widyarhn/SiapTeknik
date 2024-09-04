@@ -151,7 +151,7 @@ class MatriksPenilaianController extends Controller
             'indikator' => 'required|array', // Menjadikan 'indikator' sebagai array wajib
             'indikator.*.bobot' => 'sometimes|nullable|numeric',
             'indikator.*.check' => 'sometimes|nullable',
-            'indikator.*.no_butir' => 'sometimes|nullable|max:2',
+            'indikator.*.no_butir' => 'sometimes|nullable|max:3',
             'indikator.*.deskriptor' => 'sometimes|required|min:6',
             'indikator.*.sangat_baik' => 'sometimes|required|min:6',
             'indikator.*.baik' => 'sometimes|required|min:6',

@@ -80,6 +80,12 @@
                     @endforeach
                 </ul>
             </li>
+            <li class="dropdown {{ Request::segment(1) == 'rekomendasi' ? 'active' : '' }}">
+                <a href="{{ url('rekomendasi') }}">
+                    <i class="fas fa-file" aria-hidden="true"></i>
+                    <span>Rekomendasi Pembinaan</span>
+                </a>
+            </li>
             <li class="menu-header">Rekapitulasi Penilaian</li>
             <li class="dropdown  {{ Request::segment('1') == 'rekap-nilaiAk' ? 'active' : '' }}">
                 <a href="#" class="nav-link has-dropdown">

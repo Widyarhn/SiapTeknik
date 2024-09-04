@@ -78,13 +78,13 @@
 
                   <div class="form-group">
                     <div class="d-block">
-                    	<label for="password" class="control-label">Password</label>
-                      <div class="float-right">
+                      <label for="password" class="control-label">Password</label>
+                      {{--<div class="float-right">
                         <a href="{{route('forgot-password')}}" class="text-small" style="color: #243dff">
                           Lupa Password?
                         </a>
-                      </div>
-                    </div>
+                      </div>--}}
+                    </div> 
                     <input id="password" type="password" class="form-control" name="password" required placeholder="password">
                     <div class="invalid-feedback">
                       masukkan password yang benar

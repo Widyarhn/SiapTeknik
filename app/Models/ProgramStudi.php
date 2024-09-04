@@ -17,6 +17,10 @@ class ProgramStudi extends Model
     {
         return $this->belongsTo(Jenjang::class);
     }
+    public function timelines()
+    {
+        return $this->hasmany(Timeline::class);
+    }
     
     public function data_dukung()
     {
@@ -32,10 +36,24 @@ class ProgramStudi extends Model
     {
         return $this->hasMany('App\Models\Lkps');
     }
+    public function surat_pernyataan()
+    {
+        return $this->hasMany('App\Models\SuratPernyataan');
+    }
+
+    public function lampiran_renstra()
+    {
+        return $this->hasMany('App\Models\LampiranRenstra');
+    }
+
 
     public function led()
     {
         return $this->hasMany('App\Models\Led');
+    }
+    public function rpembinaan()
+    {
+        return $this->hasMany('App\Models\RPembinaan');
     }
 
     public function user_prodi()
@@ -66,6 +84,10 @@ class ProgramStudi extends Model
     public function tahun()
     {
         return $this->hasOne(Tahun::class);
+    }
+    public function import_lkps()
+    {
+        return $this->hasMany(ImportLkps::class);
     }
 
     public function pengajuan_dokumen()

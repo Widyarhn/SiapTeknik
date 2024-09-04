@@ -6,7 +6,7 @@ use App\Models\LabelImport;
 use App\Models\ProgramStudi;
 use Illuminate\Database\Seeder;
 
-class LabelD3Seeder extends Seeder
+class LabelD4Seeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -16,7 +16,7 @@ class LabelD3Seeder extends Seeder
     public function run()
     {
 
-        $labels = [
+        $labeld4 = [
             [
                 "label" => "N1",
                 "sheet_name" => "1-1",
@@ -83,22 +83,36 @@ class LabelD3Seeder extends Seeder
                 "sheet_name" => "2a1",
                 "cell" => "G12"
             ],
-
             [
                 "label" => "NPendaftar",
-                "sheet_name" => "2a2",
-                "cell" => "C11"
+                "sheet_name" => "2a1",
+                "cell" => "C12"
             ],
             [
                 "label" => "NLolos",
-                "sheet_name" => "2a2",
-                "cell" => "D11"
+                "sheet_name" => "2a1",
+                "cell" => "D12"
             ],
-            //PKE INI NM
+            // [
+            //     "label" => "NM",
+            //     "sheet_name" => "2a2",
+            //     "cell" => "G11"
+            // ],
+
             [
-                "label" => "NM",
-                "sheet_name" => "2a2",
-                "cell" => "G11"
+                "label" => "JM_AKTIF",
+                "sheet_name" => "2b",
+                "cell" => "N7"
+            ],
+            [
+                "label" => "JM_ASING_FT",
+                "sheet_name" => "2b",
+                "cell" => "N10"
+            ],
+            [
+                "label" => "JM_ASING_PT",
+                "sheet_name" => "2b",
+                "cell" => "N13"
             ],
 
             [
@@ -253,6 +267,12 @@ class LabelD3Seeder extends Seeder
                 "label" => "NC3",
                 "sheet_name" => "3b5",
                 "cell" => "N16"
+            ],
+
+            [
+                "label" => "NAS",
+                "sheet_name" => "3b6",
+                "cell" => "J7"
             ],
 
             [
@@ -415,6 +435,17 @@ class LabelD3Seeder extends Seeder
                 "sheet_name" => "5d",
                 "cell" => "F10"
             ],
+
+            [
+                "label" => "NPM",
+                "sheet_name" => "6a",
+                "cell" => "M12"
+            ],
+            [
+                "label" => "NPD",
+                "sheet_name" => "3b2",
+                "cell" => "F12"
+            ],
             
             [
                 "label" => "NPkMM",
@@ -476,67 +507,55 @@ class LabelD3Seeder extends Seeder
             ],
 
             [
-                "label" => "g",
-                "sheet_name" => "8c",
-                "cell" => "G22"
-            ],[
                 "label" => "c",
                 "sheet_name" => "8c",
-                "cell" => "G23"
+                "cell" => "I32"
             ],[
                 "label" => "f",
                 "sheet_name" => "8c",
-                "cell" => "G24"
+                "cell" => "I35"
             ],[
                 "label" => "b",
                 "sheet_name" => "8c",
-                "cell" => "F22"
-            ],[
-                "label" => "i",
-                "sheet_name" => "8c",
-                "cell" => "F23"
+                "cell" => "H32"
             ],[
                 "label" => "e",
                 "sheet_name" => "8c",
-                "cell" => "F24"
+                "cell" => "H35"
             ],[
                 "label" => "a",
                 "sheet_name" => "8c",
-                "cell" => "B22"
-            ],[
-                "label" => "h",
-                "sheet_name" => "8c",
-                "cell" => "C23"
+                "cell" => "B32"
             ],[
                 "label" => "d",
                 "sheet_name" => "8c",
-                "cell" => "D24"
+                "cell" => "E35"
             ],
 
             [
                 "label" => "NL",
                 "sheet_name" => "8d1",
-                "cell" => "B27"
+                "cell" => "B36"
             ],
             [
                 "label" => "NJ",
                 "sheet_name" => "8d1",
-                "cell" => "C27"
+                "cell" => "C36"
             ],
             [
                 "label" => "N-WT3",
                 "sheet_name" => "8d1",
-                "cell" => "E27"
+                "cell" => "E36"
             ],
             [
                 "label" => "N-WT36",
                 "sheet_name" => "8d1",
-                "cell" => "F27"
+                "cell" => "F36"
             ],
             [
                 "label" => "N-WT6",
                 "sheet_name" => "8d1",
-                "cell" => "G27"
+                "cell" => "G36"
             ],
 
             [
@@ -722,14 +741,86 @@ class LabelD3Seeder extends Seeder
             ],
 
             [
+                "label" => "NA1",
+                "sheet_name" => "8f2",
+                "cell" => "F7"
+            ],
+            [
+                "label" => "NA2",
+                "sheet_name" => "8f2",
+                "cell" => "F8"
+            ],
+            [
+                "label" => "NA3",
+                "sheet_name" => "8f2",
+                "cell" => "F9"
+            ],
+            [
+                "label" => "NA4",
+                "sheet_name" => "8f2",
+                "cell" => "F10"
+            ],
+            [
+                "label" => "NB1",
+                "sheet_name" => "8f2",
+                "cell" => "F11"
+            ],
+            [
+                "label" => "NB2",
+                "sheet_name" => "8f2",
+                "cell" => "F12"
+            ],
+            [
+                "label" => "NB3",
+                "sheet_name" => "8f2",
+                "cell" => "F13"
+            ],
+            [
+                "label" => "NC1",
+                "sheet_name" => "8f2",
+                "cell" => "F14"
+            ],
+            [
+                "label" => "NC2",
+                "sheet_name" => "8f2",
+                "cell" => "F15"
+            ],
+            [
+                "label" => "NC3",
+                "sheet_name" => "8f2",
+                "cell" => "F16"
+            ],
+
+            [
                 "label" => "NAPJ",
                 "sheet_name" => "8f4",
                 "cell" => "L7"
             ],
+
+            [
+                "label" => "NA",
+                "sheet_name" => "8f5-1",
+                "cell" => "J13"
+            ],
+            [
+                "label" => "NB",
+                "sheet_name" => "8f5-2",
+                "cell" => "K9"
+            ],
+            [
+                "label" => "NC",
+                "sheet_name" => "8f5-3",
+                "cell" => "L19"
+            ],
+            [
+                "label" => "ND",
+                "sheet_name" => "8f5-4",
+                "cell" => "J8"
+            ],
         ];
 
-        foreach (ProgramStudi::where('jenjang_id', 1)->get() as $key => $prodi)
-            foreach ($labels as $item)
+        foreach (ProgramStudi::where('jenjang_id', 2)->get() as $key => $prodi)
+            foreach ($labeld4 as $item)
                 LabelImport::insert([
                     'program_studi_id' => $prodi->id,
                     "label" => $item["label"],

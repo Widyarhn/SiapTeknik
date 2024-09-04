@@ -25,10 +25,22 @@ class Tahun extends Model
     {
         return $this->hasMany('App\Models\Lkps');
     }
+    public function lampiran()
+    {
+        return $this->hasMany('App\Models\LampiranRenstra');
+    }
+    public function surat_pernyataan()
+    {
+        return $this->hasMany('App\Models\SuratPernyataan');
+    }
 
     public function surat_pengantar()
     {
         return $this->hasMany('App\Models\SuratPengantar');
+    }
+    public function import_lkps()
+    {
+        return $this->hasMany('App\Models\ImportLkps');
     }
 
     public function led()
@@ -44,6 +56,10 @@ class Tahun extends Model
     public function sertifikat()
     {
         return $this->hasMany('App\Models\Sertifikat');
+    }
+    public function rekomendasi()
+    {
+        return $this->hasMany('App\Models\RPembinaan');
     }
 
     public function berita_acara()

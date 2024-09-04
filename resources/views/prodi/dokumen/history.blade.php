@@ -214,7 +214,7 @@
                                                             </td>
                                                         </tr>
                                                         <tr>
-                                                            <td class="text-center">Lampiran (Izin Pendirian PS, Renstra)</td>
+                                                            <td class="text-center">Lampiran</td>
                                                             <td>
                                                                 @if (empty($lampiran))
                                                                 @else

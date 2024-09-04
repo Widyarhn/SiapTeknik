@@ -67,11 +67,11 @@
                                     <h4>Sertifikat Akreditasi</h4>
                                     <div class="card-header-action">
                                         @if (count($user_prodi->program_studi->sertifikat) == 0)
-                                            <a href="#" class="btn btn-secondary btn-create"> Sertifikat belum
+                                            <a href="#" class="btn btn-secondary btn-create" > Sertifikat belum
                                                 tersedia</a>
                                         @else
                                             <a href="{{ url('storage/sertifikat/', $user_prodi->program_studi->sertifikat[0]->file) }}"
-                                                target="_blank">{{ $user_prodi->program_studi->sertifikat[0]->file }}</a>
+                                                target="_blank" class="btn btn-primary" >Sertifikat Tersedia</a>
                                         @endif
                                     </div>
                                 </div>
@@ -90,12 +90,32 @@
                                                 Berita Acara belum tersedia</a>
                                         @else
                                             <a href="{{ url('storage/berita-acara/', $user_prodi->program_studi->berita_acara[0]->file) }}"
-                                                target="_blank">Asesmen Lapangan</a>
+                                                class="btn btn-primary"  target="_blank">Berita Acara Tersedia</a>
+                                            @php
+                                                $id_asesor = $user_prodi->program_studi->user_asesor->first();
+                                            @endphp
+                                            <a href="{{ route('prodi.ba', $id_asesor->id) }}"
+                                                class="btn btn-info btn-view ml-2" target="_blank">Tinjau BA</a>
                                         @endif
                                     </div>
                                 </div>
                                 <div class="card-body">
                                     <p> Anda bisa melihat Berita Acara Asesmen Lapangan di sini</p>
+                                </div>
+                                <div class="card-header">
+                                    <h4>Rekomendasi Pembinaan</h4>
+                                    <div class="card-header-action">
+                                        @if (count($user_prodi->program_studi->rpembinaan) == 0)
+                                            <a href="#" class="btn btn-secondary btn-create">
+                                                Belum tersedia</a>
+                                        @else
+                                            <a href="{{ url('storage/rekomendasi/', $user_prodi->program_studi->rpembinaan[0]->file) }}"
+                                                class="btn btn-primary"  target="_blank">Lihat</a>
+                                        @endif
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <p> Anda bisa melihat Rekomendasi Pembinaan di sini</p>
                                 </div>
                             </div>
                         </div>

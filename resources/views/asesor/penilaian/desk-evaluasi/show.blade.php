@@ -7,6 +7,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title> Asesor | Asesmen Kecukupan</title>
     @include('body')
+</head>
 
 <body>
     <div id="app">
@@ -386,7 +387,7 @@
                                                             @endif
                                                         @endif --}}
 
-                                                        
+
                                                         @if ($m->asesmen_kecukupan)
                                                             @if ($m->asesmen_kecukupan->user_asesor_id == $user_asesor->id)
                                                                 <form
@@ -846,66 +847,71 @@
         var matriks = @json($matriks);
 
         $(document).ready(function() {
-            $('#btn-save').click(function(e) {
-                e.preventDefault();
-                var data = {};
+                    $('#btn-save').click(function(e) {
+                            e.preventDefault();
+                            var data = {};
 
-                // Kelompokkan data berdasarkan rumus_id
-                $.each(matriks, function(index, matrik) {
-                    var noButir = matrik.indikator.no_butir;
-                    var rumus_id = matrik.indikator.rumus_id;
-                    var nilai = matrik.asesmen_kecukupan ? matrik.asesmen_kecukupan.nilai : null;
+                            // Kelompokkan data berdasarkan rumus_id
+                            $.each(matriks, function(index, matrik) {
+                                var noButir = matrik.indikator.no_butir;
+                                var rumus_id = matrik.indikator.rumus_id;
+                                var nilai = matrik.asesmen_kecukupan ? matrik.asesmen_kecukupan.nilai : null;
 
-                    // Cek jika noButir tidak null atau tidak undefined
-                    if (noButir !== null && noButir !== undefined) {
-                        var key = noButir.replace('.', '');
+                                // Cek jika noButir tidak null atau tidak undefined
+                                if (noButir !== null && noButir !== undefined) {
+                                    var key = noButir.replace('.', '');
 
-                        // Inisialisasi array untuk rumus_id jika belum ada
-                        if (!data[rumus_id]) {
-                            data[rumus_id] = {};
-                        }
+                                    // Inisialisasi array untuk rumus_id jika belum ada
+                                    if (!data[rumus_id]) {
+                                        data[rumus_id] = {};
+                                    }
 
-                        // Simpan nilai berdasarkan key
-                        data[rumus_id][key] = nilai;
-                    }
-                });
-
-                console.log('Data yang dikirim:', data); // Log data sebelum dikirim
-
-                var csrfToken = $('meta[name="csrf-token"]').attr('content');
-
-                $.ajaxSetup({
-                    headers: {
-                        'X-CSRF-TOKEN': csrfToken
-                    }
-                });
-
-                @if ($kriteriaId)
-                    $.ajax({
-                        url: `{{ route('asesmen-kecukupan.calculate', $kriteriaId) }}`,
-                        type: 'POST',
-                        data: data,
-                        dataType: 'json',
-                        success: function(response) {
-                            console.log('Response dari server:', response);
-                            swal({
-                                title: 'Berhasil!',
-                                text: "Data berhasil disimpan.",
-                                icon: 'success',
-                            }).then(() => {
-                                // Tindakan setelah berhasil
+                                    // Simpan nilai berdasarkan key
+                                    data[rumus_id][key] = nilai;
+                                }
                             });
-                        },
-                        error: function(jqXHR, textStatus, errorThrown) {
-                            console.error('Terjadi kesalahan:', textStatus, errorThrown);
-                        }
-                    });
-                @else
-                    console.error('Matriks kosong atau tidak valid.');
-                @endif
 
-            });
-        });
+                            console.log('Data yang dikirim:', data); // Log data sebelum dikirim
+
+                            var csrfToken = $('meta[name="csrf-token"]').attr('content');
+
+                            $.ajaxSetup({
+                                headers: {
+                                    'X-CSRF-TOKEN': csrfToken
+                                }
+                            });
+
+                            @if ($kriteriaId)
+                                $.ajax({
+                                        url: `{{ route('asesmen-kecukupan.calculate', $kriteriaId) }}`,
+                                        type: 'POST',
+                                        data: data,
+                                        dataType: 'json',
+                                        success: function(response) {
+                                            console.log('Response dari server:', response);
+                                            if (response.success) {
+                                                swal({
+                                                    title: 'Berhasil!',
+                                                    text: "Data berhasil disimpan.",
+                                                    icon: 'success',
+                                                }).then(() => {
+                                                    // Tindakan setelah berhasil
+                                                });
+                                            } else {
+                                                console.error('Respons tidak sesuai harapan:', response);
+                                            }
+                                        },
+                                            error: function(jqXHR, textStatus, errorThrown) {
+                                                console.error('Terjadi kesalahan:', textStatus,
+                                                errorThrown);
+                                            }
+                                        });
+                                @else
+                                    console.error('Matriks kosong atau tidak valid.');
+                                @endif
+
+                            });
+                    });
     </script>
 
 
@@ -953,7 +959,6 @@
 
     {{-- </script> --}}
 </body>
-</head>
 
 </html>
 {{-- // $.ajax({

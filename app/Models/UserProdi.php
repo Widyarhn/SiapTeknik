@@ -21,7 +21,7 @@ class UserProdi extends Model
     {
         return $this->belongsTo(User::class, 'user_id');
     }
-    
+
     public function jenjang()
     {
         return $this->belongsTo(Jenjang::class);
@@ -34,8 +34,9 @@ class UserProdi extends Model
 
     public function pengajuan_dokumen()
     {
-        return $this->belongsTo(PengajuanDokumen::class, 'id');
+        return $this->hasOne(PengajuanDokumen::class, 'user_prodi_id', 'id');
     }
+
 
     public function lkps()
     {
@@ -50,8 +51,28 @@ class UserProdi extends Model
     {
         return $this->hasOne("App\Models\SuratPengantar", "program_studi_id", "program_studi_id");
     }
+    public function surat_pernyataan()
+    {
+        return $this->hasOne("App\Models\SuratPernyataan", "program_studi_id", "program_studi_id");
+    }
+    public function lampiran_renstra()
+    {
+        return $this->hasOne("App\Models\LampiranRenstra", "program_studi_id", "program_studi_id");
+    }
     public function data_dukung()
     {
         return $this->hasMany("App\Models\DataDukung", "program_studi_id", "program_studi_id");
+    }
+    public function rpembinaan()
+    {
+        return $this->hasMany("App\Models\RPembinaan", "program_studi_id", "program_studi_id");
+    }
+    public function berita_acara()
+    {
+        return $this->hasMany("App\Models\BeritaAcara", "program_studi_id", "program_studi_id");
+    }
+    public function Sertifikat()
+    {
+        return $this->hasMany("App\Models\Sertifikat", "program_studi_id", "program_studi_id");
     }
 }

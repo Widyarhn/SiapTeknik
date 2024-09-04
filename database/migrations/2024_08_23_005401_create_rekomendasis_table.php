@@ -1,7 +1,9 @@
 <?php
 
+use App\Models\Kriteria;
 use App\Models\ProgramStudi;
-use App\Models\SubKriteria;
+use App\Models\Tahun;
+use App\Models\UserAsesor;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -13,12 +15,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('rumuses', function (Blueprint $table) {
+        Schema::create('rekomendasis', function (Blueprint $table) {
             $table->id();
-            $table->foreignIdFor(SubKriteria::class)->nullable();
+            $table->foreignIdFor(Kriteria::class)->nullable();
             $table->foreignIdFor(ProgramStudi::class)->nullable();
-            $table->string('rumus');
-            $table->float('t_butir')->nullable();
+            $table->foreignIdFor(Tahun::class)->nullable();
+            $table->foreignIdFor(UserAsesor::class)->nullable();
+            $table->text('komendasi');
+            $table->text('rekomendasi');
             $table->timestamps();
         });
     }
@@ -28,6 +32,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('rumuses');
+        Schema::dropIfExists('rekomendasis');
     }
 };

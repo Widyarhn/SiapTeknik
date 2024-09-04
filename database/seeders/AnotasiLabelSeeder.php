@@ -23,7 +23,8 @@ class AnotasiLabelSeeder extends Seeder
                                 N3 = Jumlah kerjasama PkM. 
                                 NDTPS = Jumlah dosen tetap yang ditugaskan sebagai pengampu mata kuliah dengan bidang keahlian yang sesuai dengan kompetensi inti 
                                 program studi yang diakreditasi.",
-            ],[
+            ],
+            [
                 "jenjang_id" => "1",
                 "rumus_label" => "10.B",
                 "anotasi" => "NI = Jumlah kerjasama tingkat internasional.	Faktor: a = 1 , b = 4 , c = 6 NN = Jumlah kerjasama tingkat nasional. 
@@ -182,6 +183,11 @@ class AnotasiLabelSeeder extends Seeder
             ],
             [
                 "jenjang_id" => "1",
+                "rumus_label" => "45",
+                "anotasi" => "NMKI = Jumlah mata kuliah yang dikembangkan berdasarkan hasil penelitian/PkM DTPS dalam 3 tahun terakhir.",
+            ],
+            [
+                "jenjang_id" => "1",
                 "rumus_label" => "47. A",
                 "anotasi" => "Tingkat kepuasan pengguna pada aspek: 
                         TKM1: Reliability; TKM2: Responsiveness; TKM3: Assurance; TKM4: Empathy; TKM5: Tangible. 
@@ -232,6 +238,11 @@ class AnotasiLabelSeeder extends Seeder
             ],
             [
                 "jenjang_id" => "1",
+                "rumus_label" => "60",
+                "anotasi" => "Jika PBS ≥ 80%, maka Skor = 4 ",
+            ],
+            [
+                "jenjang_id" => "1",
                 "rumus_label" => "61",
                 "anotasi" => "RI = (NI / NL) x 100% , RN = (NN / NL) x 100% , RW = (NW / NL) x 100%	Faktor: a = 5% , b = 20% , c = 90% . NI = Jumlah lulusan yang bekerja di badan usaha tingkat multi nasional/internasional. 
                     NN = Jumlah lulusan yang bekerja di badan usaha tingkat nasional atau berwirausaha yang berizin. 
@@ -252,6 +263,219 @@ class AnotasiLabelSeeder extends Seeder
                 "jenjang_id" => "1",
                 "rumus_label" => "63",
                 "anotasi" => "NAPJ = Jumlah produk/jasa karya mahasiswa yang diadopsi oleh industri/masyarakat dalam 3 tahun terakhir.",
+            ],
+        ]);
+
+        //d4
+        AnotasiLabel::insert([
+            [
+                "jenjang_id" => "2",
+                "rumus_label" => "10.A",
+                "anotasi" => "RK = ((a x N1) + (b x N2) + (c x N3)) / NDTPS Faktor: a = 3 , b = 1 , c = 2",
+            ],
+            [
+                "jenjang_id" => "2",
+                "rumus_label" => "10.B",
+                "anotasi" => "NI = Jumlah kerjasama tingkat internasional.	Faktor: a = 1 , b = 4 , c = 6 NN = Jumlah kerjasama tingkat nasional. 
+                                NW = Jumlah kerjasama tingkat wilayah/lokal. A=NI/a; B=NN/b; C=NW/c 
+                                Jika NI ≥ a dan NN < b, maka NI = a Jika NI < a dan NN ≥ b, maka NN = b Jika NW ≥ c, maka NW = c",
+            ],
+            [
+                "jenjang_id" => "2",
+                "rumus_label" => "13.B",
+                "anotasi" => "Jika Rasio ≥ 4 , maka B = 4 Jika Rasio < 4 , maka B = (4 x Rasio) / 4 .",
+            ],
+            [
+                "jenjang_id" => "2",
+                "rumus_label" => "14.B",
+                "anotasi" => "Jika PMA ≥ 1% , maka B = 4 ",
+            ],
+            [
+                "jenjang_id" => "2",
+                "rumus_label" => "16",
+                "anotasi" => "PDTT = (NDTT / (NDT + NDTT)) x 100% ",
+            ],
+            [
+                "jenjang_id" => "2",
+                "rumus_label" => "17",
+                "anotasi" => "Jika PDS3 ≥ 15% , skor = 4",
+            ],
+            [
+                "jenjang_id" => "2",
+                "rumus_label" => "18",
+                "anotasi" => "Jika PDSK ≥ 50% , maka Skor = 4",
+            ],
+            [
+                "jenjang_id" => "2",
+                "rumus_label" => "19",
+                "anotasi" => "Jika PGBLKL ≥ 50% , maka Skor = 4 ",
+            ],
+            [
+                "jenjang_id" => "2",
+                "rumus_label" => "20",
+                "anotasi" => "Jika 15 ≤ RMD ≤ 25 ",
+            ],
+            [
+                "jenjang_id" => "2",
+                "rumus_label" => "21",
+                "anotasi" => "RDPU = Rata-rata jumlah bimbingan sebagai pembimbing utama di seluruh program/ semester. ",
+            ],
+            [
+                "jenjang_id" => "2",
+                "rumus_label" => "22",
+                "anotasi" => "Ekuivalensi Waktu Mengajar Penuh DTPS. ",
+            ],
+            [
+                "jenjang_id" => "2",
+                "rumus_label" => "23",
+                "anotasi" => "PDTT = (NDTT / (NDT + NDTT)) x 100% ",
+            ],
+            [
+                "jenjang_id" => "2",
+                "rumus_label" => "24",
+                "anotasi" => "PMKI = (MKKI / MKK) x 100%",
+            ],
+            [
+                "jenjang_id" => "2",
+                "rumus_label" => "25",
+                "anotasi" => "Jika RRD ≥ 0,5 , maka Skor = 4 . ",
+            ],
+            [
+                "jenjang_id" => "2",
+                "rumus_label" => "26",
+                "anotasi" => "Jika RI > a dan RN > b maka Skor = 4 ",
+            ],
+            [
+                "jenjang_id" => "2",
+                "rumus_label" => "27",
+                "anotasi" => "Faktor: a = 0,05 , b = 0,3 , c = 1 
+                NI = Jumlah PkM dengan sumber pembiayaan luar negeri dalam 3 tahun terakhir. ",
+            ],
+            [
+                "jenjang_id" => "2",
+                "rumus_label" => "28",
+                "anotasi" => " Faktor: a = 0,1 ,b= 1 , c = 2 
+                NA1 = Jumlah publikasi di jurnal nasional tidak terakreditasi.",
+            ],
+            [
+                "jenjang_id" => "2",
+                "rumus_label" => "29",
+                "anotasi" => "RS = NAS / NDTPS",
+            ],
+            [
+                "jenjang_id" => "2",
+                "rumus_label" => "30",
+                "anotasi" => "RS = NAPJ / NDTPS ",
+            ],
+            [
+                "jenjang_id" => "2",
+                "rumus_label" => "31",
+                "anotasi" => "RLP = (2 x (NA + NB + NC) + ND) / NDTPS",
+            ],
+            [
+                "jenjang_id" => "2",
+                "rumus_label" => "34",
+                "anotasi" => "DOP = Rata-rata dana operasional pendidikan/mahasiswa/ tahun dalam 3 tahun terakhir (dalam rupiah penuh).",
+            ],
+            [
+                "jenjang_id" => "2",
+                "rumus_label" => "35",
+                "anotasi" => "DPD = Rata-rata dana penelitian DTPS/ tahun dalam 3 tahun terakhir (dalam rupiah penuh). ",
+            ],
+            [
+                "jenjang_id" => "2",
+                "rumus_label" => "36",
+                "anotasi" => "DPkMD = Rata-rata dana PkM DTPS/ tahun dalam 3 tahun terakhir (dalam rupiah penuh).  ",
+            ],
+            [
+                "jenjang_id" => "2",
+                "rumus_label" => "44",
+                "anotasi" => "PJP = (JP / JB) x 100% ",
+            ],
+            [
+                "jenjang_id" => "2",
+                "rumus_label" => "50",
+                "anotasi" => "NMKI > 3 ",
+            ],
+            [
+                "jenjang_id" => "2",
+                "rumus_label" => "52",
+                "anotasi" => "TKM ≥ 75%",
+            ],
+            [
+                "jenjang_id" => "2",
+                "rumus_label" => "54",
+                "anotasi" => "PPDM = (NPM / NPD) x 100% ",
+            ],
+            [
+                "jenjang_id" => "2",
+                "rumus_label" => "56",
+                "anotasi" => "PPkMDM = (NPkMM / NPkMD) x 100% ",
+            ],
+            [
+                "jenjang_id" => "2",
+                "rumus_label" => "58",
+                "anotasi" => "Jika RIPK ≥ 3,25",
+            ],
+            [
+                "jenjang_id" => "2",
+                "rumus_label" => "59",
+                "anotasi" => "Faktor: a = 0,1% , b = 1% , c = 2% NI = Jumlah prestasi akademik internasional.",
+            ],
+            [
+                "jenjang_id" => "2",
+                "rumus_label" => "60",
+                "anotasi" => "Jika RI > a dan RN > b",
+            ],
+            [
+                "jenjang_id" => "2",
+                "rumus_label" => "61",
+                "anotasi" => "Jika 3,5 < MS ≤ 4,5 , maka Skor = 4",
+            ],
+            [
+                "jenjang_id" => "2",
+                "rumus_label" => "62",
+                "anotasi" => "PTW = Persentase kelulusan  tepat waktu. ",
+            ],
+            [
+                "jenjang_id" => "2",
+                "rumus_label" => "63",
+                "anotasi" => "Jika 6% < MDO < 45%, maka skor = [180 – (400 x MDO)] / 39.",
+            ],
+            [
+                "jenjang_id" => "2",
+                "rumus_label" => "65",
+                "anotasi" => "Jika WT < 3 bulan, ",
+            ],
+            [
+                "jenjang_id" => "2",
+                "rumus_label" => "66",
+                "anotasi" => "Jika PBS ≥ 60% , ",
+            ],
+            [
+                "jenjang_id" => "2",
+                "rumus_label" => "67",
+                "anotasi" => "RI = (NI / NL) x 100% , RN = (NN / NL) x 100% , RW = (NW / NL) x 100% ",
+            ],
+            [
+                "jenjang_id" => "2",
+                "rumus_label" => "68",
+                "anotasi" => "Skor = STKi / 7  ",
+            ],
+            [
+                "jenjang_id" => "2",
+                "rumus_label" => "69",
+                "anotasi" => "RL = ((NA1 + NB1 + NC1) / NM) x 100% , RN = ((NA2 + NA3 + NB2 + NC2) / NM) x 100% , RI = ((NA4 + NB3 + NC3) / NM) x 100%",
+            ],
+            [
+                "jenjang_id" => "2",
+                "rumus_label" => "70",
+                "anotasi" => "Jika NAPJ ≥ 2 ,",
+            ],
+            [
+                "jenjang_id" => "2",
+                "rumus_label" => "71",
+                "anotasi" => "NLP = 2 x (NA + NB + NC) + ND ",
             ],
         ]);
     }

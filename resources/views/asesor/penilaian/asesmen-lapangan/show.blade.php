@@ -260,6 +260,7 @@
                                                                             @if ($m->anotasi_label)
                                                                             <input type="hidden" name="nilai" value="{{ $m->asesmen_kecukupan->nilai }}" id="{{ $m->indikator->no_butir }}">
                                                                             @endif
+                                                                        
                                                                     </td>
                                                                 </tr>
                                                                 <tr>
@@ -311,7 +312,7 @@
                                         <div class="card-body">
                                             <div class="modal-footer bg-whitesmoke br">
                                                 <div>
-                                                    <a href="{{ route('asesor.penilaian.asesmen-kecukupan.elemen', $program_studi->id) }}"
+                                                    <a href="{{ route('nilai-asesmenlapangan.elemen', $program_studi->id) }}"
                                                         class="btn btn-secondary"><i class="fa fa-chevron-left"></i>
                                                         Kembali</a>
                                                 </div>

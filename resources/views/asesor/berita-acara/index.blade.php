@@ -84,7 +84,7 @@ th, td {
           </tr>
       </thead>
       <tbody>
-  @php
+  {{-- @php
   $counter = 1;
   @endphp
           @foreach($desk_evaluasi as $d)
@@ -113,7 +113,7 @@ th, td {
   <div class="footer">
     <p>Berita acara ini dikeluarkan oleh asesor {{ auth()->user()->nama }}.</p>
 </div>
-  @endif
+  @endif --}}
 {{-- </div> --}}
 </body>
 </html>

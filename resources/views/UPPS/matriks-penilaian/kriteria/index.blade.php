@@ -49,7 +49,8 @@
                     @endif
                     <div class="section-body">
                         <h2 class="section-title">Data Kriteria</h2>
-                        <p class="section-lead">Data tambahan untuk dokumen kriteria jenjang D3 dan D4 lingkup Teknik</p>
+                        <p class="section-lead">Data tambahan untuk dokumen kriteria jenjang D3 dan D4 lingkup Teknik
+                        </p>
                         <!--Basic table-->
                         <div class="row">
                             <div class="col-12">
@@ -113,6 +114,16 @@
                                         <input type="text" class="form-control" name="kriteria"
                                             placeholder="contoh: Kondisi Eksternal">
                                     </div>
+                                    <div class="form-group">
+                                        <div class="custom-control custom-checkbox my-3">
+                                            <input type="checkbox" class="custom-control-input"
+                                                id="kuantitatif-checkbox" name="kuantitatif" value="1"
+                                                {{ old('kuantitatif', $kriteria->kuantitatif ?? false) ? 'checked' : '' }}>
+                                            <label class="custom-control-label"
+                                                for="kuantitatif-checkbox">Kuantitatif</label>
+                                        </div>
+                                    </div>
+
                                     {{-- <div id="lkps-wrapper">
                                         <div class="lkps-item d-flex align-items-center">
                                             <div class="form-group flex-grow-1">
@@ -190,12 +201,12 @@
         //         const newItem = document.createElement('div');
         //         newItem.className = 'lkps-item d-flex align-items-center';
         //         newItem.innerHTML = `
-        //             <div class="form-group flex-grow-1">
-        //                 <label>Nama Tabel LKPS</label>
-        //                 <input type="text" class="form-control" name="lkps[${index}][nama_tabel_lkps]" placeholder="contoh: Tabel 1 Kerjasama Tridharma Perguruan Tinggi - Pendidikan">
-        //             </div>
-        //             <button type="button" class="btn btn-icon icon-left btn-danger remove-lkps ml-2"><i class="fa fa-trash"></i></button>
-        //             <button type="button" class="btn btn-primary ml-2 add-lkps"><i class="fas fa-plus"></i></button>`;
+    //             <div class="form-group flex-grow-1">
+    //                 <label>Nama Tabel LKPS</label>
+    //                 <input type="text" class="form-control" name="lkps[${index}][nama_tabel_lkps]" placeholder="contoh: Tabel 1 Kerjasama Tridharma Perguruan Tinggi - Pendidikan">
+    //             </div>
+    //             <button type="button" class="btn btn-icon icon-left btn-danger remove-lkps ml-2"><i class="fa fa-trash"></i></button>
+    //             <button type="button" class="btn btn-primary ml-2 add-lkps"><i class="fas fa-plus"></i></button>`;
         //         lkpsWrapper.appendChild(newItem);
 
         //         newItem.querySelector('.remove-lkps').addEventListener('click', function() {
@@ -252,9 +263,9 @@
 
         // let lkpsEditIndex = 0;
 
-    //     function addLkpsEdit() {
-    //         lkpsEditIndex++;
-    //         $('#editLkpsContainer').append(`
+        //     function addLkpsEdit() {
+        //         lkpsEditIndex++;
+        //         $('#editLkpsContainer').append(`
     //     <div class="input-group mb-3" id="edit-lkps-${lkpsEditIndex}">
     //         <input type="hidden" name="lkps[${lkpsEditIndex}][id]" value="">
     //         <input type="text" class="form-control" name="lkps[${lkpsEditIndex}][nama_tabel_lkps]" required>
@@ -263,7 +274,7 @@
     //         </div>
     //     </div>
     // `);
-    //     }
+        //     }
 
         // function removeLkpsEdit(index) {
         //     let id = $(`#edit-lkps-${index} input[name^='lkps[${index}][id]']`).val();
@@ -293,14 +304,14 @@
                     // // Mengisi item yang ada
                     // response.listLkps.forEach((lkps, index) => {
                     //     $('#editLkpsContainer').append(`
-                    //     <div class="input-group mb-3" id="edit-lkps-${index}">
-                    //         <input type="hidden" name="lkps[${index}][id]" value="${lkps.id}">
-                    //         <input type="text" class="form-control" name="lkps[${index}][nama_tabel_lkps]" value="${lkps.nama}" required>
-                    //         <div class="input-group-append">
-                    //             <button class="btn btn-danger" type="button" onclick="removeLkpsEdit(${index})">Remove</button>
-                    //         </div>
-                    //     </div>
-                    // `);
+                //     <div class="input-group mb-3" id="edit-lkps-${index}">
+                //         <input type="hidden" name="lkps[${index}][id]" value="${lkps.id}">
+                //         <input type="text" class="form-control" name="lkps[${index}][nama_tabel_lkps]" value="${lkps.nama}" required>
+                //         <div class="input-group-append">
+                //             <button class="btn btn-danger" type="button" onclick="removeLkpsEdit(${index})">Remove</button>
+                //         </div>
+                //     </div>
+                // `);
                     //     lkpsEditIndex = Math.max(lkpsEditIndex, index);
                     // });
                 }

@@ -204,6 +204,11 @@ class AkreditasiController extends Controller
         $ak->keterangan = 'Approved';
         $ak->save();
 
+        $tahun = Tahun::where('id', $ak->tahun_id)->firstOrFail();
+        $tahun->akhir_akreditasi = now(); 
+        $tahun->is_active = false;
+        $tahun->update();
+
         return redirect()->back()->with('success', 'Asesmen Lapangan telah disetujui!');
     }
 
@@ -433,13 +438,20 @@ class AkreditasiController extends Controller
                 $q->where('is_active', 1);
             })
             ->get();
-
         foreach ($data as $item) {
-            if (count($item->timeline) > 0) {
+            if ($item->berita_acara && count($item->timeline) > 0) {
                 $format = [];
                 foreach ($item->timeline as $timeline) {
                     $format["tahun"] = $timeline->tahun->tahun;
                     $format["program_studi"] = $item->jenjang->jenjang . ' ' . $item->nama;
+                    // Perbaiki URL untuk berita_acara
+                    $format["berita_acara"] = $item->berita_acara->first()->file
+                        ? url('storage/berita-acara/' . $item->berita_acara->first()->file)
+                        : '-';
+                    $format["rekomendasi"] = $item->rpembinaan->first()->file
+                        ? url('storage/rekomendasi/' . $item->rpembinaan->first()->file)
+                        : '-';
+                    // $format["sertifikat"] = $item->sertifikat->file ? url('storage/' . $item->sertifikat->file) : '-';
                     $format["timeline"] = $timeline->id;
                     $format["prodi"] = $timeline->program_studi_id;
                     $format["thn"] = $timeline->tahun_id;
@@ -503,13 +515,13 @@ class AkreditasiController extends Controller
             <a href="' . route('akreditasi.asesmenLapangan.show', ['id' => $row['asesor1']]) . '">' . number_format($row['nilai_asesor1'], 2) . '</a>
             ';
             })
-            ->addColumn('berita_acara', function ($row) {
 
-                return '-';
+            ->addColumn('berita_acara', function ($row) {
+                return $row['berita_acara'] === '-' ? '-' : '<a href="' . $row['berita_acara'] . '" target="_blank">' . basename($row['berita_acara']) . '</a>';
             })
             ->addColumn('saran_rekomendasi', function ($row) {
 
-                return '-';
+                return $row['rekomendasi'] === '-' ? '-' : '<a href="' . $row['rekomendasi'] . '" target="_blank">' . basename($row['rekomendasi']) . '</a>';
             })
             ->addColumn('action', function ($row) {
 
@@ -564,6 +576,15 @@ class AkreditasiController extends Controller
                 foreach ($item->timeline as $timeline) {
                     $format["tahun"] = $timeline->tahun->tahun;
                     $format["program_studi"] = $item->jenjang->jenjang . ' ' . $item->nama;
+                    $format["berita_acara"] = $item->berita_acara->first()->file
+                        ? url('storage/berita-acara/' . $item->berita_acara->first()->file)
+                        : '-';
+                    $format["sertifikat"] = $item->sertifikat->first()->file
+                        ? url('storage/sertifikat/' . $item->sertifikat->first()->file)
+                        : '-';
+                    $format["rekomendasi"] = $item->rpembinaan->first()->file
+                        ? url('storage/rekomendasi/' . $item->rpembinaan->first()->file)
+                        : '-';
                     $format["timeline"] = $timeline->id;
                     $format["prodi"] = $timeline->program_studi_id;
                     $format["thn"] = $timeline->tahun_id;
@@ -642,13 +663,13 @@ class AkreditasiController extends Controller
                 return $row['akreditasi'] ?? '-';
             })
             ->addColumn('sertifikat', function ($row) {
-                return '-';
+                return $row['sertifikat'] === '-' ? '-' : '<a href="' . $row['sertifikat'] . '" target="_blank">' . basename($row['sertifikat']) . '</a>';
             })
             ->addColumn('saran_rekomendasi', function ($row) {
-                return '-';
+                return $row['rekomendasi'] === '-' ? '-' : '<a href="' . $row['rekomendasi'] . '" target="_blank">' . basename($row['rekomendasi']) . '</a>';
             })
             ->addColumn('berita_acara', function ($row) {
-                return '-';
+                return $row['berita_acara'] === '-' ? '-' : '<a href="' . $row['berita_acara'] . '" target="_blank">' . basename($row['berita_acara']) . '</a>';
             })
             ->addColumn('action', function ($row) {
                 return '
@@ -1139,19 +1160,50 @@ class AkreditasiController extends Controller
                 }
             })
             ->addColumn('status', function ($row) {
-                if ($row->tahun->is_active == true) {
-                    $status = '<div class="progress mb-3">
-                    <div class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">0</div>
-                    </div>';
-                } else if ($row->tahun->is_active == false) {
-                    $status = "<button class='btn btn-success btn-sm'>
-                    <i class='fa fa-check'></i> Selesai </button>";
+                $progress = 0;
+
+                // Cek pengajuan dokumen
+                $pengajuanDokumen = $row->pengajuan_dokumen->first();
+                if ($pengajuanDokumen && $pengajuanDokumen->tanggal_selesai) {
+                    $progress += 20; // Pengajuan dokumen selesai
                 }
+
+                // Cek asesmen kecukupan
+                $timeline = $row->program_studi->timelines()->where('kegiatan', 'Asesmen Kecukupan')->first();
+                if ($timeline) {
+                    if ($timeline->status == 1) {
+                        $progress += 20; // Asesmen kecukupan sudah selesai
+                    }
+                    if ($timeline->selesai == 1) {
+                        $progress += 20; // Nilai asesmen kecukupan selesai
+                    }
+                }
+
+                // Cek asesmen lapangan
+                $timelineLapangan = $row->program_studi->timelines()->where('kegiatan', 'Asesmen Lapangan')->first();
+                if ($timelineLapangan) {
+                    if ($timelineLapangan->status == 1) {
+                        $progress += 20; // Asesmen lapangan sudah selesai
+                    }
+                    if ($timelineLapangan->selesai == 1) {
+                        $progress = 100; // Nilai asesmen lapangan selesai
+                    }
+                }
+
+                $progress = min($progress, 100); // Pastikan progres tidak lebih dari 100%
+
+                $status = '<div class="progress mb-3">
+                    <div class="progress-bar" role="progressbar" aria-valuenow="' . $progress . '" aria-valuemin="0" aria-valuemax="100" style="width: ' . $progress . '%;">
+                        ' . $progress . '%
+                    </div>
+                    </div>';
+
                 return $status;
             })
+
             ->addColumn('action', function ($row) {
                 return '<div class="buttons">
-                <a href="#" data-toggle="modal" data-target="#modalDetail" data-url="' . route('akreditasi.show', $row->id) . '" data-prodi="' . $row->program_studi->jenjang->jenjang . ' ' . $row->program_studi->nama . '" data-tahun="' . $row->tahun->tahun . '" class="btn btn-sm btn-secondary btn-detail"><i class="fa fa-solid fa-eye"></i></a>
+                <a class="btn btn-secondary btn-sm" href="' . route('upps.dokumenajuan.prodi', ['id_prodi' => $row->program_studi_id]) . '"><i class="fas fa-eye"></i></a>
                 <a href="javascript:void(0)" data-route="' . route('akreditasi.destroy', $row->id) . '"
                     id="delete" class="btn btn-danger btn-sm"><i class="fa fa-trash"></i></a>';
             })

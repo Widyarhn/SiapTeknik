@@ -22,6 +22,7 @@ class DatabaseSeeder extends Seeder
         $this->call(ProgramStudiSeeder::class);
         $this->call(RoleSeeder::class);
         $this->call(LabelD3Seeder::class);
+        $this->call(LabelD4Seeder::class);
         $this->call(AnotasiLabelSeeder::class);
     }
 }

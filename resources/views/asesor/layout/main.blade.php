@@ -52,15 +52,23 @@
                                             class="btn btn-primary" target="_blank">
                                             View
                                         </a>
-                                        @if (count($user_asesor->program_studi->sertifikat) == 0)
+                                        {{-- @if (empty($user_asesor->program_studi->sertifikat)) --}}
+                                        @if ($user_asesor->program_studi->sertifikat->isEmpty())
+                                            <a href="#" data-toggle="modal" data-target="#modalTambah"
+                                                class="btn btn-outline-primary btn-create"><i class="fas fa-upload"></i>
+                                                Upload Sertifikat</a>
+                                        @else
+                                            <a href="#" class="btn btn-secondary btn-create">Sertifikat sudah
+                                                diupload</a>
+                                        @endif
+                                        {{-- @if (count($user_asesor->program_studi->sertifikat) == 0)
                                             <a href="#" data-toggle="modal" data-target="#modalTambah"
                                                 class="btn btn-outline-primary btn-create"><i class="fas fa-upload"></i>
                                                 Upload Sertifikat</a>
                                         @else
                                             <a href="#" class="btn btn-secondary btn-create"> Sertifikat sudah
                                                 diupload</a>
-                                        @endif
-                                        </a>
+                                        @endif --}}
                                     </div>
                                 </div>
                                 <div class="card-body">
@@ -76,29 +84,19 @@
                                 <div class="card-header">
                                     <h4>Berita Acara</h4>
                                     <div class="card-header-action">
-                                        {{-- <a href="{{ route('dashboard-asesor.pdf.show') }}" class="btn btn-primary"
-                                            target="_blank">
-                                            Desk Evaluasi
-                                        </a>
-                                        @if (count($user_asesor->program_studi->ba_desk_eval) == 0)
-                                            <a href="#" data-toggle="modal" data-target="#TambahBaDeskEval"
-                                                class="btn btn-outline-primary btn-create"><i
-                                                    class="fas fa-upload"></i></a>
-                                        @else
-                                            <a href="#" class="btn btn-secondary btn-create"><i
-                                                    class="fa fa-check"></i></a>
-                                        @endif --}}
                                         <a href="{{ route('dashboard-asesor.pdf.asesmen') }}" class="btn btn-primary"
                                             target="_blank">
-                                            Asesmen Lapangan
+                                            View
                                         </a>
-                                        @if (count($user_asesor->program_studi->berita_acara) == 0)
-                                            <a href="#" data-toggle="modal" data-target="#TambahBaAsesmenLapangan"
-                                                class="btn btn-outline-primary btn-create"><i
-                                                    class="fas fa-upload"></i></a>
+                                        @if ($user_asesor->program_studi->berita_acara->isEmpty())
+                                            <!-- Tombol untuk membuka modal -->
+                                            <a href="#" data-toggle="modal" data-target="#modalTambahBeritaAcara"
+                                                class="btn btn-outline-primary">
+                                                <i class="fas fa-upload"></i> Upload Berita Acara
+                                            </a>
                                         @else
-                                            <a href="#" class="btn btn-secondary btn-create"><i
-                                                    class="fa fa-check"></i></a>
+                                            <a href="#" class="btn btn-secondary"><i
+                                                    class="fa fa-check"></i>&nbsp; Berita Acara sudah diupload</a>
                                         @endif
                                     </div>
                                 </div>
@@ -111,141 +109,92 @@
                     </div>
                 </section>
             </div>
+            <!-- Modal Sertifikat -->
+            <div class="modal fade" tabindex="-1" role="dialog" id="modalTambah">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Kirimkan sertifikat ke UPPS dan Program Studi</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <form action="{{ route('dashboard-asesor.sertifikat.storeSertif') }}" method="post"
+                            enctype="multipart/form-data">
+                            @csrf
+                            @method('POST')
+                            <div class="modal-body">
+                                <div class="form-group">
+                                    <label>Upload Sertifikat</label>
+                                    <input type="file" class="form-control" name="file" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>*unduh sertifikat akreditasi program studi terlebih dahulu, pada tombol
+                                        View</label>
+                                    <label>**pastikan desk evaluasi dan asesmen lapangan sudah selesai dilakukan</label>
+                                </div>
+                                <input type="hidden" value="{{ $user_asesor->tahun->id }}" name="tahun_id" />
+                                <input type="hidden" value="{{ $user_asesor->program_studi->id }}"
+                                    name="program_studi_id" />
+                                <input type="hidden" value="{{ $user_asesor->program_studi->jenjang->id }}"
+                                    name="jenjang_id" />
+                            </div>
+                            <div class="modal-footer bg-whitesmoke br">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
+                                <button type="submit" class="btn btn-primary">Simpan</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal Berita Acara -->
+            <div class="modal fade" tabindex="-1" role="dialog" id="modalTambahBeritaAcara">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Kirimkan Berita Acara Asesmen Lapangan ke UPPS dan Program Studi
+                            </h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <form action="{{ route('dashboard-asesor.berita-acara.asesmenLapangan') }}" method="post"
+                            enctype="multipart/form-data">
+                            @csrf
+                            @method('POST')
+                            <div class="modal-body">
+                                <div class="form-group">
+                                    <label>Upload Berita acara asesmen lapangan</label>
+                                    <input type="file" class="form-control" name="file" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>*unduh berita acara asesmen lapangan akreditasi program studi terlebih
+                                        dahulu, pada tombol asesmen lapangan</label>
+                                    <label>**pastikan asesmen lapangan sudah selesai dilakukan</label>
+                                </div>
+                                <input type="hidden" value="{{ $user_asesor->tahun->id }}" name="tahun_id" />
+                                <input type="hidden" value="{{ $user_asesor->program_studi->id }}"
+                                    name="program_studi_id" />
+                                <input type="hidden" value="{{ $user_asesor->program_studi->jenjang->id }}"
+                                    name="jenjang_id" />
+                            </div>
+                            <div class="modal-footer bg-whitesmoke br">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
+                                <button type="submit" class="btn btn-primary">Simpan</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
             <footer class="main-footer">
                 @include('footer')
             </footer>
         </div>
+
     </div>
-    <div class="modal fade" tabindex="-1" role="dialog" id="modalTambah">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Kirimkan sertifikat ke UPPS dan Program Studi</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <form action="{{ route('dashboard-asesor.sertifikat.storeSertif') }}" method="post"
-                    enctype="multipart/form-data" id="formActionTambah">
-                    @csrf
-                    @method('POST')
-                    <div class="modal-body" id="formTambah">
-                        <div class="card">
-                            <form class="needs-validation" novalidate="">
-                                <div class="card-body">
-                                    <div class="form-group">
-                                        <label>Upload Sertifikat</label>
-                                        <input type="file" class="form-control" name="file" required="">
-                                    </div>
-                                    <div class="form-group">
-                                        <label>*unduh sertifikat akreditasi program studi terlebih dahulu, pada
-                                            tombol
-                                            View
-                                            </a></label>
-                                        <label>**pastikan desk evaluasi dan asesmen lapangan sudah selesai
-                                            dilakukan</label>
-                                    </div>
-                                    <input type="hidden" value="{{ $user_asesor->tahun->id }}" name="tahun_id" />
-                                    <input type="hidden" value="{{ $user_asesor->program_studi->id }}"
-                                        name="program_studi_id" />
-                                    <input type="hidden" value="{{ $user_asesor->program_studi->jenjang->id }}"
-                                        name="jenjang_id" />
-                                </div>
-                        </div>
-                        <div class="modal-footer bg-whitesmoke br">
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
-                            <button type="submit" class="btn btn-primary">Simpan</button>
-                        </div>
-                </form>
-            </div>
-        </div>
-    </div>
-    <div class="modal fade" tabindex="-1" role="dialog" id="TambahBaDeskEval">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Kirimkan Berita Acara Desk Evaluasi ke UPPS dan Program Studi</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <form action="{{ route('dashboard-asesor.berita-acara.deskEval') }}" method="post"
-                    enctype="multipart/form-data" id="formActionTambah">
-                    @csrf
-                    @method('POST')
-                    <div class="modal-body" id="formTambah">
-                        <div class="card">
-                            <form class="needs-validation" novalidate="">
-                                <div class="card-body">
-                                    <div class="form-group">
-                                        <label>Upload Berita acara desk evaluasi</label>
-                                        <input type="file" class="form-control" name="file" required="">
-                                    </div>
-                                    <div class="form-group">
-                                        <label>*unduh berita acara desk evaluasi akreditasi program studi terlebih
-                                            dahulu, pada tombol
-                                            desk evaluasi
-                                            </a></label>
-                                        <label>**pastikan desk evaluasi sudah selesai dilakukan</label>
-                                    </div>
-                                    <input type="hidden" value="{{ $user_asesor->tahun->id }}" name="tahun_id" />
-                                    <input type="hidden" value="{{ $user_asesor->program_studi->id }}"
-                                        name="program_studi_id" />
-                                    <input type="hidden" value="{{ $user_asesor->program_studi->jenjang->id }}"
-                                        name="jenjang_id" />
-                                </div>
-                        </div>
-                        <div class="modal-footer bg-whitesmoke br">
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
-                            <button type="submit" class="btn btn-primary">Simpan</button>
-                        </div>
-                </form>
-            </div>
-        </div>
-    </div>
-    <div class="modal fade" tabindex="-1" role="dialog" id="TambahBaAsesmenLapangan">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Kirimkan Berita Acara Asesmen Lapangan ke UPPS dan Program Studi</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <form action="{{ route('dashboard-asesor.berita-acara.asesmenLapangan') }}" method="post"
-                    enctype="multipart/form-data" id="formActionTambah">
-                    @csrf
-                    @method('POST')
-                    <div class="modal-body" id="formTambah">
-                        <div class="card">
-                            <form class="needs-validation" novalidate="">
-                                <div class="card-body">
-                                    <div class="form-group">
-                                        <label>Upload Berita acara asesmen lapangan</label>
-                                        <input type="file" class="form-control" name="file" required="">
-                                    </div>
-                                    <div class="form-group">
-                                        <label>*unduh berita acara asesmen lapangan akreditasi program studi terlebih
-                                            dahulu, pada tombol
-                                            asesmen lapangan
-                                            </a></label>
-                                        <label>**pastikan asesmen lapangan sudah selesai dilakukan</label>
-                                    </div>
-                                    <input type="hidden" value="{{ $user_asesor->tahun->id }}" name="tahun_id" />
-                                    <input type="hidden" value="{{ $user_asesor->program_studi->id }}"
-                                        name="program_studi_id" />
-                                    <input type="hidden" value="{{ $user_asesor->program_studi->jenjang->id }}"
-                                        name="jenjang_id" />
-                                </div>
-                        </div>
-                        <div class="modal-footer bg-whitesmoke br">
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
-                            <button type="submit" class="btn btn-primary">Simpan</button>
-                        </div>
-                </form>
-            </div>
-        </div>
-    </div>
+
 </body>
 
 </html>

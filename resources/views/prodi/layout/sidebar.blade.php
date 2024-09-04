@@ -22,14 +22,30 @@
             $activeProdiId = Request::segment(3); // Assuming the program studi ID is the second segment in the URL
         @endphp
         @foreach ($prodi as $p)
-            <li class="dropdown {{ Request::segment(1) == 'ajuan-prodi' && $activeProdiId == $p->id ? 'active' : '' }}">
+            {{-- <li class="dropdown {{ Request::segment(1) == 'ajuan-prodi' && $activeProdiId == $p->id ? 'active' : '' }}"> --}}
+                <li class="dropdown {{ Request::segment(1) == 'ajuan-prodi' ? 'active' : '' }}">
                 <a value="{{ $p->id }}" href="{{ route('ajuan-prodi.prodi', $p->id) }}">
                     <i class="fas fa-file" aria-hidden="true"></i>
                     <span>{{ $p->jenjang->jenjang }} {{ $p->nama }}</span>
                 </a>
             </li>
         @endforeach
-
+        <li class="menu-header">History Akreditasi</li>
+        @php
+            $prodi = App\Models\ProgramStudi::with('jenjang')
+                ->whereHas('user_prodi', function ($query) {
+                    $query->where('user_id', Auth::user()->id);
+                })
+                ->get();// Assuming the program studi ID is the second segment in the URL
+        @endphp
+        @foreach ($prodi as $p)
+            <li class="dropdown {{ Request::segment(1) == 'history' ? 'active' : '' }}">
+                <a value="{{ $p->id }}" href="{{ route('history', $p->id) }}">
+                    <i class="fas fa-database" aria-hidden="true"></i>
+                    <span>{{ $p->jenjang->jenjang }} {{ $p->nama }}</span>
+                </a>
+            </li>
+        @endforeach
         <li class="menu-header">Data Dukung</li>
         <li class="dropdown {{ Request::segment('1') == 'data-dukung' ? 'active' : '' }}">
             <a href="#" class="nav-link has-dropdown">

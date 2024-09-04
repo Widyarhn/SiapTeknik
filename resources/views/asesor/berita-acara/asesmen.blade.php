@@ -91,9 +91,7 @@ th, td {
             <td>{{ $counter }}</td>
             <td>
               @if ($d->matriks_penilaian != null)
-                {{$d->matriks_penilaian->sub_kriteria}}
-              @elseif ($d->suplemen != null)
-                {{$d->suplemen->sub_kriteria}}
+                {{$d->matriks_penilaian->sub_kriteria->sub_kriteria}}
               @endif
             </td>
             <td>{{$d->deskripsi}}</td>

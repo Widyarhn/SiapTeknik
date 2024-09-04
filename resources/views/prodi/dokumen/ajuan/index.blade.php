@@ -68,18 +68,18 @@
                         @endphp
                         @if ($existingUP || $up->tahun->is_active == 1)
                             @if ($up->pengajuan_dokumen)
-                            @if ($up->pengajuan_dokumen->status == 2)
-                            <div class="alert alert-warning alert-dismissible show fade alert-has-icon">
-                                <div class="alert-icon"><i class="far fa-lightbulb"></i></div>
-                                <div class="alert-body">
-                                    <button class="close" data-dismiss="alert">
-                                        <span>&times;</span>
-                                    </button>
-                                    <div class="alert-title">Dokumen Akreditasi telah ditolak</div>
-                                    Catatan UPPS: {{ $up->pengajuan_dokumen->keterangan }}
-                                </div>
-                            </div>
-                            @endif
+                                @if ($up->pengajuan_dokumen->status == '2')
+                                    <div class="alert alert-warning alert-dismissible show fade alert-has-icon">
+                                        <div class="alert-icon"><i class="far fa-lightbulb"></i></div>
+                                        <div class="alert-body">
+                                            <button class="close" data-dismiss="alert">
+                                                <span>&times;</span>
+                                            </button>
+                                            <div class="alert-title">Dokumen Akreditasi telah ditolak</div>
+                                            Catatan UPPS: {{ $up->pengajuan_dokumen->keterangan }}
+                                        </div>
+                                    </div>
+                                @endif
                             @endif
                             <div class="row">
                                 <div class="col-12">
@@ -91,12 +91,268 @@
                                                         <tr>
                                                             {{-- @dd($up) --}}
                                                             <th class="text-center">Tahun {{ $now }}</th>
+
+                                                            {{-- @if ($up->tahun_id == null || $up->pengajuan_dokumen->status != 1)
+                                                                <th class="text-center"> </th>
+                                                                <th>Nama File</th>
+                                                            @elseif ($up->tahun_id && $up->pengajuan_dokumen->status == 1)
+                                                                <th>Nama File</th>
+                                                            @endif --}}
                                                             @if ($existingUP || $up->pengajuan_dokumen->status != 1)
                                                                 <th class="text-center"> </th>
                                                             @endif
                                                             <th>Nama File</th>
                                                         </tr>
                                                     </thead>
+                                                    {{-- <tbody>
+                                                        <tr>
+                                                            <td class="text-center">Surat Pengantar</td>
+                                                            @if ($up->tahun_id == null)
+                                                                @if (empty($up->surat_pengantar))
+                                                                    <td class="text-center">
+                                                                        <form
+                                                                            action="{{ route('ajuan-prodi.storeSp') }}"
+                                                                            method="post" enctype="multipart/form-data"
+                                                                            id="formActionStore">
+                                                                            @csrf
+                                                                            <div class="d-flex align-items-center">
+                                                                                <input type="hidden"
+                                                                                    value="{{ $up->program_studi_id }}"
+                                                                                    name="program_studi_id" />
+                                                                                <input type="file" name="file"
+                                                                                    accept=".pdf" required>
+                                                                                <button type="submit"
+                                                                                    class="btn btn-outline-primary">Upload</button>
+                                                                            </div>
+                                                                        </form>
+                                                                    </td>
+                                                                    <td>
+                                                                        Belum ada
+                                                                    </td>
+                                                                @elseif($up->surat_pengantar->status != '1')
+                                                                    <td class="text-center">
+                                                                        <form
+                                                                            action="{{ route('ajuan-prodi.updateSp', $up->surat_pengantar->id) }}"
+                                                                            method="post" enctype="multipart/form-data"
+                                                                            id="formActionStore">
+                                                                            @csrf
+                                                                            @method('POST')
+                                                                            <div class="d-flex align-items-left">
+                                                                                <input type="hidden"
+                                                                                    value="{{ $up->program_studi_id }}"
+                                                                                    name="program_studi_id" />
+                                                                                <input type="file" name="file"
+                                                                                    accept=".pdf">
+                                                                                <button type="submit"
+                                                                                    class="btn btn-outline-warning">Update</button>
+                                                                            </div>
+                                                                        </form>
+                                                                    </td>
+                                                                    <td>
+                                                                        <a href="{{ Storage::url($up->surat_pengantar->file) }}"
+                                                                            target="_blank">{{ basename($up->surat_pengantar->file) }}</a>
+                                                                    </td>
+                                                                @endif
+                                                            @else
+                                                                @if ($up->pengajuan_dokumen->status == '1')
+                                                                    <td>
+                                                                        <a href="{{ Storage::url($up->surat_pengantar->file) }}"
+                                                                            target="_blank">{{ basename($up->surat_pengantar->file) }}</a>
+                                                                    </td>
+                                                                @elseif($up->pengajuan_dokumen->status != '1' && $up->surat_pengantar->status != '1')
+                                                                    <td class="text-center">
+                                                                        <form
+                                                                            action="{{ route('ajuan-prodi.updateSp', $up->surat_pengantar->id) }}"
+                                                                            method="post" enctype="multipart/form-data"
+                                                                            id="formActionStore">
+                                                                            @csrf
+                                                                            @method('POST')
+                                                                            <div class="d-flex align-items-left">
+                                                                                <input type="hidden"
+                                                                                    value="{{ $up->program_studi_id }}"
+                                                                                    name="program_studi_id" />
+                                                                                <input type="file" name="file"
+                                                                                    accept=".pdf">
+                                                                                <button type="submit"
+                                                                                    class="btn btn-outline-warning">Update</button>
+                                                                            </div>
+                                                                        </form>
+                                                                    </td>
+                                                                    <td>
+                                                                        <a href="{{ Storage::url($up->surat_pengantar->file) }}"
+                                                                            target="_blank">{{ basename($up->surat_pengantar->file) }}</a>
+                                                                    </td>
+                                                                @endif
+                                                            @endif
+                                                        </tr>
+                                                        <tr>
+                                                            <td class="text-center">LED</td>
+                                                            @if ($up->tahun_id == null)
+                                                                @if (empty($up->led))
+                                                                    <td class="text-center">
+                                                                        <form
+                                                                            action="{{ route('ajuan-prodi.storeled') }}"
+                                                                            method="post" enctype="multipart/form-data"
+                                                                            id="formActionStore">
+                                                                            @csrf
+                                                                            @method('POST')
+                                                                            <div class="d-flex align-items-center">
+                                                                                <input type="hidden"
+                                                                                    value="{{ $up->program_studi_id }}"
+                                                                                    name="program_studi_id" />
+                                                                                <input type="file" name="file"
+                                                                                    accept=".pdf" required>
+                                                                                <button type="submit"
+                                                                                    class="btn btn-outline-primary">Upload</button>
+                                                                            </div>
+                                                                        </form>
+                                                                    </td>
+                                                                    <td>
+                                                                        Belum ada
+                                                                    </td>
+                                                                @elseif($up->led->status != '1')
+                                                                    <td class="text-center">
+                                                                        <form
+                                                                            action="{{ route('ajuan-prodi.updateled', $up->led->id) }}"
+                                                                            method="post"
+                                                                            enctype="multipart/form-data"
+                                                                            id="formActionStore">
+                                                                            @csrf
+                                                                            @method('POST')
+                                                                            <div class="d-flex align-items-left">
+                                                                                <input type="hidden"
+                                                                                    value="{{ $up->program_studi_id }}"
+                                                                                    name="program_studi_id" />
+                                                                                <input type="file" name="file"
+                                                                                    accept=".pdf">
+                                                                                <button type="submit"
+                                                                                    class="btn btn-outline-warning">Update</button>
+                                                                            </div>
+                                                                        </form>
+                                                                    </td>
+                                                                    <td>
+                                                                        <a href="{{ Storage::url($up->led->file) }}"
+                                                                            target="_blank">{{ basename($up->led->file) }}</a>
+                                                                    </td>
+                                                                @endif
+                                                            @else
+                                                                @if ($up->pengajuan_dokumen->status == '1')
+                                                                    <td>
+                                                                        <a href="{{ Storage::url($up->led->file) }}"
+                                                                            target="_blank">{{ basename($up->led->file) }}</a>
+                                                                    </td>
+                                                                @else
+                                                                    <td class="text-center">
+                                                                        <form
+                                                                            action="{{ route('ajuan-prodi.updateled', $up->led->id) }}"
+                                                                            method="post"
+                                                                            enctype="multipart/form-data"
+                                                                            id="formActionStore">
+                                                                            @csrf
+                                                                            @method('POST')
+                                                                            <div class="d-flex align-items-left">
+                                                                                <input type="hidden"
+                                                                                    value="{{ $up->program_studi_id }}"
+                                                                                    name="program_studi_id" />
+                                                                                <input type="file" name="file"
+                                                                                    accept=".pdf">
+                                                                                <button type="submit"
+                                                                                    class="btn btn-outline-warning">Update</button>
+                                                                            </div>
+                                                                        </form>
+                                                                    </td>
+                                                                    <td>
+                                                                        <a href="{{ Storage::url($up->led->file) }}"
+                                                                            target="_blank">{{ basename($up->led->file) }}</a>
+                                                                    </td>
+                                                                @endif
+                                                            @endif
+                                                        </tr>
+                                                        <tr>
+                                                            <td class="text-center">LKPS</td>
+                                                            @if ($up->tahun_id == null)
+                                                                @if (empty($up->lkps))
+                                                                    <td class="text-center">
+                                                                        <form
+                                                                        action="{{ route('ajuan-prodi.storelkps') }}"
+                                                                        method="post"
+                                                                        enctype="multipart/form-data"
+                                                                        id="formActionStore">
+                                                                        @csrf
+                                                                        @method('POST')
+                                                                            <div class="d-flex align-items-center">
+                                                                                <input type="hidden"
+                                                                                    value="{{ $up->program_studi_id }}"
+                                                                                    name="program_studi_id" />
+                                                                                <input type="file" name="file"
+                                                                                    accept=".pdf" required>
+                                                                                <button type="submit"
+                                                                                    class="btn btn-outline-primary">Upload</button>
+                                                                            </div>
+                                                                        </form>
+                                                                    </td>
+                                                                    <td>
+                                                                        Belum ada
+                                                                    </td>
+                                                                @elseif($up->lkps->status != '1')
+                                                                    <td class="text-center">
+                                                                        <form
+                                                                            action="{{ route('ajuan-prodi.updatelkps', $up->lkps->id) }}"
+                                                                            method="post"
+                                                                            enctype="multipart/form-data"
+                                                                            id="formActionStore">
+                                                                            @csrf
+                                                                            @method('POST')
+                                                                            <div class="d-flex align-items-left">
+                                                                                <input type="hidden"
+                                                                                    value="{{ $up->program_studi_id }}"
+                                                                                    name="program_studi_id" />
+                                                                                <input type="file" name="file"
+                                                                                    accept=".pdf">
+                                                                                <button type="submit"
+                                                                                    class="btn btn-outline-warning">Update</button>
+                                                                            </div>
+                                                                        </form>
+                                                                    </td>
+                                                                    <td>
+                                                                        <a href="{{ Storage::url($up->lkps->file) }}"
+                                                                            target="_blank">{{ basename($up->lkps->file) }}</a>
+                                                                    </td>
+                                                                @endif
+                                                            @else
+                                                                @if ($up->pengajuan_dokumen->status == '1')
+                                                                    <td>
+                                                                        <a href="{{ Storage::url($up->lkps->file) }}"
+                                                                            target="_blank">{{ basename($up->lkps->file) }}</a>
+                                                                    </td>
+                                                                @else
+                                                                    <td class="text-center">
+                                                                        <form
+                                                                            action="{{ route('ajuan-prodi.updatelkps', $up->lkps->id) }}"
+                                                                            method="post"
+                                                                            enctype="multipart/form-data"
+                                                                            id="formActionStore">
+                                                                            @csrf
+                                                                            @method('POST')
+                                                                            <div class="d-flex align-items-left">
+                                                                                <input type="hidden"
+                                                                                    value="{{ $up->program_studi_id }}"
+                                                                                    name="program_studi_id" />
+                                                                                <input type="file" name="file"
+                                                                                    accept=".pdf">
+                                                                                <button type="submit"
+                                                                                    class="btn btn-outline-warning">Update</button>
+                                                                            </div>
+                                                                        </form>
+                                                                    </td>
+                                                                    <td>
+                                                                        <a href="{{ Storage::url($up->lkps->file) }}"
+                                                                            target="_blank">{{ basename($up->lkps->file) }}</a>
+                                                                    </td>
+                                                                @endif
+                                                            @endif
+                                                        </tr>
+                                                    </tbody> --}}
                                                     <tbody>
                                                         <tr>
                                                             <td class="text-center">Surat Pengantar</td>
@@ -153,13 +409,68 @@
                                                             </td>
                                                         </tr>
                                                         <tr>
+                                                            <td class="text-center">Surat Pernyataan</td>
+                                                            @if ($existingUP || $up->pengajuan_dokumen->status != 1)
+                                                                <td class="text-center">
+                                                                    @if (empty($up->surat_pernyataan))
+                                                                        <form
+                                                                            action="{{ route('ajuan-prodi.storePernyataan') }}"
+                                                                            method="post" enctype="multipart/form-data"
+                                                                            id="formActionStore">
+                                                                            @csrf
+                                                                            <div class="d-flex align-items-center">
+                                                                                <input type="hidden"
+                                                                                    value="{{ $up->program_studi_id }}"
+                                                                                    name="program_studi_id" />
+                                                                                <input type="file" name="file"
+                                                                                    accept=".pdf" required>
+                                                                                <button type="submit"
+                                                                                    class="btn btn-outline-primary">Upload</button>
+                                                                            </div>
+                                                                        </form>
+                                                                    @elseif($up->surat_pernyataan->status != 1)
+                                                                        <form
+                                                                            action="{{ route('ajuan-prodi.updatePernyataan', $up->surat_pernyataan->id) }}"
+                                                                            method="post" enctype="multipart/form-data"
+                                                                            id="formActionStore">
+                                                                            @csrf
+                                                                            @method('POST')
+                                                                            <div class="d-flex align-items-left">
+                                                                                <input type="hidden"
+                                                                                    value="{{ $up->program_studi_id }}"
+                                                                                    name="program_studi_id" />
+                                                                                <input type="file" name="file"
+                                                                                    accept=".pdf">
+                                                                                <button type="submit"
+                                                                                    class="btn btn-outline-warning">Update</button>
+                                                                            </div>
+                                                                        </form>
+                                                                    @endif
+                                                                </td>
+                                                            @endif
+                                                            <td>
+                                                                @if ($existingUP || $up->pengajuan_dokumen->status != 1)
+                                                                    @if (empty($up->surat_pernyataan))
+                                                                        Belum ada
+                                                                    @else
+                                                                        <a href="{{ Storage::url($up->surat_pernyataan->file) }}"
+                                                                            target="_blank">{{ basename($up->surat_pernyataan->file) }}</a>
+                                                                    @endif
+                                                                @else
+                                                                    <a href="{{ Storage::url($up->surat_pernyataan->file) }}"
+                                                                        target="_blank">{{ basename($up->surat_pernyataan->file) }}</a>
+                                                                @endif
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
                                                             <td class="text-center">Dokumen LKPS</td>
                                                             @if ($existingUP || $up->pengajuan_dokumen->status != 1)
                                                                 <td class="text-center">
                                                                     @if (empty($up->lkps))
                                                                         <form
                                                                             action="{{ route('ajuan-prodi.storelkps') }}"
-                                                                            method="post" enctype="multipart/form-data"
+                                                                            method="post"
+                                                                            enctype="multipart/form-data"
                                                                             id="formActionStore">
                                                                             @csrf
                                                                             @method('POST')
@@ -177,7 +488,8 @@
                                                                     @elseif($up->lkps->status != 1)
                                                                         <form
                                                                             action="{{ route('ajuan-prodi.updatelkps', $up->lkps->id) }}"
-                                                                            method="post" enctype="multipart/form-data"
+                                                                            method="post"
+                                                                            enctype="multipart/form-data"
                                                                             id="formActionStore">
                                                                             @csrf
                                                                             @method('POST')
@@ -216,7 +528,8 @@
                                                                     @if (empty($up->led))
                                                                         <form
                                                                             action="{{ route('ajuan-prodi.storeled') }}"
-                                                                            method="post" enctype="multipart/form-data"
+                                                                            method="post"
+                                                                            enctype="multipart/form-data"
                                                                             id="formActionStore">
                                                                             @csrf
                                                                             @method('POST')
@@ -266,6 +579,63 @@
                                                                 @endif
                                                             </td>
                                                         </tr>
+                                                        <tr>
+                                                            <td class="text-center">Lampiran (Izin Pendirian PS,
+                                                                Renstra)</td>
+                                                            @if ($existingUP || $up->pengajuan_dokumen->status != 1)
+                                                                <td class="text-center">
+                                                                    @if (empty($up->lampiran_renstra))
+                                                                        <form
+                                                                            action="{{ route('ajuan-prodi.storeLampiran') }}"
+                                                                            method="post"
+                                                                            enctype="multipart/form-data"
+                                                                            id="formActionStore">
+                                                                            @csrf
+                                                                            <div class="d-flex align-items-center">
+                                                                                <input type="hidden"
+                                                                                    value="{{ $up->program_studi_id }}"
+                                                                                    name="program_studi_id" />
+                                                                                <input type="file" name="file"
+                                                                                    accept=".pdf" required>
+                                                                                <button type="submit"
+                                                                                    class="btn btn-outline-primary">Upload</button>
+                                                                            </div>
+                                                                        </form>
+                                                                    @elseif($up->lampiran_renstra->status != 1)
+                                                                        <form
+                                                                            action="{{ route('ajuan-prodi.updateSp', $up->lampiran_renstra->id) }}"
+                                                                            method="post"
+                                                                            enctype="multipart/form-data"
+                                                                            id="formActionStore">
+                                                                            @csrf
+                                                                            @method('POST')
+                                                                            <div class="d-flex align-items-left">
+                                                                                <input type="hidden"
+                                                                                    value="{{ $up->program_studi_id }}"
+                                                                                    name="program_studi_id" />
+                                                                                <input type="file" name="file"
+                                                                                    accept=".pdf">
+                                                                                <button type="submit"
+                                                                                    class="btn btn-outline-warning">Update</button>
+                                                                            </div>
+                                                                        </form>
+                                                                    @endif
+                                                                </td>
+                                                            @endif
+                                                            <td>
+                                                                @if ($existingUP || $up->pengajuan_dokumen->status != 1)
+                                                                    @if (empty($up->lampiran_renstra))
+                                                                        Belum ada
+                                                                    @else
+                                                                        <a href="{{ Storage::url($up->lampiran_renstra->file) }}"
+                                                                            target="_blank">{{ basename($up->lampiran_renstra->file) }}</a>
+                                                                    @endif
+                                                                @else
+                                                                    <a href="{{ Storage::url($up->lampiran_renstra->file) }}"
+                                                                        target="_blank">{{ basename($up->lampiran_renstra->file) }}</a>
+                                                                @endif
+                                                            </td>
+                                                        </tr>
                                                     </tbody>
                                                 </table>
                                             </div>
@@ -278,10 +648,25 @@
                                             <h4>Import Tabel LKPS &rsaquo; </h4>Import file LKPS per kriteria
                                         </div>
                                         <div class="card-body">
+                                            <b>Template LKPS yang Tersedia:</b>
+                                            <ol>
+                                                @forelse($templates as $template)
+                                                    <li>
+                                                        <a href="{{ url('storage/instrumen/' . $template->file) }}"
+                                                            target="_blank"  download>
+                                                            {{ $template->judul }}
+                                                        </a>
+                                                    </li>
+                                                @empty
+                                                    <li>Tidak ada template LKPS yang tersedia.</li>
+                                                @endforelse
+                                            </ol>
                                             @foreach ($kriteria as $kriteriaItem)
                                                 <div class="form-group row align-items-center">
                                                     <label
-                                                        class="col-md-4 text-md-right text-left">{{ $kriteriaItem->kriteria }}</label>
+                                                        class="col-md-4 text-md-right text-left">{{ $kriteriaItem->kriteria }}
+                                                    </label>
+
                                                     @php
                                                         $existingLkps = $importLkps
                                                             ->where('kriteria_id', $kriteriaItem->id)
@@ -362,17 +747,25 @@
                                                 </div>
                                             @endforeach
                                             <div class="modal-footer bg-whitesmoke br">
-                                                <a href="{{ route('ajuan-prodi.calculate', $up->program_studi_id) }}" class="btn btn-primary">Calculate</a>
+                                                <a href="{{ route('ajuan-prodi.calculate', $up->program_studi_id) }}"
+                                                    class="btn btn-primary">Calculate</a>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="col-12 col-md-3 col-lg-3">
-                                    @if ($up->pengajuan_dokumen == null)
-                                        @if (!empty($up->led) && !empty($up->lkps) && !empty($up->surat_pengantar))
+                                    @if ($up->tahun_id == null)
+                                        @if (
+                                            !empty($up->led) &&
+                                                !empty($up->lkps) &&
+                                                !empty($up->surat_pernyataan) &&
+                                                !empty($up->lampiran_renstra) &&
+                                                !empty($up->surat_pengantar))
                                             <a href="javascript:void(0)" data-id="{{ $up->id }}"
                                                 data-lkps="{{ $up->lkps->id }}"
                                                 data-surat_pengantar="{{ $up->surat_pengantar->id }}"
+                                                data-spernyataan="{{ $up->surat_pernyataan->id }}"
+                                                data-lampiran="{{ $up->lampiran_renstra->id }}"
                                                 data-led="{{ $up->led->id }}" data-tahun="{{ now()->year }}"
                                                 data-route="{{ route('ajuan-prodi.ajukan') }}"
                                                 class="text-center text-white btn-sm ajukan-btn">
@@ -388,11 +781,18 @@
                                                 isset($up->lkps->status) &&
                                                 $up->lkps->status != 2 &&
                                                 isset($up->surat_pengantar->status) &&
-                                                $up->surat_pengantar->status != 2 && isset($up->pengajuan_dokumen) &&
+                                                $up->surat_pengantar->status != 2 &&
+                                                isset($up->surat_pernyataan->status) &&
+                                                $up->surat_pernyataan->status != 2 &&
+                                                isset($up->lampiran_renstra->status) &&
+                                                $up->lampiran_renstra->status != 2 &&
+                                                isset($up->pengajuan_dokumen) &&
                                                 $up->pengajuan_dokumen->status != 1 &&
                                                 empty($up->pengajuan_dokumen->tanggal_selesai))
                                             <a href="javascript:void(0)" data-id="{{ $up->id }}"
                                                 data-lkps="{{ $up->lkps->id }}"
+                                                data-spernyataan="{{ $up->surat_pernyataan->id }}"
+                                                data-lampiran="{{ $up->lampiran_renstra->id }}"
                                                 data-surat_pengantar="{{ $up->surat_pengantar->id }}"
                                                 data-led="{{ $up->led->id }}" data-tahun="{{ now()->year }}"
                                                 data-route="{{ route('ajuan-prodi.ajukan') }}"
@@ -429,6 +829,8 @@
                     let led_id = $(this).data('led');
                     let lkps_id = $(this).data('lkps');
                     let surat_pengantar_id = $(this).data('surat_pengantar');
+                    let spernyataan_id = $(this).data('spernyataan');
+                    let lampiran_id = $(this).data('lampiran');
                     let tahun = $(this).data('tahun'); // Mengambil tahun dari data-attributes
                     let route = $(this).data('route');
                     let tanggal_hari_ini = new Date().toISOString().slice(0, 10);

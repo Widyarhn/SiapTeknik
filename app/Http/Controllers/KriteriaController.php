@@ -35,7 +35,7 @@ class KriteriaController extends Controller
                 </div>';
             })
             // ->rawColumns(['listLkpsNames', 'action'])
-            ->rawColumns([ 'action'])
+            ->rawColumns(['action'])
             ->make(true);
     }
 
@@ -45,29 +45,50 @@ class KriteriaController extends Controller
         $validatedData = $request->validate([
             'butir' => 'required|string|max:255',
             'kriteria' => 'required|string|max:255',
-            'lkps' => 'nullable|array',
-            'lkps.*.nama_tabel_lkps' => 'sometimes|nullable|min:6',
+            // Tidak perlu validasi khusus untuk checkbox
         ]);
 
-        DB::transaction(function () use ($validatedData) {
-            $kriteria = Kriteria::create([
-                'butir' => $validatedData['butir'],
-                'kriteria' => $validatedData['kriteria'],
-            ]);
-            // if (!empty($validatedData['lkps'])) {
-            //     foreach ($validatedData['lkps'] as $lkpsItem) {
-            //         if (!empty($lkpsItem['nama_tabel_lkps'])) { // Hanya simpan jika 'nama_tabel_lkps' tidak null
-            //             ListLkps::create([
-            //                 'kriteria_id' => $kriteria->id,
-            //                 'nama' => $lkpsItem['nama_tabel_lkps'],
-            //             ]);
-            //         }
-            //     }
-            // }
-        });
+        // Jika checkbox dicentang, nilai kuantitatif akan menjadi true
+        $isKuantitatif = $request->has('kuantitatif') ? true : false;
 
-        return redirect()->back()->with('success', 'Data Kriteria Berhasil Ditambahkan');
+        // Lakukan penyimpanan data
+        $kriteria = new Kriteria();
+        $kriteria->butir = $request->input('butir');
+        $kriteria->kriteria = $request->input('kriteria');
+        $kriteria->kuantitatif = $isKuantitatif;
+        $kriteria->save();
+
+        return redirect()->back()->with('success', 'Data kriteria berhasil disimpan.');
     }
+
+    // public function store(Request $request)
+    // {
+    //     $validatedData = $request->validate([
+    //         'butir' => 'required|string|max:255',
+    //         'kriteria' => 'required|string|max:255',
+    //         'lkps' => 'nullable|array',
+    //         'lkps.*.nama_tabel_lkps' => 'sometimes|nullable|min:6',
+    //     ]);
+
+    //     DB::transaction(function () use ($validatedData) {
+    //         $kriteria = Kriteria::create([
+    //             'butir' => $validatedData['butir'],
+    //             'kriteria' => $validatedData['kriteria'],
+    //         ]);
+    //         // if (!empty($validatedData['lkps'])) {
+    //         //     foreach ($validatedData['lkps'] as $lkpsItem) {
+    //         //         if (!empty($lkpsItem['nama_tabel_lkps'])) { // Hanya simpan jika 'nama_tabel_lkps' tidak null
+    //         //             ListLkps::create([
+    //         //                 'kriteria_id' => $kriteria->id,
+    //         //                 'nama' => $lkpsItem['nama_tabel_lkps'],
+    //         //             ]);
+    //         //         }
+    //         //     }
+    //         // }
+    //     });
+
+    //     return redirect()->back()->with('success', 'Data Kriteria Berhasil Ditambahkan');
+    // }
 
     public function show($id)
     {
@@ -109,7 +130,7 @@ class KriteriaController extends Controller
         // if (!empty($deletedLkpsIds)) {
         //     ListLkps::whereIn('id', $deletedLkpsIds)->delete();
         // }
-        
+
         // // Mengupdate atau menambah ListLkps
         // if (isset($validatedData['lkps'])) {
         //     // Mengupdate ListLkps yang ada

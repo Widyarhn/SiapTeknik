@@ -30,15 +30,25 @@ class InstrumenController extends Controller
                 return $row->jenjang->jenjang;
             })
             ->addColumn('action', function ($row) {
+                // Get the file extension
+                $fileExtension = pathinfo($row->file, PATHINFO_EXTENSION);
+    
+                // Determine URL based on file extension
+                if ($fileExtension == 'xlsx') {
+                    $fileUrl = url("storage/instrumen/".$row->file);
+                    $fileLink = '<a href="'.$fileUrl.'" download class="btn btn-icon icon-left btn-success"><i class="fa fa-download"></i></a>';
+                } else {
+                    $fileUrl = url("storage/instrumen/".$row->file);
+                    $fileLink = '<a href="'.$fileUrl.'" target="_blank" class="btn btn-icon icon-left btn-info"><i class="fa fa-book-open"></i></a>';
+                }
+    
                 return '<div class="buttons">
-                <a href="'.url("storage/instrumen/".$row->file).'" target="_blank" class="btn btn-icon icon-left btn-info"><i class="fa fa-book-open"></i></a>
-                <a href="#" data-toggle="modal" data-target="#modalEdit" data-url="'.route('instrumen.show', $row->id).'" id="edit" class="btn btn-icon icon-left btn-warning btn-edit"><i class="far fa-edit"></i></a>
-
-                <a href="javascript:void(0)" data-route="'.route('instrumen.destroy', $row->id).'"
-                id="delete" class="btn btn-danger btn-md"><i class="fa fa-trash"></i></a>
-            </div>';
-
-        })
+                    '.$fileLink.'
+                    <a href="#" data-toggle="modal" data-target="#modalEdit" data-url="'.route('instrumen.show', $row->id).'" id="edit" class="btn btn-icon icon-left btn-warning btn-edit"><i class="far fa-edit"></i></a>
+                    <a href="javascript:void(0)" data-route="'.route('instrumen.destroy', $row->id).'"
+                    id="delete" class="btn btn-danger btn-md"><i class="fa fa-trash"></i></a>
+                </div>';
+            })
             ->rawColumns(['program_studi','action'])
             ->make(true);
     }
@@ -47,7 +57,7 @@ class InstrumenController extends Controller
     {
         
         $validatedData = $request->validate([
-            'file' => 'required|mimes:pdf',
+            'file' => 'required|mimes:pdf,xlsx',
             'judul' => ['required', 'min:6'],
             'jenjang_id' => 'required'
         ]);

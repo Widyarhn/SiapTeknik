@@ -16,6 +16,7 @@
 <script src="/assets/modules/datatables/DataTables-1.10.16/js/jquery.dataTables.min.js"></script>
 <script src="/assets/modules/datatables/DataTables-1.10.16/js/dataTables.bootstrap4.min.js"></script>
 
+
 <!-- JS Libraies -->
 <script src="/assets/modules/jquery-ui/jquery-ui.min.js"></script>
 <script src="/assets/modules/sweetalert/sweetalert.min.js"></script>

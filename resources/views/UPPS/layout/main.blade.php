@@ -76,8 +76,8 @@
                         <div class="col-lg-4 col-md-4 col-sm-12">
                             <div class="card card-statistic-2">
                                 <div class="card-icon shadow-info bg-info"
-                                        style="margin-left: 16px;margin-top: 16px;margin-bottom: 16px;margin-right: 16px;">
-                                        <i class="fas fa-clipboard-list"></i>
+                                    style="margin-left: 16px;margin-top: 16px;margin-bottom: 16px;margin-right: 16px;">
+                                    <i class="fas fa-clipboard-list"></i>
                                 </div>
                                 <div class="card-wrap">
                                     <div class="card-header" style="padding-top: 16px;">
@@ -106,8 +106,8 @@
                         <div class="col-lg-4 col-md-4 col-sm-12">
                             <div class="card card-statistic-2">
                                 <div class="card-icon shadow-success bg-success"
-                                        style="margin-left: 16px;margin-top: 16px;margin-bottom: 16px;margin-right: 16px;">
-                                        <i class="fas fa-clipboard-check"></i>
+                                    style="margin-left: 16px;margin-top: 16px;margin-bottom: 16px;margin-right: 16px;">
+                                    <i class="fas fa-clipboard-check"></i>
                                 </div>
                                 <div class="card-wrap">
                                     <div class="card-header" style="padding-top: 16px;">
@@ -139,7 +139,7 @@
                             <a href="{{ route('user.index') }}">
                                 <div class="card card-statistic-2">
                                     <div class="card-icon shadow-secondary bg-secondary"
-                                        style="margin-left: 16px;margin-top: 16px;margin-bottom: 16px;margin-right: 16px;">
+                                        style="margin-left: 16px;margin-top: 16px;margin-bottom: 16px;margin-right: 16px; text-color:yellow">
                                         <i class="fas fa-users"></i>
                                     </div>
                                     <div class="card-wrap">
@@ -173,7 +173,7 @@
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-lg-4 col-md-4 col-12">
+                        {{-- <div class="col-lg-4 col-md-4 col-12">
                             <div class="card card-primary">
                                 <div class="card-header">
                                     <h4>Timeline Akreditasi</h4>
@@ -214,8 +214,32 @@
                                     </ul>
                                 </div>
                             </div>
+                        </div> --}}
+                        <div class="col-lg-5 col-md-5 col-12">
+                            <div class="card card-primary">
+                                <div class="card-header">
+                                    <h4>Timeline Akreditasi</h4>
+                                    <div class="card-header-action dropdown">
+                                        <a href="#" data-toggle="dropdown" class="btn btn-danger dropdown-toggle">Pilih Prodi</a>
+                                        <ul class="dropdown-menu"
+                                            style="width: auto;box-shadow:0 4px 8px rgba(0, 0, 0, 0.13)">
+                                            <li class="dropdown-title">Pilih Program Studi</li>
+                                            <li><a href="#" class="dropdown-item btn-pilih" data-id="1">D3 Teknik Mesin</a></li>
+                                            <li><a href="#" class="dropdown-item btn-pilih" data-id="2">D3 Teknik Pendingin dan Tata Udara</a></li>
+                                            <li><a href="#" class="dropdown-item btn-pilih" data-id="3">D4 Perancangan Manufaktur</a></li>
+                                            <li><a href="#" class="dropdown-item btn-pilih" data-id="4">D4 Teknologi Rekayasa Instrumentasi dan Kontrol</a></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="card-body" style="overflow-x: auto; white-space: nowrap;">
+                                    <ul class="list-inline" id="timeline-list">
+                                        <p class="text-center">Pilih program studi untuk melihat timeline.</p>
+                                    </ul>
+                                </div>
+                            </div>
                         </div>
-                        <div class="col-lg-8 col-md-8 col-12">
+                        
+                        <div class="col-lg-7 col-md-7 col-12">
                             <div class="card card-primary">
                                 <div class="card-header">
                                     <div class="buttons">
@@ -440,6 +464,67 @@
 
 
     <script>
+        $(document).on('click', '.btn-pilih', function(e) {
+            e.preventDefault();
+            var prodiId = $(this).data('id');
+            var prodiName = $(this).text().trim(); // Mengambil nama prodi dari teks dropdown
+
+            // Ganti teks tombol dropdown dengan nama prodi yang dipilih
+            $('.btn-danger.dropdown-toggle').text(prodiName);
+
+            $.ajax({
+                url: '{{ route('timeline.byProdi', ['prodi_id' => '__prodi_id__']) }}'.replace(
+                    '__prodi_id__', prodiId),
+                type: 'GET',
+                success: function(response) {
+                    var timelineList = $('#timeline-list');
+                    timelineList.empty(); // Mengosongkan daftar timeline
+
+                    // Pengajuan Dokumen
+                    if (response.pengajuan) {
+                        timelineList.append(
+                            '<li class="media">' +
+                            '<div class="media-body">' +
+                            '<div class="media-title">Pengajuan Dokumen</div>' +
+                            '<div class="mt-1">' +
+                            '<div class="font-weight-600 text-muted text-medium">' +
+                            response.pengajuan.tanggal_ajuan + ' s/d ' + response.pengajuan
+                            .tanggal_selesai +
+                            '</div>' +
+                            '</div>' +
+                            '</div>' +
+                            '</li>'
+                        );
+                    }
+
+                    // Timeline Asesmen Kecukupan dan Asesmen Lapangan
+                    if (response.timelines.length > 0) {
+                        $.each(response.timelines, function(index, timeline) {
+                            timelineList.append(
+                                '<li class="media">' +
+                                '<div class="media-body">' +
+                                '<div class="media-title">' + timeline.kegiatan + '</div>' +
+                                '<div class="mt-1">' +
+                                '<div class="font-weight-600 text-muted text-medium">' +
+                                timeline.tanggal_mulai + ' s/d ' + timeline.batas_waktu +
+                                '</div>' +
+                                '</div>' +
+                                '</div>' +
+                                '</li>'
+                            );
+                        });
+                    } else {
+                        timelineList.append(
+                            '<p class="text-center">Belum ada timeline untuk Prodi</p>'
+                        );
+                    }
+                },
+                error: function() {
+                    alert('Terjadi kesalahan, silakan coba lagi.');
+                }
+            });
+        });
+
         $(function() {
             $('#daftarAkreditasiProdi').dataTable({
                 processing: true,

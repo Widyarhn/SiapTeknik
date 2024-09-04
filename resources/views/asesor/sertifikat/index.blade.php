@@ -5,15 +5,18 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sertifikat {{$user_asesor->program_studi->jenjang->jenjang }} {{$user_asesor->program_studi->nama }}</title>
+    <title>Sertifikat {{ $user_asesor->program_studi->jenjang->jenjang }} {{ $user_asesor->program_studi->nama }}
+    </title>
     <style>
         /* Ganti dengan gaya desain yang Anda inginkan */
         body {
             font-family: Arial, sans-serif;
             /* background-color: #f5f5f5; */
-            background-image: url('assets/img/sertifikat.png'); /* Ganti dengan nama dan format gambar yang sesuai */
-        background-size: cover; /* Sesuaikan sesuai kebutuhan */
-        background-repeat: no-repeat;
+            background-image: url('assets/img/sertifikat.png');
+            /* Ganti dengan nama dan format gambar yang sesuai */
+            background-size: cover;
+            /* Sesuaikan sesuai kebutuhan */
+            background-repeat: no-repeat;
             margin: 0;
             padding: 0;
             display: flex;
@@ -64,54 +67,39 @@
         </div>
         <div class="content">
             <p>
-                Simulasi Akereditasi Politeknik Negeri Indramayu, tahun simulasi {{$user_asesor->tahun->tahun}}
+                Simulasi Akereditasi Politeknik Negeri Indramayu, tahun simulasi {{ $user_asesor->tahun->tahun }}
             </p>
             <p>
                 Berdasarkan simulasi yang telah dilakukan, menyatakan bahwa :
             </p>
             <p>
-                Program studi {{$user_asesor->program_studi->jenjang->jenjang}} Teknik Informatika
+                Program studi {{ $user_asesor->program_studi->jenjang->jenjang }}
+                {{ $user_asesor->program_studi->nama }}
             </p>
             <p>
                 Politeknik Negeri Indramayu
             </p>
         </div>
-    @php
-        $nomer_matriks = 0;
-    @endphp
-    @foreach ($matriks as $item)
-        @php
-            $nomer_matriks += $item->matriks_penilaian->bobot * $item->nilai;
-        @endphp
-    @endforeach
+        <h2>Total Bobot: <span class="badge-info">{{ number_format($total, 2) }}</span></h2>
 
-    @php
-        $nomer_suplemen = 0;
-    @endphp
-    @foreach ($suplemen as $sup)
-        @php
-            $nomer_suplemen += $sup->suplemen->bobot * $sup->nilai;
-        @endphp
-    @endforeach
-    @php
-        $total = $nomer_matriks + $nomer_suplemen;
-    @endphp
+        <!-- Tampilkan Kategori Akreditasi -->
         <div class="akreditasi">
             @if($total <= 0)
-            BELUM MELAKUKAN AKREDITASI
+                BELUM MELAKUKAN AKREDITASI
             @elseif ($total >= 1 && $total <= 200)
-            TIDAK MEMENUHI SYARAT PERINGKAT
+                TIDAK MEMENUHI SYARAT PERINGKAT
             @elseif($total >= 200 && $total <= 301 )
-            BAIK
+                BAIK
             @elseif($total >= 301 && $total <= 361)
-            BAIK SEKALI
+                BAIK SEKALI
             @elseif($total >= 361)
-            UNGGUL
+                UNGGUL
             @endif
         </div>
-        <div class="footer">
-            <p>Sertifikat ini dikeluarkan oleh asesor {{ auth()->user()->nama }}</p>
-        </div>
+    <div class="footer">
+        <p>Sertifikat ini dikeluarkan oleh asesor {{ auth()->user()->nama }}</p>
+    </div>
+
     </div>
 </body>
 

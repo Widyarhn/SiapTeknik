@@ -62,6 +62,26 @@ class DashboardUPPSController extends Controller
         return view('UPPS.layout.main', $data);
     }
 
+    public function getTimelineByProdi($prodi_id)
+    {
+        $timelines = Timeline::where('program_studi_id', $prodi_id)
+            ->orderBy('tanggal_mulai', 'asc')
+            ->get();
+
+        $pengajuan = PengajuanDokumen::with(['user_prodi' => function ($q) use ($prodi_id) {
+            $q->where('program_studi_id', $prodi_id);
+        }])->where('status', '1')->first();
+
+        return response()->json([
+            'timelines' => $timelines,
+            'pengajuan' => $pengajuan
+        ]);
+    }
+
+
+
+
+
     public function json(Request $request)
     {
         $data = Tahun::orderBy('tahun', 'ASC')
