@@ -18,6 +18,8 @@ use App\Models\ProgramStudi;
 use Illuminate\Http\Request;
 use App\Models\SuratPengantar;
 use App\Models\AsesmenLapangan;
+use App\Models\LampiranRenstra;
+use App\Models\SuratPernyataan;
 use App\Models\AsesmenKecukupan;
 use App\Models\MatriksPenilaian;
 use App\Models\PengajuanDokumen;
@@ -133,6 +135,12 @@ class AkreditasiController extends Controller
             case 'surat_pengantar':
                 $dokumen = SuratPengantar::find($id);
                 break;
+            case 'surat_pernyataan':
+                $dokumen = SuratPernyataan::find($id);
+                break;
+            case 'lampiran_renstra':
+                $dokumen = LampiranRenstra::find($id);
+                break;
             default:
                 return response()->json(['success' => false, 'message' => 'Jenis dokumen tidak valid.']);
         }
@@ -165,6 +173,12 @@ class AkreditasiController extends Controller
                 break;
             case 'surat_pengantar':
                 $dokumen = SuratPengantar::find($id);
+                break;
+            case 'surat_pernyataan':
+                $dokumen = SuratPernyataan::find($id);
+                break;
+            case 'lampiran_renstra':
+                $dokumen = LampiranRenstra::find($id);
                 break;
         }
 
@@ -205,7 +219,7 @@ class AkreditasiController extends Controller
         $ak->save();
 
         $tahun = Tahun::where('id', $ak->tahun_id)->firstOrFail();
-        $tahun->akhir_akreditasi = now(); 
+        $tahun->akhir_akreditasi = now();
         $tahun->is_active = false;
         $tahun->update();
 
@@ -1138,7 +1152,6 @@ class AkreditasiController extends Controller
     {
         $data = UserProdi::with(['pengajuan_dokumen' => function ($r) {
             $r->where('status', '1');
-            $r->whereNotNull('tanggal_selesai');
         }, 'program_studi', 'jenjang', 'tahun'])
             ->orderBy('id', 'ASC')->whereNotNull('tahun_id')->get();
         return DataTables::of($data)

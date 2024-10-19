@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('label');
             $table->string('sheet_name')->nullable();
             $table->string('cell')->nullable();
-            $table->float('nilai')->nullable();
+            $table->decimal('nilai', 20, 2)->nullable();
             $table->timestamps();
         });
     }

@@ -45,19 +45,29 @@
                             });
                         </script>
                     @endif
-                    {{-- <div class="alert alert-warning alert-dismissible show fade alert-has-icon">
+                    {{-- <div class="alert alert-info alert-dismissible show fade alert-has-icon">
                         <div class="alert-icon"><i class="far fa-lightbulb"></i></div>
                         <div class="alert-body">
                             <button class="close" data-dismiss="alert">
                                 <span>&times;</span>
                             </button>
-                            @if ($timeline)
-                            <div class="alert-title">{{ $timeline->tanggal_mulai }} s.d.
-                                {{ $timeline->tanggal_akhir }}</div>
-                            {{ $timeline->kegiatan }}
-                            @else
+                            @if ($timeline && $timeline->isNotEmpty())
+                                @foreach ($timeline as $item)
+                                    <div class="alert-title">{{ $item->tanggal_mulai }} s.d. {{ $item->batas_waktu }}
+                                    </div>
 
+                                    @if ($item->user_asesor && $item->user_asesor->user)
+                                        Tahap Penilaian {{ $item->kegiatan }} oleh Tim Asesor
+                                        {{ $item->user_asesor->user->nama }}
+                                    @else
+                                        <p>No asesor information available</p>
+                                    @endif
+                                @endforeach
+                            @else
+                                <p>No timeline available</p>
                             @endif
+
+
                         </div>
                     </div> --}}
                     <div class="row">
@@ -67,11 +77,11 @@
                                     <h4>Sertifikat Akreditasi</h4>
                                     <div class="card-header-action">
                                         @if (count($user_prodi->program_studi->sertifikat) == 0)
-                                            <a href="#" class="btn btn-secondary btn-create" > Sertifikat belum
+                                            <a href="#" class="btn btn-secondary btn-create"> Sertifikat belum
                                                 tersedia</a>
                                         @else
                                             <a href="{{ url('storage/sertifikat/', $user_prodi->program_studi->sertifikat[0]->file) }}"
-                                                target="_blank" class="btn btn-primary" >Sertifikat Tersedia</a>
+                                                target="_blank" class="btn btn-primary">Sertifikat Tersedia</a>
                                         @endif
                                     </div>
                                 </div>
@@ -90,7 +100,7 @@
                                                 Berita Acara belum tersedia</a>
                                         @else
                                             <a href="{{ url('storage/berita-acara/', $user_prodi->program_studi->berita_acara[0]->file) }}"
-                                                class="btn btn-primary"  target="_blank">Berita Acara Tersedia</a>
+                                                class="btn btn-primary" target="_blank">Berita Acara Tersedia</a>
                                             @php
                                                 $id_asesor = $user_prodi->program_studi->user_asesor->first();
                                             @endphp
@@ -110,7 +120,7 @@
                                                 Belum tersedia</a>
                                         @else
                                             <a href="{{ url('storage/rekomendasi/', $user_prodi->program_studi->rpembinaan[0]->file) }}"
-                                                class="btn btn-primary"  target="_blank">Lihat</a>
+                                                class="btn btn-primary" target="_blank">Lihat</a>
                                         @endif
                                     </div>
                                 </div>

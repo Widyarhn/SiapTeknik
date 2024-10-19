@@ -3,6 +3,8 @@
     use App\Models\Led;
     use App\Models\SuratPengantar;
     use App\Models\UserAsesor;
+    use App\Models\SuratPernyataan;
+    use App\Models\LampiranRenstra;
 @endphp
 
 <!DOCTYPE html>
@@ -99,6 +101,18 @@
                                             )
                                                 ->where('tahun_id', $t->user_prodi->tahun_id)
                                                 ->first();
+                                            $surat_pernyataan = SuratPernyataan::where(
+                                                'program_studi_id',
+                                                $t->user_prodi->program_studi_id,
+                                            )
+                                                ->where('tahun_id', $t->user_prodi->tahun_id)
+                                                ->first();
+                                            $lampiran_renstra = LampiranRenstra::where(
+                                                'program_studi_id',
+                                                $t->user_prodi->program_studi_id,
+                                            )
+                                                ->where('tahun_id', $t->user_prodi->tahun_id)
+                                                ->first();
                                             $asesor = UserAsesor::whereHas('timeline', function ($query) {
                                                 $query->where('kegiatan', 'Asesmen Kecukupan');
                                             })
@@ -107,7 +121,7 @@
                                         @endphp
 
                                         <div class="card">
-                                            @if ($surat_pengantar->status == '1' && $led->status == '1' && $lkps->status == '1')
+                                            @if ($surat_pengantar->status == '1' && $led->status == '1' && $lkps->status == '1' && $surat_pernyataan->status == '1' && $lampiran_renstra->status == '1')
                                                 <div class="card-header"
                                                     style="border-bottom-width: 0px;padding-bottom: 0px;">
                                                     @if (is_null($asesor))
@@ -219,6 +233,47 @@
                                                                 </td>
                                                             </tr>
                                                             <tr>
+                                                                <td class="text-center">Surat Pernyataan</td>
+                                                                <td>
+                                                                    <a href="{{ Storage::url($surat_pernyataan->file) }}"
+                                                                        target="_blank">{{ basename($surat_pernyataan->file) }}</a>
+                                                                </td>
+                                                                <td class="text-center">
+
+                                                                    @if ($surat_pernyataan->status == '0' && $surat_pernyataan->keterangan == null)
+                                                                        <div
+                                                                            class="d-flex align-items-center text-center">
+                                                                            <a href="javascript:void(0)"
+                                                                                class="btn btn-success btn-sm approve-btn"
+                                                                                data-id="{{ $surat_pernyataan->id }}"
+                                                                                data-type="surat_pernyataan"
+                                                                                data-route="{{ route('dokumen_approve', ['id' => $surat_pernyataan->id, 'type' => 'surat_pernyataan']) }}">
+                                                                                <i class="fa fa-check"></i> Approve
+                                                                            </a>
+                                                                            <button type="button"
+                                                                                class="btn btn-danger btn-sm ml-1 disapprove-btn"
+                                                                                data-id="{{ $surat_pernyataan->id }}"
+                                                                                data-type="surat_pernyataan"
+                                                                                data-route="{{ route('dokumen_disapprove', $surat_pernyataan->id) }}">
+                                                                                <b>X</b> Disapprove
+                                                                            </button>
+                                                                        </div>
+                                                                    @else
+                                                                        @if ($surat_pernyataan->status == '1')
+                                                                            <div
+                                                                                class="buttons btn btn-icon icon-left btn-success">
+                                                                                {{ $surat_pernyataan->keterangan }}
+                                                                            </div>
+                                                                        @else
+                                                                            <div
+                                                                                class="buttons btn btn-icon icon-left btn-danger">
+                                                                                {{ $surat_pernyataan->keterangan }}
+                                                                            </div>
+                                                                        @endif
+                                                                    @endif
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
                                                                 <td class="text-center">Dokumen LKPS</td>
                                                                 <td>
                                                                     <a href="{{ Storage::url($lkps->file) }}"
@@ -293,6 +348,46 @@
                                                                             <div
                                                                                 class="buttons btn btn-icon icon-left btn-danger">
                                                                                 {{ $led->keterangan }}
+                                                                            </div>
+                                                                        @endif
+                                                                    @endif
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td class="text-center">Lampiran (Izin Pendirian PS, Renstra)</td>
+                                                                <td>
+                                                                    <a href="{{ Storage::url($led->file) }}"
+                                                                        target="_blank">{{ basename($lampiran_renstra->file) }}</a>
+                                                                </td>
+                                                                <td class="text-center">
+                                                                    @if ($lampiran_renstra->status == '0' && $lampiran_renstra->keterangan == null)
+                                                                        <div
+                                                                            class="d-flex align-items-center text-center">
+                                                                            <a href="javascript:void(0)"
+                                                                                class="btn btn-success btn-sm approve-btn"
+                                                                                data-id="{{ $lampiran_renstra->id }}"
+                                                                                data-type="lampiran_renstra"
+                                                                                data-route="{{ route('dokumen_approve', ['id' => $lampiran_renstra->id, 'type' => 'lampiran_renstra']) }}">
+                                                                                <i class="fa fa-check"></i> Approve
+                                                                            </a>
+                                                                            <button type="button"
+                                                                                class="btn btn-danger btn-sm ml-1 disapprove-btn"
+                                                                                data-id="{{ $lampiran_renstra->id }}"
+                                                                                data-type="lampiran_renstra"
+                                                                                data-route="{{ route('dokumen_disapprove', $lampiran_renstra->id) }}">
+                                                                                <b>X</b> Disapprove
+                                                                            </button>
+                                                                        </div>
+                                                                    @else
+                                                                        @if ($lampiran_renstra->status == '1')
+                                                                            <div
+                                                                                class="buttons btn btn-icon icon-left btn-success">
+                                                                                {{ $lampiran_renstra->keterangan }}
+                                                                            </div>
+                                                                        @else
+                                                                            <div
+                                                                                class="buttons btn btn-icon icon-left btn-danger">
+                                                                                {{ $lampiran_renstra->keterangan }}
                                                                             </div>
                                                                         @endif
                                                                     @endif

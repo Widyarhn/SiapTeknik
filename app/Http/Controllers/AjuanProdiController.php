@@ -491,6 +491,8 @@ class AjuanProdiController extends Controller
             'led_id' => 'required|integer',
             'lkps_id' => 'required|integer',
             'surat_pengantar_id' => 'required|integer',
+            'spernyataan_id' => 'required|integer',
+            'lampiran_id' => 'required|integer',
             'tahun' => 'required|integer',
             'tanggal_hari_ini' => 'required|date',
         ]);

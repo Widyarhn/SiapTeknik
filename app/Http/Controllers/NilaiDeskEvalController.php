@@ -289,16 +289,27 @@ class NilaiDeskEvalController extends Controller
     }
     public function calculateItem(Request $request, string $id_kriteria)
     {
-        
         try {
+            // Ambil prodi_id dari request
+            $prodiId = $request->input('prodi_id');
+    
+            // Validasi prodi_id jika diperlukan
+            if (!$prodiId) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Prodi ID tidak ditemukan dalam request.',
+                ], 400);
+            }
+    
+            // Ambil sub-kriteria dan rumus
             $sub_kriteria_ids = SubKriteria::where('kriteria_id', $id_kriteria)->pluck('id')->toArray();
-            $rumuses = Rumus::whereIn('sub_kriteria_id', $sub_kriteria_ids)->get();
+            $rumuses = Rumus::whereIn('sub_kriteria_id', $sub_kriteria_ids)->where('program_studi_id', $prodiId)->get();
             $processedRumusIds = [];
-
+    
             foreach ($rumuses as $rumus) {
                 $rumus_id = $rumus->id;
                 $variables = $request->get($rumus_id, []);
-
+    
                 if (is_array($variables) && !empty($variables)) {
                     if (!in_array($rumus_id, $processedRumusIds)) {
                         $persamaan = $rumus->rumus;
@@ -307,10 +318,16 @@ class NilaiDeskEvalController extends Controller
                         $rumus->save();
                         $processedRumusIds[] = $rumus_id;
                     } else {
-                        return redirect()->back()->with('error', 'Rumus_id sudah diproses: ' . $rumus_id);
+                        return response()->json([
+                            'success' => false,
+                            'message' => 'Rumus_id sudah diproses: ' . $rumus_id,
+                        ], 400);
                     }
                 } else {
-                    return redirect()->back()->with('error', 'Data variabel tidak valid atau kosong untuk rumus_id: ' . $rumus_id);
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Data variabel tidak valid atau kosong untuk rumus_id: ' . $rumus_id,
+                    ], 400);
                 }
             }
             return response()->json([
@@ -324,6 +341,7 @@ class NilaiDeskEvalController extends Controller
             ], 500);
         }
     }
+    
 
     // public function calculateItem(Request $request, string $id_kriteria){
     //     try{

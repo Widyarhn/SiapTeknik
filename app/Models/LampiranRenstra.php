@@ -20,7 +20,7 @@ class LampiranRenstra extends Model
         return $this->belongsTo(Tahun::class);
     } 
     
-    public function pengajua_dokumen()
+    public function pengajuan_dokumen()
     {
         return $this->hasOne('App\Models\PengajuanDokumen');
     }

@@ -3,6 +3,8 @@
     use App\Models\Led;
     use App\Models\SuratPengantar;
     use App\Models\UserProdi;
+    use App\Models\SuratPernyataan;
+    use App\Models\LampiranRenstra;
 @endphp
 
 <!DOCTYPE html>
@@ -764,7 +766,7 @@
                                             <a href="javascript:void(0)" data-id="{{ $up->id }}"
                                                 data-lkps="{{ $up->lkps->id }}"
                                                 data-surat_pengantar="{{ $up->surat_pengantar->id }}"
-                                                data-spernyataan="{{ $up->surat_pernyataan->id }}"
+                                                data-surat_pernyataan="{{ $up->surat_pernyataan->id }}"
                                                 data-lampiran="{{ $up->lampiran_renstra->id }}"
                                                 data-led="{{ $up->led->id }}" data-tahun="{{ now()->year }}"
                                                 data-route="{{ route('ajuan-prodi.ajukan') }}"
@@ -791,7 +793,7 @@
                                                 empty($up->pengajuan_dokumen->tanggal_selesai))
                                             <a href="javascript:void(0)" data-id="{{ $up->id }}"
                                                 data-lkps="{{ $up->lkps->id }}"
-                                                data-spernyataan="{{ $up->surat_pernyataan->id }}"
+                                                data-surat_pernyataan="{{ $up->surat_pernyataan->id }}"
                                                 data-lampiran="{{ $up->lampiran_renstra->id }}"
                                                 data-surat_pengantar="{{ $up->surat_pengantar->id }}"
                                                 data-led="{{ $up->led->id }}" data-tahun="{{ now()->year }}"
@@ -829,7 +831,7 @@
                     let led_id = $(this).data('led');
                     let lkps_id = $(this).data('lkps');
                     let surat_pengantar_id = $(this).data('surat_pengantar');
-                    let spernyataan_id = $(this).data('spernyataan');
+                    let spernyataan_id = $(this).data('surat_pernyataan');
                     let lampiran_id = $(this).data('lampiran');
                     let tahun = $(this).data('tahun'); // Mengambil tahun dari data-attributes
                     let route = $(this).data('route');
@@ -854,6 +856,8 @@
                                     user_prodi_id: id,
                                     led_id: led_id,
                                     lkps_id: lkps_id,
+                                    spernyataan_id: spernyataan_id,
+                                    lampiran_id: lampiran_id,
                                     surat_pengantar_id: surat_pengantar_id,
                                     tahun: tahun, // Menambahkan tahun
                                     tanggal_hari_ini: tanggal_hari_ini

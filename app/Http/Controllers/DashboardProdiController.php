@@ -31,7 +31,6 @@ class DashboardProdiController extends Controller
         $timeline = Timeline::with(['user_asesor' => function ($q) use ($user_prodi) {
             $q->where('program_studi_id', $user_prodi->program_studi_id);
         }])->get();
-        
         return view('prodi.layout.main',['user_prodi'=>$user_prodi, 'timeline' => $timeline]);
         
     }

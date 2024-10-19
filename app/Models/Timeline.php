@@ -25,7 +25,11 @@ class Timeline extends Model
 
     public function user_asesor()
     {
-        return $this->hasMany(UserAsesor::class);
+        return $this->belongsTo(UserAsesor::class);
+    }
+    public function user()
+    {
+        return $this->hasMany(User::class);
     }
     
 }

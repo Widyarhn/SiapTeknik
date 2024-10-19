@@ -1154,55 +1154,116 @@ class PengolahanDataKuantitatifController extends Controller
     }
 
     //blm tny cipiti
+    // public function calculate47A($id_prodi, $jenjangId)
+    // {
+    //     // Ambil data dari LabelImport untuk program studi yang ditentukan
+    //     $labelImport = LabelImport::where('program_studi_id', $id_prodi)->where('sheet_name', '5d')->get();
+
+    //     // Ambil nilai NMKI
+    //     $ai1 = $labelImport->whereIn('label', ['ai1', 'bi1', 'ci1', 'di1'])->pluck('nilai', 'label');
+    //     $ai2 = $labelImport->whereIn('label', ['ai2', 'bi2', 'ci2', 'di2'])->pluck('nilai', 'label');
+    //     $ai3 = $labelImport->whereIn('label', ['ai3', 'bi3', 'ci3', 'di3'])->pluck('nilai', 'label');
+    //     $ai4 = $labelImport->whereIn('label', ['ai4', 'bi4', 'ci4', 'di4'])->pluck('nilai', 'label');
+    //     $ai5 = $labelImport->whereIn('label', ['ai5', 'bi5', 'ci5', 'di5'])->pluck('nilai', 'label');
+
+    //     $tkmVar1 = array_merge($ai1->mapWithKeys(fn($nilai, $label) => [$label => (int)$nilai])->toArray());
+    //     $tkm1 = $this->evaluator->evaluate('(4 * ai1) + (3 * bi1) + (2 * ci1) + di1', $tkmVar1);
+    //     $tkm1Ori = $tkm1['result'];
+    //     $tkm1Conv = floatval(str_replace(',', '.', $tkm1Ori));
+
+    //     $tkmVar2 = array_merge($ai2->mapWithKeys(fn($nilai, $label) => [$label => (int)$nilai])->toArray());
+    //     $tkm2 = $this->evaluator->evaluate('(4 * ai2) + (3 * bi2) + (2 * ci2) + di2', $tkmVar2);
+    //     $tkm2Ori = $tkm2['result'];
+    //     $tkm2Conv = floatval(str_replace(',', '.', $tkm2Ori));
+
+    //     $tkmVar3 = array_merge($ai3->mapWithKeys(fn($nilai, $label) => [$label => (int)$nilai])->toArray());
+    //     $tkm3 = $this->evaluator->evaluate('(4 * ai3) + (3 * bi3) + (2 * ci3) + di3', $tkmVar3);
+    //     $tkm3Ori = $tkm3['result'];
+    //     $tkm3Conv = floatval(str_replace(',', '.', $tkm3Ori));
+
+    //     $tkmVar4 = array_merge($ai4->mapWithKeys(fn($nilai, $label) => [$label => (int)$nilai])->toArray());
+    //     $tkm4 = $this->evaluator->evaluate('(4 * ai4) + (3 * bi4) + (2 * ci4) + di4', $tkmVar4);
+    //     $tkm4Ori = $tkm4['result'];
+    //     $tkm4Conv = floatval(str_replace(',', '.', $tkm4Ori));
+
+    //     $tkmVar5 = array_merge($ai5->mapWithKeys(fn($nilai, $label) => [$label => (int)$nilai])->toArray());
+    //     $tkm5 = $this->evaluator->evaluate('(4 * ai5) + (3 * bi5) + (2 * ci5) + di5', $tkmVar5);
+    //     $tkm5Ori = $tkm5['result'];
+    //     $tkm5Conv = floatval(str_replace(',', '.', $tkm5Ori));
+
+    //     $tkm = ($tkm1Conv + $tkm2Conv + $tkm3Conv + $tkm4Conv + $tkm5Conv) / 5;
+
+    //     if ($tkm >= 75) {
+    //         $skor = 4.0;
+    //     } elseif ($tkm >= 25 && $tkm < 75) {
+    //         $skor = (8 * $tkm) - 2;
+    //     } elseif ($tkm < 25) {
+    //         $skor = 0.0;
+    //     }
+
+    //     // Ambil id matriks dari AnotasiLabel
+    //     $anotasiLabel = AnotasiLabel::where('rumus_label', '47. A')->where('jenjang_id', $jenjangId)->first();
+    //     $idMatriks = $anotasiLabel ? $anotasiLabel->matriks_penilaian_id : null;
+
+    //     // Simpan nilai ke dalam tabel AsesmenKecukupan
+    //     AsesmenKecukupan::updateOrCreate(
+    //         [
+    //             'matriks_penilaian_id' => $idMatriks,
+    //         ],
+    //         [
+    //             'nilai' => $skor,
+    //             'deskripsi' => "Hasil Skor berdasarkan label 47. A",
+    //         ]
+    //     );
+    // }
     public function calculate47A($id_prodi, $jenjangId)
     {
         // Ambil data dari LabelImport untuk program studi yang ditentukan
-        $labelImport = LabelImport::where('program_studi_id', $id_prodi)->where('sheet_name', '5d')->get();
+        $labelImport = LabelImport::where('program_studi_id', $id_prodi)
+            ->where('sheet_name', '5d')
+            ->get();
 
-        // Ambil nilai NMKI
-        $ai1 = $labelImport->whereIn('label', ['ai1', 'bi1', 'ci1', 'di1'])->pluck('nilai', 'label');
-        $ai2 = $labelImport->whereIn('label', ['ai2', 'bi2', 'ci2', 'di2'])->pluck('nilai', 'label');
-        $ai3 = $labelImport->whereIn('label', ['ai3', 'bi3', 'ci3', 'di3'])->pluck('nilai', 'label');
-        $ai4 = $labelImport->whereIn('label', ['ai4', 'bi4', 'ci4', 'di4'])->pluck('nilai', 'label');
-        $ai5 = $labelImport->whereIn('label', ['ai5', 'bi5', 'ci5', 'di5'])->pluck('nilai', 'label');
+        // Definisikan aspek dan ambil nilai
+        $tkmValues = [];
 
-        $tkmVar1 = array_merge($ai1->mapWithKeys(fn($nilai, $label) => [$label => (int)$nilai])->toArray());
-        $tkm1 = $this->evaluator->evaluate('(4 * ai1) + (3 * bi1) + (2 * ci1) + di1', $tkmVar1);
-        $tkm1Ori = $tkm1['result'];
-        $tkm1Conv = floatval(str_replace(',', '.', $tkm1Ori));
+        foreach (range(1, 5) as $i) {
+            $labels = [
+                "ai{$i}",
+                "bi{$i}",
+                "ci{$i}",
+                "di{$i}"
+            ];
 
-        $tkmVar2 = array_merge($ai2->mapWithKeys(fn($nilai, $label) => [$label => (int)$nilai])->toArray());
-        $tkm2 = $this->evaluator->evaluate('(4 * ai2) + (3 * bi2) + (2 * ci2) + di2', $tkmVar2);
-        $tkm2Ori = $tkm2['result'];
-        $tkm2Conv = floatval(str_replace(',', '.', $tkm2Ori));
+            $values = $labelImport->whereIn('label', $labels)->pluck('nilai', 'label');
 
-        $tkmVar3 = array_merge($ai3->mapWithKeys(fn($nilai, $label) => [$label => (int)$nilai])->toArray());
-        $tkm3 = $this->evaluator->evaluate('(4 * ai3) + (3 * bi3) + (2 * ci3) + di3', $tkmVar3);
-        $tkm3Ori = $tkm3['result'];
-        $tkm3Conv = floatval(str_replace(',', '.', $tkm3Ori));
+            // Ambil nilai dengan tipe data float dan kalikan dengan 100 untuk persentase
+            $ai = isset($values["ai{$i}"]) ? (float)$values["ai{$i}"] * 100 : 0.0;
+            $bi = isset($values["bi{$i}"]) ? (float)$values["bi{$i}"] * 100 : 0.0;
+            $ci = isset($values["ci{$i}"]) ? (float)$values["ci{$i}"] * 100 : 0.0;
+            $di = isset($values["di{$i}"]) ? (float)$values["di{$i}"] * 100 : 0.0;
 
-        $tkmVar4 = array_merge($ai4->mapWithKeys(fn($nilai, $label) => [$label => (int)$nilai])->toArray());
-        $tkm4 = $this->evaluator->evaluate('(4 * ai4) + (3 * bi4) + (2 * ci4) + di4', $tkmVar4);
-        $tkm4Ori = $tkm4['result'];
-        $tkm4Conv = floatval(str_replace(',', '.', $tkm4Ori));
+            // Hitung TKM untuk aspek ke-i
+            $tkm = (4 * $ai) + (3 * $bi) + (2 * $ci) + $di;
+            $tkmValues[] = $tkm;
+        }
 
-        $tkmVar5 = array_merge($ai5->mapWithKeys(fn($nilai, $label) => [$label => (int)$nilai])->toArray());
-        $tkm5 = $this->evaluator->evaluate('(4 * ai5) + (3 * bi5) + (2 * ci5) + di5', $tkmVar5);
-        $tkm5Ori = $tkm5['result'];
-        $tkm5Conv = floatval(str_replace(',', '.', $tkm5Ori));
+        // Hitung rata-rata TKM
+        $tkmAverage = array_sum($tkmValues) / count($tkmValues);
 
-        $tkm = ($tkm1Conv + $tkm2Conv + $tkm3Conv + $tkm4Conv + $tkm5Conv) / 5;
-
-        if ($tkm >= 75) {
+        // Hitung skor berdasarkan TKM
+        if ($tkmAverage >= 75) {
             $skor = 4.0;
-        } elseif ($tkm >= 25 && $tkm < 75) {
-            $skor = (8 * $tkm) - 2;
-        } elseif ($tkm < 25) {
+        } elseif ($tkmAverage >= 25 && $tkmAverage < 75) {
+            $skor = (8 * $tkmAverage) - 2;
+        } else {
             $skor = 0.0;
         }
 
         // Ambil id matriks dari AnotasiLabel
-        $anotasiLabel = AnotasiLabel::where('rumus_label', '47')->where('jenjang_id', $jenjangId)->first();
+        $anotasiLabel = AnotasiLabel::where('rumus_label', '47. A')
+            ->where('jenjang_id', $jenjangId)
+            ->first();
+
         $idMatriks = $anotasiLabel ? $anotasiLabel->matriks_penilaian_id : null;
 
         // Simpan nilai ke dalam tabel AsesmenKecukupan
@@ -1212,10 +1273,11 @@ class PengolahanDataKuantitatifController extends Controller
             ],
             [
                 'nilai' => $skor,
-                'deskripsi' => "Hasil Skor berdasarkan label 45",
+                'deskripsi' => "Hasil Skor berdasarkan label 47. A",
             ]
         );
     }
+
 
     public function calculate50($id_prodi, $jenjangId)
     {
@@ -1586,7 +1648,7 @@ class PengolahanDataKuantitatifController extends Controller
         $wtBetween36 = $var['N-WT36'] ?? 0;
         $wtGt6 = $var['N-WT6'] ?? 0;
 
-        $totalWt = ($wtLt3 * 1) + ($wtBetween36 * 4.5) + ($wtGt6 * 7);
+        $totalWt = ($wtLt3 * 3) + ($wtBetween36 * 4.5) + ($wtGt6 * 6);
         $totalCount = $wtLt3 + $wtBetween36 + $wtGt6;
         $wtRata2 = $totalCount > 0 ? $totalWt / $totalCount : 0;
 
